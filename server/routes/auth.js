@@ -2,7 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import User from '../models/User.js';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
+import { sendPasswordResetEmail } from '../services/emailService.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -41,30 +41,18 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Create user
+    // Create user (automatically verified)
     const user = new User({ name, email, password });
-    
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    user.verificationToken = verificationToken;
-
     await user.save();
 
-    // Send verification email
-    try {
-      console.log(`Attempting to send verification email to: ${email}`);
-      await sendVerificationEmail(email, verificationToken, name);
-      console.log(`✅ Verification email sent successfully to: ${email}`);
-    } catch (emailError) {
-      console.error('❌ Email sending failed:', emailError.message);
-      console.error('Full error:', emailError);
-      // Don't fail registration if email fails, but log the error clearly
-    }
+    // Generate login token immediately
+    const token = generateToken(user._id);
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful! Please check your email to verify your account.',
+      message: 'Registration successful! You are now logged in.',
       data: {
+        token,
         user: {
           id: user._id,
           name: user.name,
@@ -130,14 +118,7 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Check if email is verified
-    if (!user.isVerified) {
-      return res.status(401).json({
-        success: false,
-        message: 'Please verify your email before logging in',
-        needsVerification: true
-      });
-    }
+    // Email verification check removed - users can login directly
 
     // Generate token
     const token = generateToken(user._id);
@@ -166,107 +147,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Verify email
-router.post('/verify-email', async (req, res) => {
-  try {
-    const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: 'Verification token is required'
-      });
-    }
-
-    // Find user with verification token
-    const user = await User.findOne({ verificationToken: token });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or expired verification token'
-      });
-    }
-
-    // Update user
-    user.isVerified = true;
-    user.verificationToken = null;
-    await user.save();
-
-    // Generate login token
-    const authToken = generateToken(user._id);
-
-    res.json({
-      success: true,
-      message: 'Email verified successfully! You are now logged in.',
-      data: {
-        token: authToken,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          isVerified: user.isVerified
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Email verification error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Email verification failed. Please try again.'
-    });
-  }
-});
-
-// Resend verification email
-router.post('/resend-verification', async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email is required'
-      });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email is already verified'
-      });
-    }
-
-    // Generate new verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    user.verificationToken = verificationToken;
-    await user.save();
-
-    // Send verification email
-    await sendVerificationEmail(email, verificationToken, user.name);
-
-    res.json({
-      success: true,
-      message: 'Verification email sent successfully'
-    });
-
-  } catch (error) {
-    console.error('Resend verification error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to resend verification email'
-    });
-  }
-});
+// Email verification endpoints removed - users are auto-verified
 
 // Forgot password
 router.post('/forgot-password', async (req, res) => {

@@ -107,7 +107,14 @@ export const AuthProvider = ({ children }) => {
       });
       
       if (response.data.success) {
-        toast.success('Registration successful! Please check your email to verify your account.', {
+        const { token: newToken, user: userData } = response.data.data;
+        
+        // Store token and user data immediately
+        localStorage.setItem('token', newToken);
+        setToken(newToken);
+        setUser(userData);
+        
+        toast.success('Registration successful! You are now logged in.', {
           duration: 2000,
           position: 'top-center',
           style: {
@@ -139,42 +146,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const verifyEmail = async (token) => {
-    try {
-      const response = await api.post('/auth/verify-email', { token });
-      
-      if (response.data.success) {
-        const { token: authToken, user: userData } = response.data.data;
-        
-        // Store token and user data
-        localStorage.setItem('token', authToken);
-        setToken(authToken);
-        setUser(userData);
-        
-        // Don't show toast here - let the component handle the UI
-        return { success: true };
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Email verification failed';
-      // Don't show toast here - let the component handle the UI
-      return { success: false, message };
-    }
-  };
-
-  const resendVerification = async (email) => {
-    try {
-      const response = await api.post('/auth/resend-verification', { email });
-      
-      if (response.data.success) {
-        toast.success('Verification email sent! Please check your inbox.');
-        return { success: true };
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Failed to resend verification email';
-      toast.error(message);
-      return { success: false, message };
-    }
-  };
+  // Email verification methods removed - users are auto-verified
 
   const forgotPassword = async (email) => {
     try {
@@ -223,8 +195,6 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
-    verifyEmail,
-    resendVerification,
     forgotPassword,
     resetPassword,
     logout

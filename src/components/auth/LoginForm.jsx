@@ -10,7 +10,7 @@ const LoginForm = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [needsVerification, setNeedsVerification] = useState(false);
+  // Verification state removed - users are auto-verified
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,7 +27,6 @@ const LoginForm = () => {
     e.stopPropagation();
     
     setLoading(true);
-    setNeedsVerification(false);
 
     const result = await login(formData.email, formData.password);
     
@@ -36,8 +35,6 @@ const LoginForm = () => {
       setTimeout(() => {
         navigate('/app', { replace: true });
       }, 1500);
-    } else if (result.needsVerification) {
-      setNeedsVerification(true);
     }
     // For errors, don't navigate - let user see the error toast
     
@@ -111,19 +108,7 @@ const LoginForm = () => {
             </div>
           </div>
 
-          {needsVerification && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                Please verify your email before logging in.{' '}
-                <Link 
-                  to="/resend-verification" 
-                  className="font-medium underline hover:no-underline"
-                >
-                  Resend verification email
-                </Link>
-              </p>
-            </div>
-          )}
+          {/* Email verification warning removed - users are auto-verified */}
 
           <div className="flex items-center justify-between">
             <Link

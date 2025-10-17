@@ -15,11 +15,8 @@ import CreateNote from "./pages/CreateNote";
 import EditNote from "./pages/EditNote";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import ResendVerification from "./pages/ResendVerification";
-import CheckEmail from "./pages/CheckEmail";
 
 export default function App() {
   return (
@@ -53,7 +50,6 @@ export default function App() {
                 </PublicRoute>
               }
             />
-            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route
               path="/forgot-password"
               element={
@@ -63,15 +59,6 @@ export default function App() {
               }
             />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/resend-verification"
-              element={
-                <PublicRoute>
-                  <ResendVerification />
-                </PublicRoute>
-              }
-            />
-            <Route path="/check-email" element={<CheckEmail />} />
 
             {/* Protected routes */}
             <Route

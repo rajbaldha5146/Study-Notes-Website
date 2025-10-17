@@ -24,12 +24,10 @@ const Register = () => {
     return <Navigate to="/app" replace />;
   }
 
-  const handleRegistrationSuccess = (email) => {
-    // Store email for the check email page
-    localStorage.setItem('pendingVerificationEmail', email);
+  const handleRegistrationSuccess = () => {
     // Use setTimeout to allow success toast to show before navigation
     setTimeout(() => {
-      navigate('/check-email?email=' + encodeURIComponent(email), { replace: true });
+      navigate('/app', { replace: true });
     }, 2000);
   };
 
