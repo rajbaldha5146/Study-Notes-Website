@@ -34,7 +34,7 @@ const Login = () => {
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl" />
       </div>
       <div className="relative z-10">
-        <LoginForm onSuccess={() => window.location.href = from} />
+        <LoginForm />
       </div>
     </div>
   );

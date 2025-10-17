@@ -1,10 +1,11 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import RegisterForm from '../components/auth/RegisterForm';
 import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -26,7 +27,10 @@ const Register = () => {
   const handleRegistrationSuccess = (email) => {
     // Store email for the check email page
     localStorage.setItem('pendingVerificationEmail', email);
-    window.location.href = '/check-email?email=' + encodeURIComponent(email);
+    // Use setTimeout to allow success toast to show before navigation
+    setTimeout(() => {
+      navigate('/check-email?email=' + encodeURIComponent(email), { replace: true });
+    }, 2000);
   };
 
   return (

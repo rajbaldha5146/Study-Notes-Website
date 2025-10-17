@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-const LoginForm = ({ onSuccess }) => {
+const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -13,6 +13,7 @@ const LoginForm = ({ onSuccess }) => {
   const [needsVerification, setNeedsVerification] = useState(false);
 
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -23,16 +24,22 @@ const LoginForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     setLoading(true);
     setNeedsVerification(false);
 
     const result = await login(formData.email, formData.password);
     
     if (result.success) {
-      window.location.href = '/app';
+      // Use setTimeout to allow success toast to show before navigation
+      setTimeout(() => {
+        navigate('/app', { replace: true });
+      }, 1500);
     } else if (result.needsVerification) {
       setNeedsVerification(true);
     }
+    // For errors, don't navigate - let user see the error toast
     
     setLoading(false);
   };

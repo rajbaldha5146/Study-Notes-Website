@@ -61,12 +61,34 @@ export const AuthProvider = ({ children }) => {
         setToken(newToken);
         setUser(userData);
         
-        toast.success('Login successful!');
+        toast.success('Login successful! Redirecting...', {
+          duration: 1500,
+          position: 'top-center',
+          style: {
+            background: "#065f46",
+            color: "#d1fae5",
+            border: "1px solid #10b981",
+            fontSize: "16px",
+            fontWeight: "600",
+            padding: "16px",
+          },
+        });
         return { success: true };
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      toast.error(message, {
+        duration: 5000, // Show error toast for 5 seconds
+        position: 'top-center',
+        style: {
+          background: "#7f1d1d",
+          color: "#fecaca",
+          border: "1px solid #ef4444",
+          fontSize: "16px",
+          fontWeight: "600",
+          padding: "16px",
+        },
+      });
       
       return { 
         success: false, 
@@ -85,12 +107,34 @@ export const AuthProvider = ({ children }) => {
       });
       
       if (response.data.success) {
-        toast.success('Registration successful! Please check your email to verify your account.');
+        toast.success('Registration successful! Please check your email to verify your account.', {
+          duration: 2000,
+          position: 'top-center',
+          style: {
+            background: "#065f46",
+            color: "#d1fae5",
+            border: "1px solid #10b981",
+            fontSize: "16px",
+            fontWeight: "600",
+            padding: "16px",
+          },
+        });
         return { success: true, message: response.data.message };
       }
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
-      toast.error(message);
+      toast.error(message, {
+        duration: 5000,
+        position: 'top-center',
+        style: {
+          background: "#7f1d1d",
+          color: "#fecaca",
+          border: "1px solid #ef4444",
+          fontSize: "16px",
+          fontWeight: "600",
+          padding: "16px",
+        },
+      });
       return { success: false, message };
     }
   };

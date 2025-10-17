@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/api" : "http://localhost:5000/api");
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "/api" : "http://localhost:5000/api");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,7 +14,7 @@ const api = axios.create({
 // Add request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,11 +29,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
+    // Don't handle 401 redirects here - let AuthContext handle it
+    // This prevents page reloads during login attempts
     return Promise.reject(error);
   }
 );
@@ -74,12 +73,12 @@ export const updateDrawings = async (id, drawings) => {
 
 // Folders API
 export const getFolders = async () => {
-  const response = await api.get('/folders');
+  const response = await api.get("/folders");
   return response.data;
 };
 
 export const getFolderTree = async () => {
-  const response = await api.get('/folders/tree');
+  const response = await api.get("/folders/tree");
   return response.data;
 };
 
@@ -89,7 +88,7 @@ export const getFolder = async (id) => {
 };
 
 export const createFolder = async (folderData) => {
-  const response = await api.post('/folders', folderData);
+  const response = await api.post("/folders", folderData);
   return response.data;
 };
 
