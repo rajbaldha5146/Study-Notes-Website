@@ -4,7 +4,7 @@ services:
     name: study-notes-website
     env: node
     plan: free
-    buildCommand: npm run build:full
+    buildCommand: npm install --include=dev && npm run build && cd server && npm install
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
@@ -16,7 +16,6 @@ services:
     #   value: your-mongodb-connection-string
     # - key: JWT_SECRET
     #   value: your-jwt-secret
-
 # Optional: Database (if using MongoDB)
 # databases:
 #   - name: study-notes-db
