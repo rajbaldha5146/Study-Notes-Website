@@ -1,0 +1,177 @@
+import { useState } from "react";
+import { X } from "lucide-react";
+import { createFolder } from "../services/api";
+import { useFolders } from "../contexts/FolderContext";
+
+const folderIcons = [
+  "📁",
+  "📚",
+  "💻",
+  "🎯",
+  "🔬",
+  "🎨",
+  "📊",
+  "🏗️",
+  "🌟",
+  "🚀",
+  "💡",
+  "🔥",
+  "⚡",
+  "🎪",
+  "🎭",
+  "🎪",
+];
+
+const folderColors = [
+  "#3b82f6",
+  "#ef4444",
+  "#10b981",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+  "#06b6d4",
+  "#84cc16",
+];
+
+export default function CreateFolderModal({
+  parentId,
+  onClose,
+  onFolderCreated,
+}) {
+  const { refreshFolders } = useFolders();
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    icon: "📁",
+    color: "#3b82f6",
+    parentFolder: parentId,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return;
+
+    setLoading(true);
+    try {
+      const newFolder = await createFolder(formData);
+      refreshFolders(); // Refresh all folder displays
+      onFolderCreated(newFolder);
+    } catch (error) {
+      console.error("Failed to create folder:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Create New Folder
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Folder Name *
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="e.g., JavaScript, React, Data Structures"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              placeholder="Optional description..."
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Icon
+            </label>
+            <div className="grid grid-cols-8 gap-2">
+              {folderIcons.map((icon) => (
+                <button
+                  key={icon}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, icon })}
+                  className={`p-2 text-lg rounded-md border-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                    formData.icon === icon
+                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900"
+                      : "border-gray-200 dark:border-gray-600"
+                  }`}
+                >
+                  {icon}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Color
+            </label>
+            <div className="flex space-x-2">
+              {folderColors.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, color })}
+                  className={`w-8 h-8 rounded-full border-2 ${
+                    formData.color === color
+                      ? "border-gray-800 dark:border-white"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !formData.name.trim()}
+              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? "Creating..." : "Create Folder"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

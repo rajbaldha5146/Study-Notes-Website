@@ -1,0 +1,282 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom code styling */
+.prose code {
+  @apply font-mono;
+}
+
+.prose pre {
+  @apply my-6 p-0 bg-gray-900 rounded-lg border border-gray-700;
+}
+
+.prose pre code {
+  @apply bg-transparent text-gray-100 p-4 block overflow-x-auto font-mono text-sm leading-relaxed;
+}
+
+/* Inline code styling - handled by React component, this is fallback */
+.prose :not(pre) > code {
+  @apply bg-gray-900 text-orange-300 px-2 py-1 rounded text-sm font-mono font-semibold shadow-sm;
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
+/* Block code styling - always dark theme */
+.prose pre[class*="language-"] {
+  @apply my-6 p-0 bg-gray-900 rounded-lg;
+}
+
+.prose pre[class*="language-"] code {
+  @apply block p-4 bg-transparent text-gray-100 overflow-x-auto font-mono text-sm leading-relaxed;
+}
+
+/* Syntax highlighting improvements - vibrant colors like VS Code */
+.prose pre code .token.comment {
+  @apply text-green-400;
+}
+
+.prose pre code .token.keyword {
+  @apply text-purple-400;
+}
+
+.prose pre code .token.string {
+  @apply text-green-300;
+}
+
+.prose pre code .token.number {
+  @apply text-pink-400;
+}
+
+.prose pre code .token.function {
+  @apply text-orange-300;
+}
+
+.prose pre code .token.operator {
+  @apply text-gray-300;
+}
+
+.prose pre code .token.punctuation {
+  @apply text-gray-300;
+}
+
+.prose pre code .token.variable {
+  @apply text-blue-300;
+}
+
+.prose pre code .token.property {
+  @apply text-orange-300;
+}
+
+.prose pre code .token.method {
+  @apply text-orange-300;
+}
+
+/* Additional syntax highlighting for better colors */
+.prose pre code .token.builtin {
+  @apply text-cyan-300;
+}
+
+.prose pre code .token.constant {
+  @apply text-pink-400;
+}
+
+.prose pre code .token.boolean {
+  @apply text-pink-400;
+}
+
+.prose pre code .token.null {
+  @apply text-pink-400;
+}
+
+.prose pre code .token.undefined {
+  @apply text-pink-400;
+}
+
+/* Dark mode prose improvements */
+.dark .prose {
+  @apply text-gray-200;
+}
+
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6 {
+  @apply text-white;
+}
+
+.dark .prose strong {
+  @apply text-white;
+}
+
+.dark .prose blockquote {
+  @apply text-gray-300 border-gray-600;
+}
+
+.dark .prose hr {
+  @apply border-gray-600;
+}
+
+.dark .prose ul > li::marker,
+.dark .prose ol > li::marker {
+  @apply text-gray-400;
+}
+
+/* Custom highlight styles */
+.custom-highlight {
+  @apply transition-all duration-200;
+}
+
+.custom-highlight:hover {
+  @apply shadow-sm;
+}
+
+/* Scrollbar styling for code blocks */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  @apply bg-gray-800 rounded;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Book Loading Animation */
+.book-loader {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  margin: 0 auto;
+}
+
+.book-loader .book {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  transform-style: preserve-3d;
+  transform: rotateX(-15deg) rotateY(15deg);
+}
+
+.book-loader .book .cover {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.book-loader .book .cover::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.book-loader .book .page {
+  position: absolute;
+  width: 76px;
+  height: 56px;
+  top: 2px;
+  left: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transform-origin: left center;
+  animation: flip 2s infinite ease-in-out;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-loader .book .page:nth-child(2) {
+  animation-delay: 0.2s;
+  background: #f8f9fa;
+}
+
+.book-loader .book .page:nth-child(3) {
+  animation-delay: 0.4s;
+  background: #f1f3f4;
+}
+
+.book-loader .book .page:nth-child(4) {
+  animation-delay: 0.6s;
+  background: #e8eaed;
+}
+
+.book-loader .book .page::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: linear-gradient(90deg, #ddd 0%, transparent 100%);
+  border-radius: 1px;
+}
+
+.book-loader .book .page::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 8px;
+  right: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, #eee 0%, transparent 100%);
+  border-radius: 1px;
+}
+
+@keyframes flip {
+  0%, 20% {
+    transform: rotateY(0deg);
+  }
+  50%, 70% {
+    transform: rotateY(-180deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+/* Dark mode book loader */
+.dark .book-loader .book .cover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.dark .book-loader .book .page {
+  background: #374151;
+}
+
+.dark .book-loader .book .page:nth-child(2) {
+  background: #4b5563;
+}
+
+.dark .book-loader .book .page:nth-child(3) {
+  background: #6b7280;
+}
+
+.dark .book-loader .book .page:nth-child(4) {
+  background: #9ca3af;
+}
+
+.dark .book-loader .book .page::before {
+  background: linear-gradient(90deg, #6b7280 0%, transparent 100%);
+}
+
+.dark .book-loader .book .page::after {
+  background: linear-gradient(90deg, #9ca3af 0%, transparent 100%);
+}
