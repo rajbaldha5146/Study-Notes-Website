@@ -12,7 +12,8 @@
     "server:dev": "cd server && npm run dev",
     "install-server": "cd server && npm install",
     "start": "npm run server",
-    "postinstall": "npm run install-server"
+    "postinstall": "npm run install-server",
+    "build:full": "npm install && npm run build && cd server && npm install"
   },
   "dependencies": {
     "axios": "^1.7.7",
