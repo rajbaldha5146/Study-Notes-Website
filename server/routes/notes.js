@@ -1,13 +1,17 @@
 import express from 'express';
 import Note from '../models/Note.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get all notes
+// Apply authentication to all routes
+router.use(authenticateToken);
+
+// Get all notes for the authenticated user
 router.get('/', async (req, res) => {
   try {
     const { category, tag, search } = req.query;
-    let query = {};
+    let query = { user: req.user._id };
     
     if (category) query.category = category;
     if (tag) query.tags = { $in: [tag] };
@@ -25,10 +29,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single note
+// Get single note for the authenticated user
 router.get('/:id', async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findOne({ _id: req.params.id, user: req.user._id });
     if (!note) {
       return res.status(404).json({ message: 'Note not found' });
     }
@@ -38,10 +42,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create new note
+// Create new note for the authenticated user
 router.post('/', async (req, res) => {
   try {
-    const note = new Note(req.body);
+    const note = new Note({
+      ...req.body,
+      user: req.user._id
+    });
     const savedNote = await note.save();
     res.status(201).json(savedNote);
   } catch (error) {
@@ -49,11 +56,11 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update note
+// Update note for the authenticated user
 router.put('/:id', async (req, res) => {
   try {
-    const note = await Note.findByIdAndUpdate(
-      req.params.id,
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       req.body,
       { new: true, runValidators: true }
     );
@@ -66,10 +73,10 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete note
+// Delete note for the authenticated user
 router.delete('/:id', async (req, res) => {
   try {
-    const note = await Note.findByIdAndDelete(req.params.id);
+    const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user._id });
     if (!note) {
       return res.status(404).json({ message: 'Note not found' });
     }
@@ -79,28 +86,34 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Update highlights
+// Update highlights for the authenticated user
 router.patch('/:id/highlights', async (req, res) => {
   try {
-    const note = await Note.findByIdAndUpdate(
-      req.params.id,
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       { highlights: req.body.highlights },
       { new: true }
     );
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
     res.json(note);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// Update drawings
+// Update drawings for the authenticated user
 router.patch('/:id/drawings', async (req, res) => {
   try {
-    const note = await Note.findByIdAndUpdate(
-      req.params.id,
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       { drawings: req.body.drawings },
       { new: true }
     );
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
     res.json(note);
   } catch (error) {
     res.status(400).json({ message: error.message });

@@ -34,6 +34,11 @@ const noteSchema = new mongoose.Schema({
     ref: 'Folder',
     required: true
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   category: {
     type: String,
     default: 'general'

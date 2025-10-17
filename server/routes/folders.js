@@ -1,23 +1,27 @@
 import express from 'express';
 import Folder from '../models/Folder.js';
 import Note from '../models/Note.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get all folders
+// Apply authentication to all routes
+router.use(authenticateToken);
+
+// Get all folders for the authenticated user
 router.get('/', async (req, res) => {
   try {
-    const folders = await Folder.find().populate('parentFolder').sort({ createdAt: -1 });
+    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder').sort({ createdAt: -1 });
     res.json(folders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Get folder tree structure
+// Get folder tree structure for the authenticated user
 router.get('/tree', async (req, res) => {
   try {
-    const folders = await Folder.find().populate('parentFolder');
+    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder');
     
     // Build tree structure
     const folderMap = {};
@@ -43,16 +47,16 @@ router.get('/tree', async (req, res) => {
   }
 });
 
-// Get single folder with notes
+// Get single folder with notes for the authenticated user
 router.get('/:id', async (req, res) => {
   try {
-    const folder = await Folder.findById(req.params.id);
+    const folder = await Folder.findOne({ _id: req.params.id, user: req.user._id });
     if (!folder) {
       return res.status(404).json({ message: 'Folder not found' });
     }
     
-    const notes = await Note.find({ folder: req.params.id }).sort({ episode: 1, createdAt: -1 });
-    const subfolders = await Folder.find({ parentFolder: req.params.id });
+    const notes = await Note.find({ folder: req.params.id, user: req.user._id }).sort({ episode: 1, createdAt: -1 });
+    const subfolders = await Folder.find({ parentFolder: req.params.id, user: req.user._id });
     
     res.json({
       folder,
@@ -64,10 +68,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create new folder
+// Create new folder for the authenticated user
 router.post('/', async (req, res) => {
   try {
-    const folder = new Folder(req.body);
+    const folder = new Folder({
+      ...req.body,
+      user: req.user._id
+    });
     const savedFolder = await folder.save();
     res.status(201).json(savedFolder);
   } catch (error) {
@@ -75,11 +82,11 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update folder
+// Update folder for the authenticated user
 router.put('/:id', async (req, res) => {
   try {
-    const folder = await Folder.findByIdAndUpdate(
-      req.params.id,
+    const folder = await Folder.findOneAndUpdate(
+      { _id: req.params.id, user: req.user._id },
       req.body,
       { new: true, runValidators: true }
     );
@@ -92,12 +99,12 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete folder
+// Delete folder for the authenticated user
 router.delete('/:id', async (req, res) => {
   try {
-    // Check if folder has notes or subfolders
-    const notesCount = await Note.countDocuments({ folder: req.params.id });
-    const subfoldersCount = await Folder.countDocuments({ parentFolder: req.params.id });
+    // Check if folder has notes or subfolders for this user
+    const notesCount = await Note.countDocuments({ folder: req.params.id, user: req.user._id });
+    const subfoldersCount = await Folder.countDocuments({ parentFolder: req.params.id, user: req.user._id });
     
     if (notesCount > 0 || subfoldersCount > 0) {
       return res.status(400).json({ 
@@ -105,7 +112,7 @@ router.delete('/:id', async (req, res) => {
       });
     }
     
-    const folder = await Folder.findByIdAndDelete(req.params.id);
+    const folder = await Folder.findOneAndDelete({ _id: req.params.id, user: req.user._id });
     if (!folder) {
       return res.status(404).json({ message: 'Folder not found' });
     }

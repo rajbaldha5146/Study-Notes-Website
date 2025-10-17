@@ -23,6 +23,11 @@ const folderSchema = new mongoose.Schema({
     ref: "Folder",
     default: null,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
