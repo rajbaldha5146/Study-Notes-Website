@@ -2,6 +2,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { createFolder } from "../services/api";
 import { useFolders } from "../contexts/FolderContext";
+import { sanitizeName } from "../utils/sanitize";
+import toast from "react-hot-toast";
 
 const folderIcons = [
   "📁",
@@ -23,14 +25,14 @@ const folderIcons = [
 ];
 
 const folderColors = [
-  "#3b82f6",
-  "#ef4444",
-  "#10b981",
-  "#f59e0b",
-  "#8b5cf6",
-  "#ec4899",
-  "#06b6d4",
-  "#84cc16",
+  "#6366f1", // Indigo
+  "#8b5cf6", // Purple
+  "#a855f7", // Violet
+  "#ec4899", // Pink
+  "#10b981", // Emerald
+  "#06b6d4", // Cyan
+  "#f59e0b", // Amber
+  "#ef4444", // Red
 ];
 
 export default function CreateFolderModal({
@@ -43,22 +45,36 @@ export default function CreateFolderModal({
     name: "",
     description: "",
     icon: "📁",
-    color: "#3b82f6",
+    color: "#6366f1",
     parentFolder: parentId,
   });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return;
+    
+    const sanitizedName = sanitizeName(formData.name);
+    
+    if (!sanitizedName.trim()) {
+      toast.error("Folder name is required");
+      return;
+    }
 
     setLoading(true);
     try {
-      const newFolder = await createFolder(formData);
-      refreshFolders(); // Refresh all folder displays
+      const folderData = {
+        ...formData,
+        name: sanitizedName,
+        description: formData.description.trim()
+      };
+      
+      const newFolder = await createFolder(folderData);
+      toast.success("Folder created successfully!");
+      refreshFolders();
       onFolderCreated(newFolder);
     } catch (error) {
       console.error("Failed to create folder:", error);
+      toast.error(error.response?.data?.message || "Failed to create folder");
     } finally {
       setLoading(false);
     }
@@ -165,7 +181,8 @@ export default function CreateFolderModal({
             <button
               type="submit"
               disabled={loading || !formData.name.trim()}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg font-semibold"
+              aria-label={loading ? "Creating folder" : "Create folder"}
             >
               {loading ? "Creating..." : "Create Folder"}
             </button>

@@ -6,23 +6,34 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { getNote, updateNote } from '../services/api'
 import toast from 'react-hot-toast'
+import { sanitizeMarkdown, sanitizeName } from '../utils/sanitize'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function EditNote() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: '',
-    content: '',
-    tags: '',
-    category: 'javascript',
-    episode: ''
+    content: ''
   })
   const [preview, setPreview] = useState(false)
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
   useEffect(() => {
-    fetchNote()
+    let isMounted = true;
+    
+    const loadNote = async () => {
+      if (isMounted) {
+        await fetchNote();
+      }
+    };
+    
+    loadNote();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [id])
 
   const fetchNote = async () => {
@@ -30,10 +41,7 @@ export default function EditNote() {
       const note = await getNote(id)
       setFormData({
         title: note.title,
-        content: note.content,
-        tags: note.tags ? note.tags.join(', ') : '',
-        category: note.category || 'javascript',
-        episode: note.episode || ''
+        content: note.content
       })
     } catch (error) {
       toast.error('Failed to fetch note')
@@ -45,7 +53,11 @@ export default function EditNote() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.title.trim() || !formData.content.trim()) {
+    
+    const sanitizedTitle = sanitizeName(formData.title);
+    const sanitizedContent = sanitizeMarkdown(formData.content);
+    
+    if (!sanitizedTitle.trim() || !sanitizedContent.trim()) {
       toast.error('Title and content are required')
       return
     }
@@ -53,16 +65,16 @@ export default function EditNote() {
     setLoading(true)
     try {
       const noteData = {
-        ...formData,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        episode: formData.episode ? parseInt(formData.episode) : undefined
+        title: sanitizedTitle,
+        content: sanitizedContent
       }
       
       await updateNote(id, noteData)
       toast.success('Note updated successfully!')
       navigate(`/app/note/${id}`)
     } catch (error) {
-      toast.error('Failed to update note')
+      console.error('Error updating note:', error)
+      toast.error(error.response?.data?.message || 'Failed to update note')
     } finally {
       setLoading(false)
     }
@@ -78,7 +90,7 @@ export default function EditNote() {
   if (initialLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="lg" message="Loading note..." />
       </div>
     )
   }
@@ -114,77 +126,28 @@ export default function EditNote() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Title *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-                placeholder="Enter note title..."
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Episode Number
-              </label>
-              <input
-                type="number"
-                name="episode"
-                value={formData.episode}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-                placeholder="e.g., 1"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="javascript">JavaScript</option>
-                <option value="react">React</option>
-                <option value="nodejs">Node.js</option>
-                <option value="general">General</option>
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-                placeholder="javascript, closures, functions"
-              />
-            </div>
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 p-8">
+          <div>
+            <label className="block text-sm font-semibold text-gray-200 mb-3">
+              Title *
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-all"
+              placeholder="Enter note title..."
+              required
+            />
           </div>
         </div>
 
         {/* Content */}
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
-          <div className="border-b border-gray-700 px-6 py-3">
-            <h3 className="text-lg font-medium text-white">Content</h3>
-            <p className="text-sm text-gray-400">Write your note in Markdown format</p>
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 overflow-hidden">
+          <div className="border-b border-gray-700/50 px-8 py-4 bg-gray-900/30">
+            <h3 className="text-lg font-semibold text-white">Content</h3>
+            <p className="text-sm text-gray-400 mt-1">Write your note in Markdown format</p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-96">
@@ -231,9 +194,10 @@ export default function EditNote() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+            aria-label={loading ? 'Updating note' : 'Update note'}
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-5 w-5" />
             <span>{loading ? 'Updating...' : 'Update Note'}</span>
           </button>
         </div>

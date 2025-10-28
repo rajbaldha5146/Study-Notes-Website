@@ -1,0 +1,259 @@
+/* Enhanced Markdown Styling */
+
+/* Smooth scroll behavior */
+.prose {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+.prose ::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: #fff;
+}
+
+/* Heading animations */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  scroll-margin-top: 2rem;
+  position: relative;
+}
+
+/* Paragraph first letter styling for H1 following */
+.prose h1 + p::first-letter {
+  font-size: 3.5rem;
+  font-weight: bold;
+  float: left;
+  line-height: 1;
+  margin-right: 0.5rem;
+  color: rgb(99, 102, 241);
+}
+
+/* Code block enhancements */
+.prose pre {
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.prose pre code {
+  display: block;
+  padding: 0;
+}
+
+/* Inline code pulse effect */
+.prose code {
+  transition: all 0.2s ease;
+}
+
+.prose code:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* List item hover effect */
+.prose li {
+  transition: all 0.2s ease;
+  padding-left: 0.5rem;
+  border-left: 2px solid transparent;
+}
+
+.prose li:hover {
+  border-left-color: rgb(99, 102, 241);
+  padding-left: 1rem;
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+/* Blockquote styling */
+.prose blockquote {
+  position: relative;
+  font-style: italic;
+  transition: all 0.3s ease;
+}
+
+.prose blockquote:hover {
+  transform: translateX(8px);
+  box-shadow: -4px 0 0 0 rgb(99, 102, 241);
+}
+
+/* Table hover effects */
+.prose table {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.prose tbody tr {
+  transition: all 0.2s ease;
+}
+
+.prose tbody tr:hover {
+  background-color: rgba(99, 102, 241, 0.1);
+  transform: scale(1.01);
+}
+
+/* Link hover effect */
+.prose a {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.prose a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, rgb(99, 102, 241), rgb(139, 92, 246));
+  transition: width 0.3s ease;
+}
+
+.prose a:hover::after {
+  width: 100%;
+}
+
+/* Horizontal rule styling */
+.prose hr {
+  background: linear-gradient(to right, transparent, rgb(99, 102, 241), transparent);
+  height: 2px;
+  border: none;
+  position: relative;
+}
+
+.prose hr::before {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgb(17, 24, 39);
+  padding: 0 1rem;
+  color: rgb(99, 102, 241);
+  font-size: 1.5rem;
+}
+
+/* Image styling */
+.prose img {
+  transition: all 0.3s ease;
+  cursor: zoom-in;
+}
+
+.prose img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+}
+
+/* Task list styling */
+.prose input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  accent-color: rgb(99, 102, 241);
+}
+
+/* Strikethrough styling */
+.prose del {
+  text-decoration-color: rgb(239, 68, 68);
+  text-decoration-thickness: 2px;
+  opacity: 0.7;
+}
+
+/* Strong text glow effect */
+.prose strong {
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Emphasis styling */
+.prose em {
+  position: relative;
+}
+
+.prose em::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(to right, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+  z-index: -1;
+  border-radius: 4px;
+}
+
+/* Smooth fade-in animation for content */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.prose > * {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.prose > *:nth-child(1) { animation-delay: 0.1s; }
+.prose > *:nth-child(2) { animation-delay: 0.2s; }
+.prose > *:nth-child(3) { animation-delay: 0.3s; }
+.prose > *:nth-child(4) { animation-delay: 0.4s; }
+.prose > *:nth-child(5) { animation-delay: 0.5s; }
+
+/* Code block line numbers */
+.prose pre code {
+  counter-reset: line;
+}
+
+.prose pre code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2rem;
+  margin-right: 1.5rem;
+  text-align: right;
+  color: rgba(156, 163, 175, 0.4);
+  user-select: none;
+}
+
+/* Scrollbar styling */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.5);
+  border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+/* Print styles */
+@media print {
+  .prose {
+    color: #000;
+    background: #fff;
+  }
+  
+  .prose pre {
+    border: 1px solid #000;
+    page-break-inside: avoid;
+  }
+  
+  .prose h1, .prose h2, .prose h3 {
+    page-break-after: avoid;
+  }
+}

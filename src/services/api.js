@@ -38,7 +38,8 @@ api.interceptors.response.use(
 // Notes API
 export const getNotes = async (params = {}) => {
   const response = await api.get("/notes", { params });
-  return response.data;
+  // Handle both old and new response formats
+  return response.data.notes || response.data;
 };
 
 export const getNote = async (id) => {
@@ -58,11 +59,6 @@ export const updateNote = async (id, noteData) => {
 
 export const deleteNote = async (id) => {
   const response = await api.delete(`/notes/${id}`);
-  return response.data;
-};
-
-export const updateHighlights = async (id, highlights) => {
-  const response = await api.patch(`/notes/${id}/highlights`, { highlights });
   return response.data;
 };
 

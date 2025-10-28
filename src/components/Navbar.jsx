@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, Plus, Home, User, LogOut } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -11,6 +11,18 @@ export default function Navbar() {
     logout()
     setShowUserMenu(false)
   }
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserMenu && !event.target.closest('.user-menu-container')) {
+        setShowUserMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showUserMenu])
 
   return (
     <nav className="bg-gray-800 shadow-lg border-b border-gray-700 fixed top-0 left-0 right-0 z-40">
@@ -41,24 +53,32 @@ export default function Navbar() {
             </Link>
 
             {/* User Menu */}
-            <div className="relative">
+            <div className="relative user-menu-container">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-400 hover:text-blue-400 hover:bg-gray-700 transition-colors"
+                aria-label="User menu"
+                aria-expanded={showUserMenu}
+                aria-haspopup="true"
               >
                 <User className="h-4 w-4" />
                 <span className="hidden sm:block">{user?.name}</span>
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-50">
+                <div 
+                  className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
                   <div className="px-4 py-3 border-b border-gray-700">
                     <p className="text-sm font-medium text-white">{user?.name}</p>
-                    <p className="text-sm text-gray-400">{user?.email}</p>
+                    <p className="text-sm text-gray-400 truncate">{user?.email}</p>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center space-x-2 px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
+                    className="w-full flex items-center space-x-2 px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                    role="menuitem"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Sign out</span>

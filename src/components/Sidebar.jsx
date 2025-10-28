@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { 
   Folder, 
@@ -22,10 +22,22 @@ export default function Sidebar() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedParent, setSelectedParent] = useState(null)
   const location = useLocation()
-  const { refreshTrigger } = useFolders()
+  const { refreshTrigger, refreshFolders: triggerGlobalRefresh } = useFolders()
 
   useEffect(() => {
-    fetchFolders()
+    let isMounted = true;
+    
+    const loadFolders = async () => {
+      if (isMounted) {
+        await fetchFolders();
+      }
+    };
+    
+    loadFolders();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [refreshTrigger])
 
   const fetchFolders = async () => {
@@ -37,38 +49,42 @@ export default function Sidebar() {
     }
   }
 
-  const toggleFolder = (folderId) => {
-    const newExpanded = new Set(expandedFolders)
-    if (newExpanded.has(folderId)) {
-      newExpanded.delete(folderId)
-    } else {
-      newExpanded.add(folderId)
-    }
-    setExpandedFolders(newExpanded)
-  }
+  const toggleFolder = useCallback((folderId) => {
+    setExpandedFolders(prev => {
+      const newExpanded = new Set(prev)
+      if (newExpanded.has(folderId)) {
+        newExpanded.delete(folderId)
+      } else {
+        newExpanded.add(folderId)
+      }
+      return newExpanded
+    })
+  }, [])
 
-  const handleCreateFolder = (parentId = null) => {
+  const handleCreateFolder = useCallback((parentId = null) => {
     setSelectedParent(parentId)
     setShowCreateModal(true)
-  }
+  }, [])
 
-  const handleFolderCreated = (newFolder) => {
+  const handleFolderCreated = useCallback((newFolder) => {
     fetchFolders()
+    triggerGlobalRefresh()
     setShowCreateModal(false)
-  }
+  }, [triggerGlobalRefresh])
 
-  const handleDeleteFolder = async (folderId, folderName) => {
+  const handleDeleteFolder = useCallback(async (folderId, folderName) => {
     if (window.confirm(`Are you sure you want to delete "${folderName}"? This will also delete all notes and subfolders inside it.`)) {
       try {
         await deleteFolder(folderId)
         toast.success('Folder deleted successfully!')
-        fetchFolders()
+        await fetchFolders()
+        triggerGlobalRefresh()
       } catch (error) {
         console.error('Failed to delete folder:', error)
-        toast.error('Failed to delete folder. It may contain notes or subfolders.')
+        toast.error(error.response?.data?.message || 'Failed to delete folder')
       }
     }
-  }
+  }, [triggerGlobalRefresh])
 
   const renderFolder = (folder, level = 0) => {
     const isExpanded = expandedFolders.has(folder._id)
@@ -112,6 +128,7 @@ export default function Sidebar() {
               }}
               className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
               title="Create subfolder"
+              aria-label={`Create subfolder in ${folder.name}`}
             >
               <Plus className="h-3 w-3" />
             </button>
@@ -122,6 +139,7 @@ export default function Sidebar() {
               }}
               className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-400 hover:text-red-600 dark:hover:text-red-400"
               title="Delete folder"
+              aria-label={`Delete ${folder.name} folder`}
             >
               <Trash2 className="h-3 w-3" />
             </button>
@@ -147,6 +165,7 @@ export default function Sidebar() {
               onClick={() => handleCreateFolder()}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               title="Create new folder"
+              aria-label="Create new folder"
             >
               <FolderPlus className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>

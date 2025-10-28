@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { 
   Plus, 
@@ -17,16 +17,32 @@ import { getFolder, deleteNote, deleteFolder } from '../services/api'
 import BookLoader from '../components/BookLoader'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import { debounce } from '../utils/debounce'
+import { useFolders } from '../contexts/FolderContext'
 
 export default function FolderView() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { refreshFolders } = useFolders()
   const [folderData, setFolderData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
   useEffect(() => {
-    fetchFolderData()
+    let isMounted = true;
+    
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchFolderData();
+      }
+    };
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [id])
 
   const fetchFolderData = async () => {
@@ -40,20 +56,20 @@ export default function FolderView() {
     }
   }
 
-  const handleDeleteNote = async (noteId) => {
+  const handleDeleteNote = useCallback(async (noteId) => {
     if (window.confirm('Are you sure you want to delete this note?')) {
       try {
         await deleteNote(noteId)
         toast.success('Note deleted successfully!')
-        fetchFolderData()
+        await fetchFolderData()
       } catch (error) {
         console.error('Failed to delete note:', error)
-        toast.error('Failed to delete note')
+        toast.error(error.response?.data?.message || 'Failed to delete note')
       }
     }
-  }
+  }, [])
 
-  const handleDeleteFolder = async () => {
+  const handleDeleteFolder = useCallback(async () => {
     if (window.confirm(`Are you sure you want to delete "${folderData?.folder?.name}"? This will also delete all notes and subfolders inside it.`)) {
       try {
         await deleteFolder(id)
@@ -61,15 +77,32 @@ export default function FolderView() {
         navigate('/app')
       } catch (error) {
         console.error('Failed to delete folder:', error)
-        toast.error('Failed to delete folder. It may contain notes or subfolders.')
+        toast.error(error.response?.data?.message || 'Failed to delete folder')
       }
     }
-  }
+  }, [id, folderData?.folder?.name, navigate])
 
-  const filteredNotes = folderData?.notes?.filter(note =>
-    note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || []
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Memoize filtered notes to prevent unnecessary recalculations
+  const filteredNotes = useMemo(() => {
+    if (!folderData?.notes) return [];
+    
+    if (!debouncedSearchTerm) return folderData.notes;
+    
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return folderData.notes.filter(note =>
+      note.title.toLowerCase().includes(searchLower) ||
+      note.content.toLowerCase().includes(searchLower)
+    );
+  }, [folderData?.notes, debouncedSearchTerm])
 
   if (loading) {
     return (
@@ -165,6 +198,7 @@ export default function FolderView() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              aria-label="Search notes in this folder"
             />
           </div>
         </div>
@@ -253,25 +287,7 @@ export default function FolderView() {
                     {note.content.substring(0, 150)}...
                   </p>
                   
-                  {/* Tags */}
-                  {note.tags && note.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {note.tags.slice(0, 3).map(tag => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300"
-                        >
-                          <Tag className="h-3 w-3 mr-1" />
-                          {tag}
-                        </span>
-                      ))}
-                      {note.tags.length > 3 && (
-                        <span className="text-xs text-gray-500 dark:text-gray-400">+{note.tags.length - 3} more</span>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mt-4">
                     <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                       <Calendar className="h-3 w-3 mr-1" />
                       {new Date(note.createdAt).toLocaleDateString()}

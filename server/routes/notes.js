@@ -1,6 +1,7 @@
 import express from 'express';
 import Note from '../models/Note.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { validateNote, validateObjectId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -8,13 +9,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Get all notes for the authenticated user
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
-    const { category, tag, search } = req.query;
+    const { search, page = 1, limit = 50 } = req.query;
     let query = { user: req.user._id };
     
-    if (category) query.category = category;
-    if (tag) query.tags = { $in: [tag] };
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -22,28 +21,44 @@ router.get('/', async (req, res) => {
       ];
     }
     
-    const notes = await Note.find(query).sort({ episode: 1, createdAt: -1 });
-    res.json(notes);
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const notes = await Note.find(query)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip)
+      .lean();
+    
+    const total = await Note.countDocuments(query);
+    
+    res.json({
+      notes,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 // Get single note for the authenticated user
-router.get('/:id', async (req, res) => {
+router.get('/:id', validateObjectId('id'), async (req, res, next) => {
   try {
-    const note = await Note.findOne({ _id: req.params.id, user: req.user._id });
+    const note = await Note.findOne({ _id: req.params.id, user: req.user._id }).lean();
     if (!note) {
-      return res.status(404).json({ message: 'Note not found' });
+      return res.status(404).json({ success: false, message: 'Note not found' });
     }
     res.json(note);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
 // Create new note for the authenticated user
-router.post('/', async (req, res) => {
+router.post('/', validateNote, async (req, res, next) => {
   try {
     const note = new Note({
       ...req.body,
@@ -52,12 +67,12 @@ router.post('/', async (req, res) => {
     const savedNote = await note.save();
     res.status(201).json(savedNote);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 });
 
 // Update note for the authenticated user
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateObjectId('id'), validateNote, async (req, res, next) => {
   try {
     const note = await Note.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
@@ -65,46 +80,29 @@ router.put('/:id', async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!note) {
-      return res.status(404).json({ message: 'Note not found' });
+      return res.status(404).json({ success: false, message: 'Note not found' });
     }
     res.json(note);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 });
 
 // Delete note for the authenticated user
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateObjectId('id'), async (req, res, next) => {
   try {
     const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user._id });
     if (!note) {
-      return res.status(404).json({ message: 'Note not found' });
+      return res.status(404).json({ success: false, message: 'Note not found' });
     }
-    res.json({ message: 'Note deleted successfully' });
+    res.json({ success: true, message: 'Note deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Update highlights for the authenticated user
-router.patch('/:id/highlights', async (req, res) => {
-  try {
-    const note = await Note.findOneAndUpdate(
-      { _id: req.params.id, user: req.user._id },
-      { highlights: req.body.highlights },
-      { new: true }
-    );
-    if (!note) {
-      return res.status(404).json({ message: 'Note not found' });
-    }
-    res.json(note);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 });
 
 // Update drawings for the authenticated user
-router.patch('/:id/drawings', async (req, res) => {
+router.patch('/:id/drawings', validateObjectId('id'), async (req, res, next) => {
   try {
     const note = await Note.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
@@ -112,11 +110,11 @@ router.patch('/:id/drawings', async (req, res) => {
       { new: true }
     );
     if (!note) {
-      return res.status(404).json({ message: 'Note not found' });
+      return res.status(404).json({ success: false, message: 'Note not found' });
     }
     res.json(note);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 });
 

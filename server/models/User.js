@@ -72,4 +72,8 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Verification token method removed - users are auto-verified
 
+// Indexes for better query performance
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ resetPasswordToken: 1 });
+
 export default mongoose.model("User", userSchema);

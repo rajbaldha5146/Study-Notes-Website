@@ -8,13 +8,8 @@ import {
 import {
   ArrowLeft,
   Edit,
-  Highlighter,
-  Eraser,
-  Save,
-  Tag,
   Calendar,
   Folder,
-  X,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -23,8 +18,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
-import { getNote, updateHighlights, getFolder } from "../services/api";
+import { getNote, getFolder } from "../services/api";
 import "highlight.js/styles/vs2015.css"; // Dark theme for code blocks
+import "../styles/markdown.css"; // Enhanced markdown styling
 
 export default function NoteViewer() {
   const { id } = useParams();
@@ -38,71 +34,29 @@ export default function NoteViewer() {
   const [folderNotes, setFolderNotes] = useState([]);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(-1);
 
-  // Highlighting states
-  const [highlightMode, setHighlightMode] = useState(false);
-  const [removeHighlightMode, setRemoveHighlightMode] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#fbbf24"); // amber-400
-  const [highlights, setHighlights] = useState([]);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
   const contentRef = useRef(null);
 
-  // Highlight colors - professional palette
-  const highlightColors = [
-    {
-      name: "Yellow",
-      value: "#fbbf24",
-      bg: "bg-amber-200",
-      darkBg: "bg-amber-900",
-    },
-    {
-      name: "Green",
-      value: "#10b981",
-      bg: "bg-emerald-200",
-      darkBg: "bg-emerald-900",
-    },
-    {
-      name: "Blue",
-      value: "#3b82f6",
-      bg: "bg-blue-200",
-      darkBg: "bg-blue-900",
-    },
-    {
-      name: "Purple",
-      value: "#8b5cf6",
-      bg: "bg-violet-200",
-      darkBg: "bg-violet-900",
-    },
-    {
-      name: "Pink",
-      value: "#ec4899",
-      bg: "bg-pink-200",
-      darkBg: "bg-pink-900",
-    },
-    {
-      name: "Orange",
-      value: "#f97316",
-      bg: "bg-orange-200",
-      darkBg: "bg-orange-900",
-    },
-  ];
-
   useEffect(() => {
-    fetchNote();
-    if (folderId) {
-      fetchFolderNotes();
-    }
+    let isMounted = true;
+    
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchNote();
+        if (folderId) {
+          await fetchFolderNotes();
+        }
+      }
+    };
+    
+    loadData();
+    
+    // Cleanup function to prevent memory leaks
+    return () => {
+      isMounted = false;
+    };
   }, [id, folderId]);
 
-  useEffect(() => {
-    if (note) {
-      setHighlights(note.highlights || []);
-      // Apply highlights after content is rendered
-      setTimeout(() => {
-        applyHighlights();
-      }, 100);
-    }
-  }, [note]);
+
 
   const fetchNote = async () => {
     try {
@@ -162,233 +116,6 @@ export default function NoteViewer() {
     cleanContent = cleanContent.replace(/^\n+/, "").trim();
 
     return cleanContent;
-  };
-
-  const applyHighlights = () => {
-    if (!contentRef.current || !highlights.length) return;
-
-    // Remove existing highlights
-    const existingHighlights =
-      contentRef.current.querySelectorAll(".custom-highlight");
-    existingHighlights.forEach((el) => {
-      const parent = el.parentNode;
-      if (parent) {
-        parent.replaceChild(document.createTextNode(el.textContent), el);
-        parent.normalize();
-      }
-    });
-
-    // Apply saved highlights
-    highlights.forEach((highlight, index) => {
-      if (highlight.text && highlight.color) {
-        highlightTextInElement(
-          contentRef.current,
-          highlight.text,
-          highlight.color,
-          index
-        );
-      }
-    });
-  };
-
-  const highlightTextInElement = (element, searchText, color, index) => {
-    const walker = document.createTreeWalker(
-      element,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function (node) {
-          const parent = node.parentElement;
-          if (!parent) return NodeFilter.FILTER_REJECT;
-
-          const tagName = parent.tagName.toLowerCase();
-          if (
-            ["script", "style", "noscript", "code", "pre"].includes(tagName)
-          ) {
-            return NodeFilter.FILTER_REJECT;
-          }
-
-          if (parent.classList.contains("custom-highlight")) {
-            return NodeFilter.FILTER_REJECT;
-          }
-
-          return NodeFilter.FILTER_ACCEPT;
-        },
-      },
-      false
-    );
-
-    const textNodes = [];
-    let node;
-    while ((node = walker.nextNode())) {
-      textNodes.push(node);
-    }
-
-    for (const textNode of textNodes) {
-      const text = textNode.textContent;
-      const highlightIndex = text
-        .toLowerCase()
-        .indexOf(searchText.toLowerCase());
-
-      if (highlightIndex !== -1) {
-        try {
-          const range = document.createRange();
-          range.setStart(textNode, highlightIndex);
-          range.setEnd(textNode, highlightIndex + searchText.length);
-
-          const span = document.createElement("span");
-          span.className = "custom-highlight";
-          span.style.backgroundColor = color + "40"; // Add transparency
-          span.style.padding = "2px 4px";
-          span.style.borderRadius = "4px";
-          span.style.cursor = removeHighlightMode ? "pointer" : "default";
-          span.dataset.highlightIndex = index;
-          span.title = removeHighlightMode ? "Click to remove highlight" : "";
-
-          range.surroundContents(span);
-          break;
-        } catch (error) {
-          console.warn("Could not apply highlight:", error);
-        }
-      }
-    }
-  };
-
-  const handleTextSelection = () => {
-    if (!highlightMode) return;
-
-    const selection = window.getSelection();
-    const selectedText = selection.toString().trim();
-
-    if (!selectedText || selectedText.length < 2) return;
-
-    const range = selection.getRangeAt(0);
-    if (!contentRef.current.contains(range.commonAncestorContainer)) {
-      return;
-    }
-
-    // Check if already highlighted
-    const existingHighlight = highlights.find(
-      (h) => h.text.toLowerCase() === selectedText.toLowerCase()
-    );
-
-    if (existingHighlight) {
-      selection.removeAllRanges();
-      return;
-    }
-
-    // Add new highlight
-    const newHighlight = {
-      text: selectedText,
-      color: selectedColor,
-      id: Date.now(),
-    };
-
-    const updatedHighlights = [...highlights, newHighlight];
-    setHighlights(updatedHighlights);
-    setHasUnsavedChanges(true);
-    selection.removeAllRanges();
-
-    // Apply highlight immediately
-    setTimeout(() => {
-      highlightTextInElement(
-        contentRef.current,
-        selectedText,
-        selectedColor,
-        updatedHighlights.length - 1
-      );
-    }, 10);
-  };
-
-  const handleHighlightClick = (e) => {
-    if (!removeHighlightMode) return;
-
-    let highlightElement = e.target;
-    if (!highlightElement.classList.contains("custom-highlight")) {
-      highlightElement = highlightElement.closest(".custom-highlight");
-    }
-
-    if (
-      highlightElement &&
-      highlightElement.classList.contains("custom-highlight")
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const highlightText = highlightElement.textContent;
-
-      // Remove from DOM immediately
-      const parent = highlightElement.parentNode;
-      if (parent) {
-        parent.replaceChild(
-          document.createTextNode(highlightText),
-          highlightElement
-        );
-        parent.normalize();
-      }
-
-      // Update state
-      const updatedHighlights = highlights.filter((highlight) => {
-        return highlight.text.toLowerCase() !== highlightText.toLowerCase();
-      });
-
-      if (updatedHighlights.length < highlights.length) {
-        setHighlights(updatedHighlights);
-        setHasUnsavedChanges(true);
-      }
-    }
-  };
-
-  const saveHighlights = async () => {
-    try {
-      await updateHighlights(id, highlights);
-      setHasUnsavedChanges(false);
-    } catch (error) {
-      console.error("Failed to save highlights:", error);
-    }
-  };
-
-  const clearAllHighlights = () => {
-    if (highlights.length === 0) return;
-
-    if (window.confirm(`Remove all ${highlights.length} highlights?`)) {
-      // Remove from DOM
-      const existingHighlights =
-        contentRef.current?.querySelectorAll(".custom-highlight");
-      existingHighlights?.forEach((el) => {
-        const parent = el.parentNode;
-        if (parent) {
-          parent.replaceChild(document.createTextNode(el.textContent), el);
-          parent.normalize();
-        }
-      });
-
-      setHighlights([]);
-      setHasUnsavedChanges(true);
-    }
-  };
-
-  const toggleHighlightMode = () => {
-    setHighlightMode(!highlightMode);
-    if (highlightMode) {
-      setRemoveHighlightMode(false);
-    }
-  };
-
-  const toggleRemoveMode = () => {
-    setRemoveHighlightMode(!removeHighlightMode);
-    if (removeHighlightMode) {
-      setHighlightMode(false);
-    }
-
-    // Update cursor styles
-    setTimeout(() => {
-      const highlights =
-        contentRef.current?.querySelectorAll(".custom-highlight");
-      highlights?.forEach((el) => {
-        el.style.cursor = !removeHighlightMode ? "pointer" : "default";
-        el.title = !removeHighlightMode ? "Click to remove highlight" : "";
-      });
-    }, 10);
   };
 
   // Loading state
@@ -521,137 +248,32 @@ export default function NoteViewer() {
             )}
           </div>
 
-          {/* Tags */}
-          {note.tags && note.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {note.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300"
-                >
-                  <Tag className="h-3 w-3 mr-1" />
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Highlighting Tools */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center space-x-4 flex-wrap">
-              {/* Highlight Button */}
-              <button
-                onClick={toggleHighlightMode}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
-                  highlightMode
-                    ? "bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-600"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-              >
-                <Highlighter className="h-4 w-4" />
-                <span>Highlight</span>
-              </button>
-
-              {/* Remove Highlight Button */}
-              <button
-                onClick={toggleRemoveMode}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
-                  removeHighlightMode
-                    ? "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-300 dark:border-red-600"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-              >
-                <Eraser className="h-4 w-4" />
-                <span>Remove</span>
-              </button>
-
-              {/* Color Picker */}
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Color:
-                </span>
-                <div className="flex space-x-1">
-                  {highlightColors.map((color) => (
-                    <button
-                      key={color.value}
-                      onClick={() => setSelectedColor(color.value)}
-                      className={`w-6 h-6 rounded-full border-2 transition-all ${
-                        selectedColor === color.value
-                          ? "border-gray-800 dark:border-gray-200 scale-110"
-                          : "border-gray-300 dark:border-gray-600 hover:scale-105"
-                      }`}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Save Controls */}
-            <div className="flex items-center space-x-3">
-              {hasUnsavedChanges && (
-                <span className="text-sm text-amber-600 dark:text-amber-400 font-medium">
-                  Unsaved changes
-                </span>
-              )}
-
-              <button
-                onClick={saveHighlights}
-                disabled={!hasUnsavedChanges}
-                className={`flex items-center space-x-1 px-4 py-2 rounded-md transition-colors ${
-                  hasUnsavedChanges
-                    ? "bg-green-600 text-white hover:bg-green-700"
-                    : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                <Save className="h-4 w-4" />
-                <span>Save</span>
-              </button>
-
-              {highlights.length > 0 && (
-                <button
-                  onClick={clearAllHighlights}
-                  className="flex items-center space-x-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                  <span>Clear All</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            {highlightMode && (
-              <p>💡 Select text to highlight it with the chosen color</p>
-            )}
-            {removeHighlightMode && (
-              <p>💡 Click on any highlighted text to remove the highlight</p>
-            )}
-            {!highlightMode && !removeHighlightMode && (
-              <p>
-                💡 Use the tools above to highlight important parts of your
-                notes
-              </p>
-            )}
-          </div>
         </div>
 
         {/* Note Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50">
           <div
             ref={contentRef}
-            className="p-8 prose prose-lg prose-gray dark:prose-invert max-w-none"
-            onMouseUp={handleTextSelection}
-            onClick={handleHighlightClick}
-            style={{
-              userSelect:
-                highlightMode || removeHighlightMode ? "text" : "auto",
-              cursor: removeHighlightMode ? "pointer" : "default",
-            }}
+            className="p-12 prose prose-xl prose-gray dark:prose-invert max-w-none
+              prose-headings:font-bold prose-headings:tracking-tight
+              prose-h1:text-5xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-indigo-500/30
+              prose-h2:text-4xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-700/50
+              prose-h3:text-3xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-indigo-300
+              prose-h4:text-2xl prose-h4:mt-8 prose-h4:mb-3 prose-h4:text-purple-300
+              prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
+              prose-strong:text-white prose-strong:font-bold
+              prose-em:text-indigo-300 prose-em:italic
+              prose-a:text-indigo-400 prose-a:no-underline prose-a:font-medium hover:prose-a:text-indigo-300 hover:prose-a:underline
+              prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-500/10 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:my-6
+              prose-ul:my-6 prose-ul:space-y-2
+              prose-ol:my-6 prose-ol:space-y-2
+              prose-li:text-gray-300 prose-li:leading-relaxed prose-li:text-lg
+              prose-li:marker:text-indigo-400
+              prose-hr:border-gray-700/50 prose-hr:my-12
+              prose-table:border-collapse prose-table:w-full prose-table:my-8
+              prose-th:bg-gray-800/50 prose-th:p-4 prose-th:text-left prose-th:font-semibold prose-th:text-indigo-300 prose-th:border prose-th:border-gray-700
+              prose-td:p-4 prose-td:border prose-td:border-gray-700 prose-td:text-gray-300
+              prose-img:rounded-xl prose-img:shadow-2xl prose-img:my-8"
           >
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -659,17 +281,15 @@ export default function NoteViewer() {
               components={{
                 // Code handling
                 code({ node, inline, className, children, ...props }) {
-                  // Check if this is truly inline code (single backticks)
                   const isInlineCode =
                     inline === true ||
                     !className ||
                     !className.startsWith("language-");
 
                   if (isInlineCode) {
-                    // Inline code - single backticks
                     return (
                       <code
-                        className="bg-gray-900 text-orange-300 px-2 py-1 rounded text-sm font-mono font-semibold shadow-sm"
+                        className="bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-md text-base font-mono font-semibold border border-indigo-500/30 shadow-sm"
                         {...props}
                       >
                         {children}
@@ -677,10 +297,9 @@ export default function NoteViewer() {
                     );
                   }
 
-                  // Block code - triple backticks (handled by pre component)
                   return (
                     <code
-                      className={`${className} bg-transparent text-gray-100 font-mono text-sm leading-relaxed`}
+                      className={`${className} bg-transparent text-gray-100 font-mono text-base leading-relaxed`}
                       {...props}
                     >
                       {children}
@@ -694,19 +313,86 @@ export default function NoteViewer() {
                   const language = match ? match[1] : "";
 
                   return (
-                    <div className="relative my-6">
+                    <div className="relative my-8 group">
                       {language && (
-                        <div className="absolute top-0 right-0 bg-gray-700 text-gray-300 px-3 py-1 text-xs rounded-bl-md rounded-tr-md z-10 font-mono">
+                        <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 text-xs font-bold rounded-bl-xl rounded-tr-xl z-10 uppercase tracking-wider shadow-lg">
                           {language}
                         </div>
                       )}
                       <pre
-                        className="bg-gray-900 rounded-lg overflow-x-auto border border-gray-700"
+                        className="!bg-gray-950 rounded-xl overflow-x-auto border-2 border-gray-800 shadow-2xl p-6 hover:border-indigo-500/30 transition-all duration-300"
                         {...props}
                       >
                         {children}
                       </pre>
                     </div>
+                  );
+                },
+
+                // Headings with custom styling
+                h1({ node, children, ...props }) {
+                  return (
+                    <h1 className="group relative" {...props}>
+                      <span className="absolute -left-8 top-0 text-indigo-500/30 font-bold text-4xl opacity-0 group-hover:opacity-100 transition-opacity">#</span>
+                      {children}
+                    </h1>
+                  );
+                },
+
+                h2({ node, children, ...props }) {
+                  return (
+                    <h2 className="group relative" {...props}>
+                      <span className="absolute -left-7 top-0 text-indigo-500/30 font-bold text-3xl opacity-0 group-hover:opacity-100 transition-opacity">##</span>
+                      {children}
+                    </h2>
+                  );
+                },
+
+                h3({ node, children, ...props }) {
+                  return (
+                    <h3 className="group relative" {...props}>
+                      <span className="absolute -left-6 top-0 text-indigo-500/30 font-bold text-2xl opacity-0 group-hover:opacity-100 transition-opacity">###</span>
+                      {children}
+                    </h3>
+                  );
+                },
+
+                // Lists with better styling
+                ul({ node, children, ...props }) {
+                  return (
+                    <ul className="space-y-3 pl-6" {...props}>
+                      {children}
+                    </ul>
+                  );
+                },
+
+                ol({ node, children, ...props }) {
+                  return (
+                    <ol className="space-y-3 pl-6" {...props}>
+                      {children}
+                    </ol>
+                  );
+                },
+
+                // Blockquote with icon
+                blockquote({ node, children, ...props }) {
+                  return (
+                    <blockquote className="relative" {...props}>
+                      <span className="absolute -left-2 top-0 text-6xl text-indigo-500/20 font-serif">"</span>
+                      {children}
+                    </blockquote>
+                  );
+                },
+
+                // Links with icon
+                a({ node, children, href, ...props }) {
+                  return (
+                    <a href={href} className="inline-flex items-center gap-1 group" {...props}>
+                      {children}
+                      <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
                   );
                 },
               }}

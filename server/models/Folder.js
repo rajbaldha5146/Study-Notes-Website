@@ -43,4 +43,8 @@ folderSchema.pre("save", function (next) {
   next();
 });
 
+// Indexes for better query performance
+folderSchema.index({ user: 1, parentFolder: 1 });
+folderSchema.index({ user: 1, createdAt: -1 });
+
 export default mongoose.model("Folder", folderSchema);

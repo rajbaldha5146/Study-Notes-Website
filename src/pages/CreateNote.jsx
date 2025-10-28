@@ -7,17 +7,15 @@ import rehypeHighlight from "rehype-highlight";
 import { createNote, getFolders, createFolder } from "../services/api";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
+import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
 
 export default function CreateNote() {
   const navigate = useNavigate();
   const { refreshFolders } = useFolders();
-  
+
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    tags: "",
-    category: "javascript",
-    episode: "",
     folder: "",
   });
   const [preview, setPreview] = useState(false);
@@ -27,7 +25,19 @@ export default function CreateNote() {
   const [loadingFolders, setLoadingFolders] = useState(true);
 
   useEffect(() => {
-    loadFolders();
+    let isMounted = true;
+
+    const initFolders = async () => {
+      if (isMounted) {
+        await loadFolders();
+      }
+    };
+
+    initFolders();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const loadFolders = async () => {
@@ -36,16 +46,15 @@ export default function CreateNote() {
       const foldersData = await getFolders();
 
       if (foldersData.length === 0) {
-        // Create a default folder if none exists
         const defaultFolder = await createFolder({
-          name: "General Notes",
-          description: "Default folder for notes",
-          color: "#3b82f6",
+          name: "My Notes",
+          description: "Default folder for your notes",
+          color: "#6366f1",
           icon: "📝",
         });
         setFolders([defaultFolder]);
         setFormData((prev) => ({ ...prev, folder: defaultFolder._id }));
-        refreshFolders(); // Refresh sidebar
+        refreshFolders();
       } else {
         setFolders(foldersData);
         setFormData((prev) => ({ ...prev, folder: foldersData[0]._id }));
@@ -60,36 +69,40 @@ export default function CreateNote() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title.trim()) {
+
+    const sanitizedTitle = sanitizeName(formData.title);
+    const sanitizedContent = sanitizeMarkdown(formData.content);
+
+    if (!sanitizedTitle.trim()) {
       toast.error("Title is required");
       return;
     }
 
-    if (!formData.content.trim()) {
+    if (!sanitizedContent.trim()) {
       toast.error(
         "Content is required. Please write content or upload a markdown file."
       );
       return;
     }
 
+    if (!formData.folder) {
+      toast.error("Please select a folder");
+      return;
+    }
+
     setLoading(true);
     try {
       const noteData = {
-        ...formData,
-        tags: formData.tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag),
-        episode: formData.episode ? parseInt(formData.episode) : undefined,
+        title: sanitizedTitle,
+        content: sanitizedContent,
+        folder: formData.folder,
       };
 
-      console.log("Sending note data:", noteData);
       const newNote = await createNote(noteData);
       toast.success("Note created successfully!");
       navigate(`/app/note/${newNote._id}`);
     } catch (error) {
       console.error("Error creating note:", error);
-      console.error("Error response:", error.response?.data);
       toast.error(error.response?.data?.message || "Failed to create note");
     } finally {
       setLoading(false);
@@ -180,20 +193,18 @@ export default function CreateNote() {
             setFormData({
               title: "",
               content: "",
-              tags: "",
-              category: "javascript",
-              episode: "",
               folder: folders.length > 0 ? folders[0]._id : "",
             });
             toast.success("Ready to create new note");
           }}
-          className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 min-w-[200px] justify-center"
+          className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] min-w-[200px] justify-center"
+          aria-label="Create new note"
         >
           <Plus className="h-6 w-6" />
           <span className="text-lg font-semibold">New Note</span>
         </button>
 
-        <label className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer min-w-[200px] justify-center">
+        <label className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer min-w-[200px] justify-center">
           <FileText className="h-6 w-6" />
           <span className="text-lg font-semibold">Add MD File</span>
           <input
@@ -201,6 +212,7 @@ export default function CreateNote() {
             className="hidden"
             accept=".md,.markdown"
             onChange={handleFileUpload}
+            aria-label="Upload markdown file"
           />
         </label>
       </div>
@@ -229,10 +241,10 @@ export default function CreateNote() {
         )}
 
         {/* Basic Info */}
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-gray-200 mb-3">
                 Title *
               </label>
               <input
@@ -240,37 +252,21 @@ export default function CreateNote() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-all"
                 placeholder="Enter note title..."
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Episode Number
-              </label>
-              <input
-                type="number"
-                name="episode"
-                value={formData.episode}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-                placeholder="e.g., 1"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-gray-200 mb-3">
                 Folder *
               </label>
               <select
                 name="folder"
                 value={formData.folder}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 required
                 disabled={loadingFolders}
               >
@@ -285,50 +281,19 @@ export default function CreateNote() {
                 )}
               </select>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="javascript">JavaScript</option>
-                <option value="react">React</option>
-                <option value="nodejs">Node.js</option>
-                <option value="general">General</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                name="tags"
-                value={formData.tags}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
-                placeholder="javascript, closures, functions"
-              />
-            </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700">
-          <div className="border-b border-gray-700 px-6 py-3">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 overflow-hidden">
+          <div className="border-b border-gray-700/50 px-8 py-4 bg-gray-900/30">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-medium text-white">Content</h3>
-                <p className="text-sm text-gray-400">
+                <h3 className="text-lg font-semibold text-white">Content</h3>
+                <p className="text-sm text-gray-400 mt-1">
                   {uploadedFile
                     ? "Content loaded from uploaded file"
-                    : "Write your note in Markdown format or use 'Add MD File' button above"}
+                    : "Write your note in Markdown format"}
                 </p>
               </div>
             </div>
@@ -404,9 +369,10 @@ function example() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+            aria-label={loading ? "Creating note" : "Create note"}
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-5 w-5" />
             <span>{loading ? "Creating..." : "Create Note"}</span>
           </button>
         </div>

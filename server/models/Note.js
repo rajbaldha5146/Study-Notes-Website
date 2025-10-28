@@ -10,18 +10,6 @@ const noteSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  tags: [{
-    type: String,
-    trim: true
-  }],
-  highlights: [{
-    text: String,
-    color: String,
-    position: {
-      start: Number,
-      end: Number
-    }
-  }],
   drawings: [{
     canvasData: String,
     position: {
@@ -39,13 +27,6 @@ const noteSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  category: {
-    type: String,
-    default: 'general'
-  },
-  episode: {
-    type: Number
-  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -60,5 +41,10 @@ noteSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
+
+// Indexes for better query performance
+noteSchema.index({ user: 1, folder: 1 });
+noteSchema.index({ user: 1, createdAt: -1 });
+noteSchema.index({ title: 'text', content: 'text' });
 
 export default mongoose.model('Note', noteSchema);

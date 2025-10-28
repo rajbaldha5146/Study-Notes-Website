@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 const FolderContext = createContext();
 
@@ -17,10 +17,11 @@ export const FolderProvider = ({ children }) => {
     setRefreshTrigger(prev => prev + 1);
   }, []);
 
-  const value = {
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     refreshTrigger,
     refreshFolders
-  };
+  }), [refreshTrigger, refreshFolders]);
 
   return (
     <FolderContext.Provider value={value}>

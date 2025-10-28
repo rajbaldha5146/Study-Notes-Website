@@ -2,6 +2,7 @@ import express from 'express';
 import Folder from '../models/Folder.js';
 import Note from '../models/Note.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { validateFolder, validateObjectId } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -69,7 +70,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create new folder for the authenticated user
-router.post('/', async (req, res) => {
+router.post('/', validateFolder, async (req, res, next) => {
   try {
     const folder = new Folder({
       ...req.body,
@@ -78,7 +79,7 @@ router.post('/', async (req, res) => {
     const savedFolder = await folder.save();
     res.status(201).json(savedFolder);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    next(error);
   }
 });
 
@@ -99,26 +100,41 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Delete folder for the authenticated user
-router.delete('/:id', async (req, res) => {
+// Delete folder for the authenticated user (with cascade)
+router.delete('/:id', validateObjectId('id'), async (req, res, next) => {
   try {
-    // Check if folder has notes or subfolders for this user
-    const notesCount = await Note.countDocuments({ folder: req.params.id, user: req.user._id });
-    const subfoldersCount = await Folder.countDocuments({ parentFolder: req.params.id, user: req.user._id });
+    const folderId = req.params.id;
+    const userId = req.user._id;
     
-    if (notesCount > 0 || subfoldersCount > 0) {
-      return res.status(400).json({ 
-        message: 'Cannot delete folder that contains notes or subfolders' 
-      });
-    }
-    
-    const folder = await Folder.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+    // Verify folder exists and belongs to user
+    const folder = await Folder.findOne({ _id: folderId, user: userId });
     if (!folder) {
-      return res.status(404).json({ message: 'Folder not found' });
+      return res.status(404).json({ success: false, message: 'Folder not found' });
     }
-    res.json({ message: 'Folder deleted successfully' });
+    
+    // Recursive function to delete folder and all its contents
+    const deleteFolderRecursive = async (id) => {
+      // Find all subfolders
+      const subfolders = await Folder.find({ parentFolder: id, user: userId });
+      
+      // Recursively delete subfolders
+      for (const subfolder of subfolders) {
+        await deleteFolderRecursive(subfolder._id);
+      }
+      
+      // Delete all notes in this folder
+      await Note.deleteMany({ folder: id, user: userId });
+      
+      // Delete the folder itself
+      await Folder.findOneAndDelete({ _id: id, user: userId });
+    };
+    
+    // Start cascade delete
+    await deleteFolderRecursive(folderId);
+    
+    res.json({ success: true, message: 'Folder and all contents deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 });
 
