@@ -151,11 +151,11 @@ export default function NoteViewer() {
   }
 
   return (
-    <div className="min-h-screen pb-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen pb-6 sm:pb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate(-1)}
@@ -167,7 +167,7 @@ export default function NoteViewer() {
 
               {/* Navigation buttons when in folder presentation mode */}
               {folderId && folderNotes.length > 0 && (
-                <div className="flex items-center space-x-2 border-l border-gray-300 dark:border-gray-600 pl-4">
+                <div className="flex items-center space-x-2 border-l border-gray-300 dark:border-gray-600 pl-3 sm:pl-4">
                   <button
                     onClick={() => {
                       const prevIndex = currentNoteIndex - 1;
@@ -178,17 +178,17 @@ export default function NoteViewer() {
                       }
                     }}
                     disabled={currentNoteIndex <= 0}
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors ${
+                    className={`flex items-center space-x-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md transition-colors text-sm ${
                       currentNoteIndex <= 0
                         ? "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                     }`}
                   >
-                    <ChevronLeft className="h-4 w-4" />
-                    <span>Previous</span>
+                    <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Previous</span>
                   </button>
 
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {currentNoteIndex + 1} / {folderNotes.length}
                   </span>
 
@@ -202,14 +202,14 @@ export default function NoteViewer() {
                       }
                     }}
                     disabled={currentNoteIndex >= folderNotes.length - 1}
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors ${
+                    className={`flex items-center space-x-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md transition-colors text-sm ${
                       currentNoteIndex >= folderNotes.length - 1
                         ? "bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
                         : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                     }`}
                   >
-                    <span>Next</span>
-                    <ChevronRight className="h-4 w-4" />
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                   </button>
                 </div>
               )}
@@ -225,12 +225,12 @@ export default function NoteViewer() {
           </div>
 
           {/* Note Title */}
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             {note.title}
           </h1>
 
           {/* Note Meta */}
-          <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4 sm:mb-6">
             {note.episode && (
               <div className="flex items-center space-x-1">
                 <span className="font-medium">Episode {note.episode}</span>
@@ -251,10 +251,10 @@ export default function NoteViewer() {
         </div>
 
         {/* Note Content */}
-        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50">
+        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700/50">
           <div
             ref={contentRef}
-            className="p-12 prose prose-xl prose-gray dark:prose-invert max-w-none
+            className="p-4 sm:p-8 lg:p-12 prose prose-sm sm:prose-base lg:prose-xl prose-gray dark:prose-invert max-w-none
               prose-headings:font-bold prose-headings:tracking-tight
               prose-h1:text-5xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-indigo-500/30
               prose-h2:text-4xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-700/50
@@ -404,7 +404,7 @@ export default function NoteViewer() {
 
         {/* Bottom Navigation - Only show in presentation mode */}
         {folderId && folderNotes.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
             <div className="flex items-center justify-between">
               {/* Previous Note */}
               <div className="flex-1">

@@ -16,7 +16,7 @@ import CreateFolderModal from './CreateFolderModal'
 import { useFolders } from '../contexts/FolderContext'
 import toast from 'react-hot-toast'
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const [folders, setFolders] = useState([])
   const [expandedFolders, setExpandedFolders] = useState(new Set())
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -157,7 +157,19 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+      
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto z-40 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Folders</h2>

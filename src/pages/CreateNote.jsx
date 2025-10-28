@@ -157,8 +157,8 @@ export default function CreateNote() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 sm:mb-6">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <button
             onClick={() => navigate("/app")}
             className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors"
@@ -166,13 +166,13 @@ export default function CreateNote() {
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </button>
-          <h1 className="text-2xl font-bold text-white">Create New Note</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Create New Note</h1>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <button
             onClick={() => setPreview(!preview)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+            className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md transition-colors text-sm sm:text-base ${
               preview
                 ? "bg-blue-600 text-white"
                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -185,7 +185,7 @@ export default function CreateNote() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <button
           type="button"
           onClick={() => {
@@ -197,16 +197,16 @@ export default function CreateNote() {
             });
             toast.success("Ready to create new note");
           }}
-          className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] min-w-[200px] justify-center"
+          className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl sm:rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] w-full sm:w-auto sm:min-w-[200px] justify-center"
           aria-label="Create new note"
         >
-          <Plus className="h-6 w-6" />
-          <span className="text-lg font-semibold">New Note</span>
+          <Plus className="h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-base sm:text-lg font-semibold">New Note</span>
         </button>
 
-        <label className="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer min-w-[200px] justify-center">
-          <FileText className="h-6 w-6" />
-          <span className="text-lg font-semibold">Add MD File</span>
+        <label className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl sm:rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer w-full sm:w-auto sm:min-w-[200px] justify-center">
+          <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-base sm:text-lg font-semibold">Add MD File</span>
           <input
             type="file"
             className="hidden"
@@ -241,8 +241,8 @@ export default function CreateNote() {
         )}
 
         {/* Basic Info */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 p-4 sm:p-6 lg:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-semibold text-gray-200 mb-3">
                 Title *
@@ -286,11 +286,11 @@ export default function CreateNote() {
 
         {/* Content */}
         <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 overflow-hidden">
-          <div className="border-b border-gray-700/50 px-8 py-4 bg-gray-900/30">
+          <div className="border-b border-gray-700/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gray-900/30">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-white">Content</h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <h3 className="text-base sm:text-lg font-semibold text-white">Content</h3>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   {uploadedFile
                     ? "Content loaded from uploaded file"
                     : "Write your note in Markdown format"}
@@ -299,14 +299,14 @@ export default function CreateNote() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-96">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-64 sm:min-h-96">
             {/* Editor */}
             <div className={`${preview ? "hidden lg:block" : ""}`}>
               <textarea
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-96 p-6 bg-gray-900 text-white border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-gray-500"
+                className="w-full h-64 sm:h-96 p-4 sm:p-6 bg-gray-900 text-white border-0 resize-none focus:ring-0 focus:outline-none font-mono text-xs sm:text-sm placeholder-gray-500"
                 placeholder={
                   uploadedFile
                     ? "Content from uploaded file will appear here..."
@@ -336,7 +336,7 @@ function example() {
                 !preview ? "hidden lg:block" : ""
               }`}
             >
-              <div className="p-6 prose prose-sm max-w-none prose-invert">
+              <div className="p-4 sm:p-6 prose prose-sm max-w-none prose-invert overflow-auto h-64 sm:h-96">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
@@ -369,10 +369,10 @@ function example() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+            className="flex items-center space-x-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm sm:text-base w-full sm:w-auto justify-center"
             aria-label={loading ? "Creating note" : "Create note"}
           >
-            <Save className="h-5 w-5" />
+            <Save className="h-4 w-4 sm:h-5 sm:w-5" />
             <span>{loading ? "Creating..." : "Create Note"}</span>
           </button>
         </div>

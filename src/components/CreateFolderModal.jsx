@@ -81,10 +81,10 @@ export default function CreateFolderModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
             Create New Folder
           </h3>
           <button
@@ -95,7 +95,7 @@ export default function CreateFolderModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Folder Name *
@@ -131,7 +131,7 @@ export default function CreateFolderModal({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Icon
             </label>
-            <div className="grid grid-cols-8 gap-2">
+            <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 sm:gap-2">
               {folderIcons.map((icon) => (
                 <button
                   key={icon}
@@ -153,7 +153,7 @@ export default function CreateFolderModal({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Color
             </label>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {folderColors.map((color) => (
                 <button
                   key={color}
@@ -170,18 +170,18 @@ export default function CreateFolderModal({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-sm sm:text-base order-2 sm:order-1"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !formData.name.trim()}
-              className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg font-semibold"
+              className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg font-semibold text-sm sm:text-base order-1 sm:order-2"
               aria-label={loading ? "Creating folder" : "Create folder"}
             >
               {loading ? "Creating..." : "Create Folder"}

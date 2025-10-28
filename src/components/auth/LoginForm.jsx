@@ -42,19 +42,19 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <div className="text-center mb-8">
-          <LogIn className="mx-auto h-12 w-12 text-blue-600 dark:text-blue-400" />
-          <h2 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="w-full max-w-md mx-auto px-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <LogIn className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-blue-600 dark:text-blue-400" />
+          <h2 className="mt-3 sm:mt-4 text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             Welcome Back
           </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Sign in to your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Email Address

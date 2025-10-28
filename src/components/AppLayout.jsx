@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
@@ -7,6 +8,11 @@ import Sidebar from './Sidebar';
  * Eliminates code duplication from App.jsx
  */
 export default function AppLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="min-h-screen bg-gray-950 text-white overflow-x-hidden">
       {/* Floating gradient blobs */}
@@ -16,11 +22,11 @@ export default function AppLayout() {
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl" />
       </div>
       
-      <Navbar />
+      <Navbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
       
       <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 ml-64 pt-20 relative z-10">
+        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+        <main className="flex-1 p-4 sm:p-6 lg:ml-64 pt-20 relative z-10 w-full">
           <Outlet />
         </main>
       </div>

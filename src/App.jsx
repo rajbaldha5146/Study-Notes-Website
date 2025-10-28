@@ -127,8 +127,10 @@ export default function App() {
                     fontWeight: "500",
                     boxShadow:
                       "0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)",
-                    maxWidth: "400px",
+                    maxWidth: "90vw",
+                    width: "100%",
                   },
+                  className: "sm:max-w-md",
                   success: {
                     style: {
                       background: "#065f46",
