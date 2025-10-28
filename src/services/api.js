@@ -1,8 +1,14 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "/api" : "http://localhost:5000/api");
+// Determine API base URL based on environment
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:5000/api');
+
+// Log for debugging (remove in production)
+if (import.meta.env.DEV) {
+  console.log('API Base URL:', API_BASE_URL);
+  console.log('Environment Mode:', import.meta.env.MODE);
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
