@@ -251,10 +251,10 @@ export default function NoteViewer() {
         </div>
 
         {/* Note Content */}
-        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700/50">
+        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden">
           <div
             ref={contentRef}
-            className="p-4 sm:p-8 lg:p-12 prose prose-sm sm:prose-base lg:prose-xl prose-gray dark:prose-invert max-w-none
+            className="p-4 sm:p-8 lg:p-12 prose prose-sm sm:prose-base lg:prose-xl prose-gray dark:prose-invert max-w-none overflow-x-auto
               prose-headings:font-bold prose-headings:tracking-tight
               prose-h1:text-5xl prose-h1:mb-8 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-indigo-500/30
               prose-h2:text-4xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-700/50
@@ -289,7 +289,7 @@ export default function NoteViewer() {
                   if (isInlineCode) {
                     return (
                       <code
-                        className="bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-md text-base font-mono font-semibold border border-indigo-500/30 shadow-sm"
+                        className="bg-gray-900 text-orange-300 px-2.5 py-1 rounded-md text-base font-mono font-semibold shadow-sm"
                         {...props}
                       >
                         {children}
@@ -299,7 +299,11 @@ export default function NoteViewer() {
 
                   return (
                     <code
-                      className={`${className} bg-transparent text-gray-100 font-mono text-base leading-relaxed`}
+                      className={`${className} bg-transparent text-gray-50 font-mono text-base`}
+                      style={{
+                        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', Consolas, monospace",
+                        lineHeight: '1.8',
+                      }}
                       {...props}
                     >
                       {children}
@@ -313,14 +317,22 @@ export default function NoteViewer() {
                   const language = match ? match[1] : "";
 
                   return (
-                    <div className="relative my-8 group">
+                    <div className="relative my-8 overflow-x-auto">
                       {language && (
                         <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 text-xs font-bold rounded-bl-xl rounded-tr-xl z-10 uppercase tracking-wider shadow-lg">
                           {language}
                         </div>
                       )}
                       <pre
-                        className="!bg-gray-950 rounded-xl overflow-x-auto border-2 border-gray-800 shadow-2xl p-6 hover:border-indigo-500/30 transition-all duration-300"
+                        className="overflow-x-auto !mx-4 !my-8"
+                        style={{
+                          background: 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 50%, #2a1a4a 100%)',
+                          borderRadius: '10px',
+                          border: 'none',
+                          outline: 'none',
+                          padding: '2rem',
+                          boxShadow: 'none',
+                        }}
                         {...props}
                       >
                         {children}

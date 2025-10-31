@@ -44,14 +44,9 @@
   padding: 0;
 }
 
-/* Inline code pulse effect */
+/* Inline code - no hover effects for clean appearance */
 .prose code {
-  transition: all 0.2s ease;
-}
-
-.prose code:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  transition: none;
 }
 
 /* List item hover effect */

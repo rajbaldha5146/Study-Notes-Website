@@ -26,7 +26,7 @@ export default function AppLayout() {
       
       <div className="flex">
         <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-        <main className="flex-1 p-4 sm:p-6 lg:ml-64 pt-20 relative z-10 w-full">
+        <main className="flex-1 p-4 sm:p-6 lg:ml-64 pt-24 relative z-10 w-full">
           <Outlet />
         </main>
       </div>

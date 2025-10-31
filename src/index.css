@@ -2,17 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom code styling */
+/* Custom code styling - Modern Borderless Design */
 .prose code {
   @apply font-mono;
 }
 
 .prose pre {
-  @apply my-6 p-0 bg-gray-900 rounded-lg border border-gray-700;
+  @apply my-8 mx-4 p-0 overflow-x-auto;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
 }
 
 .prose pre code {
-  @apply bg-transparent text-gray-100 p-4 block overflow-x-auto font-mono text-sm leading-relaxed;
+  @apply bg-transparent text-gray-50 block font-mono text-base;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: 1.6;
+  padding: 20px;
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", "Monaco", "Inconsolata",
+    Consolas, monospace;
 }
 
 /* Inline code styling - handled by React component, this is fallback */
@@ -25,38 +36,55 @@
   content: none;
 }
 
-/* Block code styling - always dark theme */
+/* Block code styling - Modern Borderless Design */
 .prose pre[class*="language-"] {
-  @apply my-6 p-0 bg-gray-900 rounded-lg;
+  @apply my-8 mx-4 p-0 overflow-x-auto;
+  background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 50%, #2a1a4a 100%);
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .prose pre[class*="language-"] code {
-  @apply block p-4 bg-transparent text-gray-100 overflow-x-auto font-mono text-sm leading-relaxed;
+  @apply block p-8 bg-transparent text-gray-50 font-mono text-base;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: 1.8;
+  font-family: "JetBrains Mono", "Fira Code", "SF Mono", "Monaco", "Inconsolata",
+    Consolas, monospace;
 }
 
-/* Syntax highlighting improvements - vibrant colors like VS Code */
+/* Syntax highlighting - High contrast for gradient background */
 .prose pre code .token.comment {
   @apply text-green-400;
+  font-style: italic;
+  opacity: 0.85;
 }
 
 .prose pre code .token.keyword {
-  @apply text-purple-400;
+  @apply text-purple-300;
+  font-weight: 600;
 }
 
 .prose pre code .token.string {
   @apply text-green-300;
+  font-weight: 500;
 }
 
 .prose pre code .token.number {
-  @apply text-pink-400;
+  @apply text-orange-300;
+  font-weight: 600;
 }
 
 .prose pre code .token.function {
-  @apply text-orange-300;
+  @apply text-blue-300;
+  font-weight: 600;
 }
 
 .prose pre code .token.operator {
-  @apply text-gray-300;
+  @apply text-cyan-300;
+  font-weight: 500;
 }
 
 .prose pre code .token.punctuation {
@@ -64,36 +92,70 @@
 }
 
 .prose pre code .token.variable {
-  @apply text-blue-300;
+  @apply text-red-300;
+  font-weight: 500;
 }
 
 .prose pre code .token.property {
-  @apply text-orange-300;
+  @apply text-yellow-300;
+  font-weight: 500;
 }
 
 .prose pre code .token.method {
-  @apply text-orange-300;
+  @apply text-blue-300;
+  font-weight: 600;
 }
 
 /* Additional syntax highlighting for better colors */
 .prose pre code .token.builtin {
   @apply text-cyan-300;
+  font-weight: 500;
 }
 
 .prose pre code .token.constant {
   @apply text-pink-400;
+  font-weight: 600;
 }
 
 .prose pre code .token.boolean {
   @apply text-pink-400;
+  font-weight: 600;
 }
 
 .prose pre code .token.null {
   @apply text-pink-400;
+  font-weight: 600;
 }
 
 .prose pre code .token.undefined {
   @apply text-pink-400;
+  font-weight: 600;
+}
+
+.prose pre code .token.class-name {
+  @apply text-yellow-300;
+  font-weight: 600;
+}
+
+.prose pre code .token.tag {
+  @apply text-red-400;
+}
+
+.prose pre code .token.attr-name {
+  @apply text-blue-300;
+}
+
+.prose pre code .token.attr-value {
+  @apply text-emerald-300;
+}
+
+.prose pre code .token.selector {
+  @apply text-purple-300;
+}
+
+.prose pre code .token.important {
+  @apply text-red-400;
+  font-weight: 700;
 }
 
 /* Dark mode prose improvements */
@@ -127,7 +189,27 @@
   @apply text-gray-400;
 }
 
+/* Prevent scaling/transform effects on code blocks */
+.prose pre,
+.prose pre *,
+.prose code,
+.prose code * {
+  transform: none !important;
+  transition: color 0.3s ease, border-color 0.3s ease,
+    background-color 0.3s ease, box-shadow 0.3s ease !important;
+}
 
+/* Remove hover effects - keep it static */
+
+/* Line numbers styling (if needed) */
+.prose pre code .line-number {
+  @apply text-gray-500 select-none mr-4 inline-block w-8 text-right;
+}
+
+/* Copy button area */
+.prose pre .copy-button {
+  @apply absolute top-4 right-4 bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 hover:text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-200 backdrop-blur-sm border border-gray-600/50;
+}
 
 /* Scrollbar styling for code blocks */
 .prose pre::-webkit-scrollbar {
@@ -168,19 +250,19 @@
   height: 60px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .book-loader .book .cover::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 8px;
   left: 8px;
   right: 8px;
   bottom: 8px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .book-loader .book .page {
@@ -193,7 +275,7 @@
   border-radius: 2px;
   transform-origin: left center;
   animation: flip 2.5s infinite ease-in-out;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .book-loader .book .page:nth-child(2) {
@@ -212,7 +294,7 @@
 }
 
 .book-loader .book .page::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 8px;
   left: 8px;
@@ -223,7 +305,7 @@
 }
 
 .book-loader .book .page::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 16px;
   left: 8px;
@@ -234,13 +316,16 @@
 }
 
 @keyframes flip {
-  0%, 20% {
+  0%,
+  20% {
     transform: rotateY(0deg);
   }
-  45%, 55% {
+  45%,
+  55% {
     transform: rotateY(-180deg);
   }
-  80%, 100% {
+  80%,
+  100% {
     transform: rotateY(0deg);
   }
 }
