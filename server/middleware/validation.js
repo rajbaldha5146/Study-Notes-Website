@@ -16,6 +16,7 @@ const sanitizeString = (str) => {
 export const validateNote = (req, res, next) => {
   const { title, content, folder } = req.body;
   const errors = [];
+  const isUpdate = req.method === 'PUT';
 
   if (!title || typeof title !== 'string' || title.trim().length === 0) {
     errors.push('Title is required and must be a non-empty string');
@@ -33,7 +34,8 @@ export const validateNote = (req, res, next) => {
     errors.push('Content must be less than 1MB');
   }
 
-  if (!folder || typeof folder !== 'string') {
+  // Only require folder for creation, not updates
+  if (!isUpdate && (!folder || typeof folder !== 'string')) {
     errors.push('Folder ID is required');
   }
 

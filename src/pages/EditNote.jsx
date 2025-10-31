@@ -69,11 +69,25 @@ export default function EditNote() {
         content: sanitizedContent,
       };
 
+      // Debug logging
+      console.log("Updating note with data:", {
+        id,
+        title: sanitizedTitle,
+        contentLength: sanitizedContent.length,
+        contentPreview: sanitizedContent.substring(0, 100) + "..."
+      });
+
       await updateNote(id, noteData);
       toast.success("Note updated successfully!");
       navigate(`/app/note/${id}`);
     } catch (error) {
       console.error("Error updating note:", error);
+      console.error("Error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
       toast.error(error.response?.data?.message || "Failed to update note");
     } finally {
       setLoading(false);

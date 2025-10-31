@@ -64,11 +64,23 @@ const ResetPassword = () => {
     }
 
     setLoading(true);
+    setErrors({}); // Clear any previous errors
 
-    const result = await resetPassword(token, formData.password);
+    try {
+      const result = await resetPassword(token, formData.password);
 
-    if (result.success) {
-      setSuccess(true);
+      if (result.success) {
+        setSuccess(true);
+      } else {
+        setErrors({ 
+          general: result.error || "Failed to reset password. Please try again." 
+        });
+      }
+    } catch (error) {
+      console.error("Reset password error:", error);
+      setErrors({ 
+        general: "An unexpected error occurred. Please try again." 
+      });
     }
 
     setLoading(false);
@@ -137,6 +149,14 @@ const ResetPassword = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {errors.general && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {errors.general}
+                </p>
+              </div>
+            )}
+            
             <div>
               <label
                 htmlFor="password"

@@ -38,7 +38,7 @@ export default function NoteViewer() {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadData = async () => {
       if (isMounted) {
         await fetchNote();
@@ -47,16 +47,14 @@ export default function NoteViewer() {
         }
       }
     };
-    
+
     loadData();
-    
+
     // Cleanup function to prevent memory leaks
     return () => {
       isMounted = false;
     };
   }, [id, folderId]);
-
-
 
   const fetchNote = async () => {
     try {
@@ -99,20 +97,13 @@ export default function NoteViewer() {
   };
 
   const cleanMarkdownContent = (content) => {
-    // Remove YAML frontmatter - more comprehensive regex
+    // Remove YAML frontmatter - more precise regex
     let cleanContent = content;
 
-    // Remove frontmatter at the beginning (---...---)
+    // Remove frontmatter at the beginning (---...---) only
     cleanContent = cleanContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n?/m, "");
 
-    // Remove any remaining frontmatter patterns
-    cleanContent = cleanContent.replace(/^---\s*[\s\S]*?---\s*$/gm, "");
-
-    // Remove title and tags lines that might be left
-    cleanContent = cleanContent.replace(/^title:\s*.*$/gm, "");
-    cleanContent = cleanContent.replace(/^tags:\s*\[.*?\]$/gm, "");
-
-    // Clean up extra newlines
+    // Clean up extra newlines at the start
     cleanContent = cleanContent.replace(/^\n+/, "").trim();
 
     return cleanContent;
@@ -175,6 +166,8 @@ export default function NoteViewer() {
                         navigate(
                           `/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
                         );
+                        // Scroll to top when switching notes
+                        window.scrollTo(0, 0);
                       }
                     }}
                     disabled={currentNoteIndex <= 0}
@@ -199,6 +192,8 @@ export default function NoteViewer() {
                         navigate(
                           `/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
                         );
+                        // Scroll to top when switching notes
+                        window.scrollTo(0, 0);
                       }
                     }}
                     disabled={currentNoteIndex >= folderNotes.length - 1}
@@ -247,7 +242,6 @@ export default function NoteViewer() {
               </div>
             )}
           </div>
-
         </div>
 
         {/* Note Content */}
@@ -301,8 +295,9 @@ export default function NoteViewer() {
                     <code
                       className={`${className} bg-transparent text-gray-50 font-mono text-base`}
                       style={{
-                        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', Consolas, monospace",
-                        lineHeight: '1.8',
+                        fontFamily:
+                          "'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', Consolas, monospace",
+                        lineHeight: "1.8",
                       }}
                       {...props}
                     >
@@ -326,12 +321,13 @@ export default function NoteViewer() {
                       <pre
                         className="overflow-x-auto !mx-4 !my-8"
                         style={{
-                          background: 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 50%, #2a1a4a 100%)',
-                          borderRadius: '10px',
-                          border: 'none',
-                          outline: 'none',
-                          padding: '2rem',
-                          boxShadow: 'none',
+                          background:
+                            "linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 50%, #2a1a4a 100%)",
+                          borderRadius: "10px",
+                          border: "none",
+                          outline: "none",
+                          padding: "2rem",
+                          boxShadow: "none",
                         }}
                         {...props}
                       >
@@ -345,7 +341,9 @@ export default function NoteViewer() {
                 h1({ node, children, ...props }) {
                   return (
                     <h1 className="group relative" {...props}>
-                      <span className="absolute -left-8 top-0 text-indigo-500/30 font-bold text-4xl opacity-0 group-hover:opacity-100 transition-opacity">#</span>
+                      <span className="absolute -left-8 top-0 text-indigo-500/30 font-bold text-4xl opacity-0 group-hover:opacity-100 transition-opacity">
+                        #
+                      </span>
                       {children}
                     </h1>
                   );
@@ -354,7 +352,9 @@ export default function NoteViewer() {
                 h2({ node, children, ...props }) {
                   return (
                     <h2 className="group relative" {...props}>
-                      <span className="absolute -left-7 top-0 text-indigo-500/30 font-bold text-3xl opacity-0 group-hover:opacity-100 transition-opacity">##</span>
+                      <span className="absolute -left-7 top-0 text-indigo-500/30 font-bold text-3xl opacity-0 group-hover:opacity-100 transition-opacity">
+                        ##
+                      </span>
                       {children}
                     </h2>
                   );
@@ -363,7 +363,9 @@ export default function NoteViewer() {
                 h3({ node, children, ...props }) {
                   return (
                     <h3 className="group relative" {...props}>
-                      <span className="absolute -left-6 top-0 text-indigo-500/30 font-bold text-2xl opacity-0 group-hover:opacity-100 transition-opacity">###</span>
+                      <span className="absolute -left-6 top-0 text-indigo-500/30 font-bold text-2xl opacity-0 group-hover:opacity-100 transition-opacity">
+                        ###
+                      </span>
                       {children}
                     </h3>
                   );
@@ -390,7 +392,9 @@ export default function NoteViewer() {
                 blockquote({ node, children, ...props }) {
                   return (
                     <blockquote className="relative" {...props}>
-                      <span className="absolute -left-2 top-0 text-6xl text-indigo-500/20 font-serif">"</span>
+                      <span className="absolute -left-2 top-0 text-6xl text-indigo-500/20 font-serif">
+                        "
+                      </span>
                       {children}
                     </blockquote>
                   );
@@ -399,10 +403,24 @@ export default function NoteViewer() {
                 // Links with icon
                 a({ node, children, href, ...props }) {
                   return (
-                    <a href={href} className="inline-flex items-center gap-1 group" {...props}>
+                    <a
+                      href={href}
+                      className="inline-flex items-center gap-1 group"
+                      {...props}
+                    >
                       {children}
-                      <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      <svg
+                        className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
                       </svg>
                     </a>
                   );
@@ -427,6 +445,8 @@ export default function NoteViewer() {
                       navigate(
                         `/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
                       );
+                      // Scroll to top when switching notes
+                      window.scrollTo(0, 0);
                     }}
                     className="flex items-center space-x-3 text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
                   >
@@ -492,6 +512,8 @@ export default function NoteViewer() {
                       navigate(
                         `/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
                       );
+                      // Scroll to top when switching notes
+                      window.scrollTo(0, 0);
                     }}
                     className="flex items-center space-x-3 text-right p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
                   >
