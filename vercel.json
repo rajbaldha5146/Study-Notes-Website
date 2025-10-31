@@ -22,6 +22,7 @@
     {
       "src": "/assets/(.*)",
       "dest": "/dist/assets/$1"
+    },
     {
       "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json))",
       "dest": "/dist/$1"
