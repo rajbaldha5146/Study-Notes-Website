@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import notesRoutes from "./routes/notes.js";
 import foldersRoutes from "./routes/folders.js";
 import authRoutes from "./routes/auth.js";
+import aiRoutes from "./routes/ai.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -75,6 +76,7 @@ app.use(express.static(path.join(__dirname, "../dist")));
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/folders", foldersRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

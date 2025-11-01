@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Eye, FileText, Plus } from "lucide-react";
+import { ArrowLeft, Save, Eye, FileText, Plus, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -8,6 +8,7 @@ import { createNote, getFolders, createFolder } from "../services/api";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
 import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
+import AITopicGenerator from "../components/ai/AITopicGenerator";
 
 export default function CreateNote() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function CreateNote() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [folders, setFolders] = useState([]);
   const [loadingFolders, setLoadingFolders] = useState(true);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -116,6 +118,15 @@ export default function CreateNote() {
     });
   };
 
+  const handleAIContentGenerated = (aiContent) => {
+    setFormData(prevData => ({
+      ...prevData,
+      title: aiContent.title,
+      content: aiContent.content,
+    }));
+    setShowAIGenerator(false);
+  };
+
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -204,9 +215,24 @@ export default function CreateNote() {
           <span className="text-base sm:text-lg font-semibold">New Note</span>
         </button>
 
-        <label className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl sm:rounded-2xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer w-full sm:w-auto sm:min-w-[200px] justify-center">
+        <button
+          type="button"
+          onClick={() => setShowAIGenerator(!showAIGenerator)}
+          className={`flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r text-white rounded-xl sm:rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] w-full sm:w-auto sm:min-w-[200px] justify-center ${
+            showAIGenerator 
+              ? 'from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700' 
+              : 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+          }`}
+        >
+          <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
+          <span className="text-base sm:text-lg font-semibold">
+            {showAIGenerator ? 'Manual Mode' : 'AI Generate'}
+          </span>
+        </button>
+
+        <label className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl sm:rounded-2xl hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] cursor-pointer w-full sm:w-auto sm:min-w-[200px] justify-center">
           <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-base sm:text-lg font-semibold">Add MD File</span>
+          <span className="text-base sm:text-lg font-semibold">Upload MD</span>
           <input
             type="file"
             className="hidden"
@@ -218,6 +244,12 @@ export default function CreateNote() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* AI Topic Generator */}
+        <AITopicGenerator 
+          onContentGenerated={handleAIContentGenerated}
+          isVisible={showAIGenerator}
+        />
+
         {/* File Status */}
         {uploadedFile && (
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
@@ -252,10 +284,19 @@ export default function CreateNote() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-all"
-                placeholder="Enter note title..."
-                required
+                className={`w-full px-4 py-3 bg-gray-900/50 border text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-all ${
+                  formData.title ? 'border-emerald-500/50' : 'border-gray-600/50'
+                }`}
+                placeholder={showAIGenerator ? "AI will generate title..." : "Enter note title..."}
+                required={!showAIGenerator}
+                readOnly={showAIGenerator}
               />
+              {formData.title && !showAIGenerator && (
+                <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  Generated by AI
+                </p>
+              )}
             </div>
 
             <div>
@@ -293,6 +334,15 @@ export default function CreateNote() {
                 <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   {uploadedFile
                     ? "Content loaded from uploaded file"
+                    : showAIGenerator
+                    ? "AI will generate structured content"
+                    : formData.content && !uploadedFile
+                    ? (
+                        <span className="flex items-center gap-1 text-emerald-400">
+                          <Sparkles className="h-3 w-3" />
+                          Generated by AI
+                        </span>
+                      )
                     : "Write your note in Markdown format"}
                 </p>
               </div>
@@ -308,7 +358,9 @@ export default function CreateNote() {
                 onChange={handleChange}
                 className="w-full h-64 sm:h-96 p-4 sm:p-6 bg-gray-900 text-white border-0 resize-none focus:ring-0 focus:outline-none font-mono text-xs sm:text-sm placeholder-gray-500"
                 placeholder={
-                  uploadedFile
+                  showAIGenerator
+                    ? "AI will generate structured content here..."
+                    : uploadedFile
                     ? "Content from uploaded file will appear here..."
                     : `# Your Note Title
 

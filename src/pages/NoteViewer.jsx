@@ -12,6 +12,7 @@ import {
   Folder,
   ChevronLeft,
   ChevronRight,
+  Brain,
 } from "lucide-react";
 import BookLoader from "../components/BookLoader";
 import ReactMarkdown from "react-markdown";
@@ -96,6 +97,8 @@ export default function NoteViewer() {
     }
   };
 
+
+
   const cleanMarkdownContent = (content) => {
     // Remove YAML frontmatter - more precise regex
     let cleanContent = content;
@@ -132,7 +135,7 @@ export default function NoteViewer() {
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Go Back
           </button>
@@ -150,7 +153,7 @@ export default function NoteViewer() {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate(-1)}
-                className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back</span>
@@ -210,13 +213,26 @@ export default function NoteViewer() {
               )}
             </div>
 
-            <Link
-              to={`/edit/${note._id}`}
-              className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-            >
-              <Edit className="h-4 w-4" />
-              <span>Edit</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              {note?.content && note.content.length >= 100 && (
+                <Link
+                  to={`/app/quiz/${note._id}`}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-md transition-all duration-200 transform hover:scale-105"
+                  title="Take quiz on this note"
+                >
+                  <Brain className="h-4 w-4" />
+                  <span className="hidden sm:inline">Take Quiz</span>
+                </Link>
+              )}
+              
+              <Link
+                to={`/edit/${note._id}`}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <Edit className="h-4 w-4" />
+                <span>Edit</span>
+              </Link>
+            </div>
           </div>
 
           {/* Note Title */}
@@ -450,8 +466,8 @@ export default function NoteViewer() {
                     }}
                     className="flex items-center space-x-3 text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
                   >
-                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full group-hover:bg-primary-100 dark:group-hover:bg-primary-900 transition-colors">
-                      <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400" />
+                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
+                      <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                     </div>
                     <div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -492,7 +508,7 @@ export default function NoteViewer() {
                       }
                       className={`w-2 h-2 rounded-full transition-colors ${
                         index === currentNoteIndex
-                          ? "bg-primary-500"
+                          ? "bg-blue-500"
                           : index < currentNoteIndex
                           ? "bg-green-500"
                           : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
@@ -525,8 +541,8 @@ export default function NoteViewer() {
                         {folderNotes[currentNoteIndex + 1].title}
                       </div>
                     </div>
-                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full group-hover:bg-primary-100 dark:group-hover:bg-primary-900 transition-colors">
-                      <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400" />
+                    <div className="flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full group-hover:bg-blue-100 dark:group-hover:bg-blue-900 transition-colors">
+                      <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                     </div>
                   </button>
                 ) : (
