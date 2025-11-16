@@ -148,38 +148,7 @@ export const AuthProvider = ({ children }) => {
 
   // Email verification methods removed - users are auto-verified
 
-  const forgotPassword = async (email) => {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      
-      if (response.data.success) {
-        toast.success('Password reset link sent to your email!');
-        return { success: true };
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Failed to send reset email';
-      toast.error(message);
-      return { success: false, message };
-    }
-  };
 
-  const resetPassword = async (token, password) => {
-    try {
-      const response = await api.post('/auth/reset-password', { 
-        token, 
-        password 
-      });
-      
-      if (response.data.success) {
-        toast.success('Password reset successful! You can now log in.');
-        return { success: true };
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Password reset failed';
-      toast.error(message);
-      return { success: false, message };
-    }
-  };
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -195,8 +164,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
-    forgotPassword,
-    resetPassword,
+
     logout
   };
 

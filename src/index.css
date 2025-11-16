@@ -506,6 +506,15 @@ body {
   font-weight: 700;
 }
 
+/* Disable drop cap effect */
+.prose p:first-child::first-letter {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  float: none !important;
+  line-height: inherit !important;
+  margin: 0 !important;
+}
+
 /* Dark mode prose improvements */
 .dark .prose {
   @apply text-gray-200;

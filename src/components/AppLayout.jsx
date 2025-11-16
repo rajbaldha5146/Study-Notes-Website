@@ -38,22 +38,9 @@ export default function AppLayout() {
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white overflow-x-hidden">
-      {/* Animated floating gradient blobs */}
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+      {/* Subtle background pattern */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Primary blob - Blue */}
-        <div className="absolute w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl top-1/4 left-1/4 animate-blob" />
-        
-        {/* Secondary blob - Purple */}
-        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-500/15 rounded-full blur-3xl animate-blob animation-delay-2000" />
-        
-        {/* Tertiary blob - Emerald */}
-        <div className="absolute bottom-1/4 left-1/3 w-[450px] h-[450px] bg-emerald-500/10 rounded-full blur-3xl animate-blob animation-delay-4000" />
-        
-        {/* Quaternary blob - Pink */}
-        <div className="absolute bottom-1/3 right-1/3 w-[350px] h-[350px] bg-pink-500/10 rounded-full blur-3xl animate-blob animation-delay-6000" />
-
-        {/* Subtle grid overlay for depth */}
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -75,9 +62,10 @@ export default function AppLayout() {
 
       {/* Navbar with dynamic backdrop */}
       <div
+        data-navbar
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? "bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50 shadow-lg shadow-black/20"
+            ? "bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg shadow-slate-950/20"
             : "bg-transparent"
         }`}
       >
@@ -85,7 +73,9 @@ export default function AppLayout() {
       </div>
 
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+      <div data-sidebar>
+        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+      </div>
 
       {/* Main content area */}
       <main
@@ -99,7 +89,7 @@ export default function AppLayout() {
         `}
       >
         {/* Content backdrop for better readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/20 to-gray-950/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950/40 pointer-events-none" />
         
         {/* Actual content */}
         <div className="relative z-10">
@@ -111,7 +101,7 @@ export default function AppLayout() {
       {scrolled && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 p-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 lg:bottom-8 lg:right-8"
+          className="fixed bottom-6 right-6 z-50 p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/50 transition-all duration-300 lg:bottom-8 lg:right-8"
           aria-label="Scroll to top"
         >
           <svg

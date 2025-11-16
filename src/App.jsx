@@ -13,11 +13,11 @@ import FolderView from "./pages/FolderView";
 import NoteViewer from "./pages/NoteViewer";
 import CreateNote from "./pages/CreateNote";
 import EditNote from "./pages/EditNote";
-import QuizPage from "./pages/QuizPage";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+
+
 
 export default function App() {
   return (
@@ -52,15 +52,8 @@ export default function App() {
                     </PublicRoute>
                   }
                 />
-                <Route
-                  path="/forgot-password"
-                  element={
-                    <PublicRoute>
-                      <ForgotPassword />
-                    </PublicRoute>
-                  }
-                />
-                <Route path="/reset-password" element={<ResetPassword />} />
+
+
 
                 {/* Protected routes with shared layout */}
                 <Route
@@ -77,7 +70,7 @@ export default function App() {
                   <Route path="create" element={<CreateNote />} />
                   <Route path="create/:folderId" element={<CreateNote />} />
                   <Route path="edit/:id" element={<EditNote />} />
-                  <Route path="quiz/:noteId" element={<QuizPage />} />
+
                 </Route>
 
                 {/* Legacy routes - use same layout */}

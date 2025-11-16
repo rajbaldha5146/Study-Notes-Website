@@ -27,14 +27,8 @@
       "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
       "dest": "/dist/$1"
     },
-    {
-      "src": "/reset-password",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/forgot-password",
-      "dest": "/dist/index.html"
-    },
+
+
     {
       "src": "/login",
       "dest": "/dist/index.html"

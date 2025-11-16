@@ -111,17 +111,17 @@
   transition: opacity 0.2s ease;
 }
 
-/* Drop cap for the first paragraph after H1 */
+/* Drop cap disabled - keeping normal text */
 .prose h1 + p::first-letter {
-  font-size: 3.5rem;
-  font-weight: 800;
-  float: left;
-  line-height: 0.85;
-  margin: 0.1em 0.25em 0 0;
-  background: linear-gradient(135deg, rgb(var(--brand)), rgb(var(--brand-2)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: inherit;
+  font-weight: inherit;
+  float: none;
+  line-height: inherit;
+  margin: 0;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: inherit;
 }
 
 /* ---------------------------------------------------------
@@ -328,16 +328,14 @@
   color: rgb(var(--brand-2));
   padding: 0.15em 0.35em;
   border-radius: 4px;
-  border: 1px solid rgba(var(--brand), 0.22);
+  border: none;
   font-size: 0.92em;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   white-space: break-spaces;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 .prose :not(pre) > code:hover {
   background: rgba(var(--brand), 0.12);
-  border-color: rgba(var(--brand), 0.4);
-  transform: translateY(-1px);
 }
 
 /* Code blocks */
@@ -347,14 +345,14 @@
   padding: 1.25rem 1.5rem;
   border-radius: var(--radius);
   background: rgb(var(--code-bg));
-  border: 1px solid rgba(var(--code-border), 0.25);
-  box-shadow: var(--shadow-md);
+  border: none;
+  box-shadow: none;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 .prose pre:hover {
-  border-color: rgba(var(--code-border), 0.45);
-  box-shadow: 0 15px 50px rgba(var(--brand), 0.18);
+  border: none;
+  box-shadow: none;
 }
 .prose pre code {
   display: block;
@@ -433,51 +431,142 @@
 }
 
 /* ---------------------------------------------------------
-   TABLES
+   TABLES - Dark Minimal Theme
    --------------------------------------------------------- */
 .prose table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin: 1.5rem 0;
-  border-radius: var(--radius);
+  margin: 2rem 0;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(var(--brand), 0.22);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  background: rgb(2 6 23); /* slate-950 darker */
+  border: 1px solid rgb(30 41 59 / 0.6); /* slate-800/60 */
+  box-shadow: none;
 }
+
 .prose thead {
-  background: linear-gradient(135deg, rgba(var(--brand), 0.85), rgba(var(--brand-2), 0.85));
-  color: #fff;
+  background: rgb(15 23 42); /* slate-950 */
+  border-bottom: 1px solid rgb(30 41 59 / 0.5); /* slate-800/50 */
 }
+
 .prose thead th {
-  padding: 0.9rem 1rem;
+  padding: 0.875rem 1rem;
   text-align: left;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.82rem;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: rgb(148 163 184); /* slate-400 */
+  text-transform: none;
+  position: relative;
 }
+
+.prose thead th:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 30%;
+  height: 40%;
+  width: 1px;
+  background: rgb(30 41 59 / 0.4); /* slate-800/40 */
+}
+
+.prose tbody {
+  background: rgb(2 6 23); /* slate-950 darker */
+}
+
 .prose tbody tr {
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-  border-bottom: 1px solid rgba(var(--brand), 0.1);
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid rgb(30 41 59 / 0.25); /* slate-800/25 */
 }
+
 .prose tbody tr:hover {
-  background: linear-gradient(to right, rgba(var(--brand), 0.08), transparent);
-  box-shadow: 0 2px 8px rgba(var(--brand), 0.12);
-  transform: translateY(-1px);
+  background: rgb(30 41 59 / 0.15); /* slate-800/15 */
 }
+
+.prose tbody tr:last-child {
+  border-bottom: none;
+}
+
 .prose td {
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 1rem;
+  color: rgb(148 163 184); /* slate-400 */
+  font-size: 0.875rem;
+  line-height: 1.5;
+  vertical-align: top;
 }
+
+.prose td:not(:last-child) {
+  border-right: 1px solid rgb(30 41 59 / 0.2); /* slate-800/20 */
+}
+
+/* Code in table cells */
+.prose td code {
+  background: rgb(15 23 42 / 0.8); /* slate-950/80 */
+  color: rgb(59 130 246); /* blue-500 */
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  font-size: 0.8125rem;
+  border: none;
+}
+
+/* Special styling for first column (often headers/labels) */
+.prose td:first-child {
+  font-weight: 500;
+  color: rgb(203 213 225); /* slate-300 */
+  background: rgb(15 23 42 / 0.4); /* slate-950/40 */
+}
+
+/* Zebra striping with subtle slate tones */
 .prose tbody tr:nth-child(even) {
-  background: rgba(var(--brand), 0.03);
+  background: rgb(15 23 42 / 0.3); /* slate-950/30 */
 }
-/* Responsive table wrapper support */
+
+.prose tbody tr:nth-child(even):hover {
+  background: rgb(30 41 59 / 0.2); /* slate-800/20 */
+}
+
+/* Responsive table wrapper */
 .prose .table-wrap {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: var(--radius);
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .prose table {
+    font-size: 0.8125rem;
+  }
+  
+  .prose thead th,
+  .prose td {
+    padding: 0.75rem 0.875rem;
+  }
+  
+  .prose tbody tr:hover {
+    transform: none;
+  }
+}
+
+/* Scrollbar for table wrapper */
+.prose .table-wrap::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose .table-wrap::-webkit-scrollbar-track {
+  background: rgb(30 41 59 / 0.5); /* slate-800/50 */
+  border-radius: 4px;
+}
+
+.prose .table-wrap::-webkit-scrollbar-thumb {
+  background: rgb(59 130 246 / 0.6); /* blue-500/60 */
+  border-radius: 4px;
+}
+
+.prose .table-wrap::-webkit-scrollbar-thumb:hover {
+  background: rgb(59 130 246 / 0.8); /* blue-500/80 */
 }
 
 /* ---------------------------------------------------------
@@ -624,7 +713,7 @@
    --------------------------------------------------------- */
 @media (max-width: 768px) {
   .prose pre { padding: 1rem; font-size: 0.9rem; }
-  .prose h1 + p::first-letter { font-size: 3rem; }
+  .prose h1 + p::first-letter { font-size: inherit; }
   .prose img:hover { transform: none; }
 }
 @media (max-width: 480px) {
@@ -632,7 +721,7 @@
   .prose tbody tr:hover {
     transform: none;
   }
-  .prose h1 + p::first-letter { font-size: 2.5rem; }
+  .prose h1 + p::first-letter { font-size: inherit; }
 }
 
 /* ---------------------------------------------------------

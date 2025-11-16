@@ -111,12 +111,7 @@ const LoginForm = () => {
           {/* Email verification warning removed - users are auto-verified */}
 
           <div className="flex items-center justify-between">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Forgot your password?
-            </Link>
+
           </div>
 
           <button

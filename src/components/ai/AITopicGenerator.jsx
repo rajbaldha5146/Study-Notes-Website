@@ -115,7 +115,7 @@ export default function AITopicGenerator({ onContentGenerated, isVisible }) {
         <button
           onClick={handleGenerate}
           disabled={isGenerating || !topic.trim()}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:scale-100 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-medium transition-all duration-300 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
