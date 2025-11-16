@@ -24,7 +24,7 @@
       "dest": "/dist/assets/$1"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json))",
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
       "dest": "/dist/$1"
     },
     {
@@ -45,6 +45,22 @@
     },
     {
       "src": "/app/(.*)",
+      "dest": "/dist/index.html"
+    },
+    {
+      "src": "/note/(.*)",
+      "dest": "/dist/index.html"
+    },
+    {
+      "src": "/folder/(.*)",
+      "dest": "/dist/index.html"
+    },
+    {
+      "src": "/create(.*)",
+      "dest": "/dist/index.html"
+    },
+    {
+      "src": "/edit/(.*)",
       "dest": "/dist/index.html"
     },
     {

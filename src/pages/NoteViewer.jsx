@@ -167,7 +167,7 @@ export default function NoteViewer() {
                       const prevIndex = currentNoteIndex - 1;
                       if (prevIndex >= 0) {
                         navigate(
-                          `/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
+                          `/app/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
                         );
                         // Scroll to top when switching notes
                         window.scrollTo(0, 0);
@@ -193,7 +193,7 @@ export default function NoteViewer() {
                       const nextIndex = currentNoteIndex + 1;
                       if (nextIndex < folderNotes.length) {
                         navigate(
-                          `/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
+                          `/app/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
                         );
                         // Scroll to top when switching notes
                         window.scrollTo(0, 0);
@@ -226,7 +226,7 @@ export default function NoteViewer() {
               )}
               
               <Link
-                to={`/edit/${note._id}`}
+                to={`/app/edit/${note._id}`}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <Edit className="h-4 w-4" />
@@ -459,7 +459,7 @@ export default function NoteViewer() {
                     onClick={() => {
                       const prevIndex = currentNoteIndex - 1;
                       navigate(
-                        `/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
+                        `/app/note/${folderNotes[prevIndex]._id}?folder=${folderId}`
                       );
                       // Scroll to top when switching notes
                       window.scrollTo(0, 0);
@@ -503,7 +503,7 @@ export default function NoteViewer() {
                       key={index}
                       onClick={() =>
                         navigate(
-                          `/note/${folderNotes[index]._id}?folder=${folderId}`
+                          `/app/note/${folderNotes[index]._id}?folder=${folderId}`
                         )
                       }
                       className={`w-2 h-2 rounded-full transition-colors ${
@@ -526,7 +526,7 @@ export default function NoteViewer() {
                     onClick={() => {
                       const nextIndex = currentNoteIndex + 1;
                       navigate(
-                        `/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
+                        `/app/note/${folderNotes[nextIndex]._id}?folder=${folderId}`
                       );
                       // Scroll to top when switching notes
                       window.scrollTo(0, 0);
