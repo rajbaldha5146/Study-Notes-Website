@@ -18,18 +18,17 @@ export function sanitizeHTML(str) {
 
 /**
  * Sanitize markdown content
- * Removes potentially dangerous HTML while preserving markdown
+ * Minimal sanitization to preserve markdown formatting
  * @param {string} markdown - The markdown content
  * @returns {string} - Sanitized markdown
  */
 export function sanitizeMarkdown(markdown) {
   if (!markdown) return '';
   
-  // Remove script tags and event handlers
+  // Only remove actual dangerous content, preserve everything else
   return markdown
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/javascript:/gi, '');
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags only
+    .replace(/javascript:\s*[^"'\s]*/gi, ''); // Remove javascript: protocols only
 }
 
 /**

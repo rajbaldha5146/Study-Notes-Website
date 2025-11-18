@@ -47,7 +47,9 @@ router.get('/', async (req, res, next) => {
 // Get single note for the authenticated user
 router.get('/:id', validateObjectId('id'), async (req, res, next) => {
   try {
-    const note = await Note.findOne({ _id: req.params.id, user: req.user._id }).lean();
+    const note = await Note.findOne({ _id: req.params.id, user: req.user._id })
+      .populate('folder', 'name icon color')
+      .lean();
     if (!note) {
       return res.status(404).json({ success: false, message: 'Note not found' });
     }

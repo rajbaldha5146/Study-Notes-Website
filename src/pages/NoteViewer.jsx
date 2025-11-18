@@ -72,25 +72,56 @@ export default function NoteViewer() {
     };
   }, []);
 
-  // Reading progress bar (updates --progress on .prose)
+  // Reading progress bar (updates --progress on .prose) - Highly optimized for smooth scrolling
   useEffect(() => {
+    let ticking = false;
+    let lastScrollY = 0;
+
     const handleScroll = () => {
-      if (!contentRef.current) return;
+      const currentScrollY = window.scrollY;
 
-      const doc = document.documentElement;
-      const scrollTop = window.scrollY || doc.scrollTop;
-      const max = doc.scrollHeight - window.innerHeight;
-      const progress = max > 0 ? Math.min(Math.max(scrollTop / max, 0), 1) : 0;
+      // Only update if scroll position changed significantly (reduces unnecessary updates)
+      if (Math.abs(currentScrollY - lastScrollY) < 5) return;
 
-      contentRef.current.style.setProperty(
-        "--progress",
-        `${progress * 100}%`
-      );
+      if (!ticking && contentRef.current) {
+        requestAnimationFrame(() => {
+          if (!contentRef.current) return;
+
+          const doc = document.documentElement;
+          const scrollTop = window.scrollY || doc.scrollTop;
+          const max = doc.scrollHeight - window.innerHeight;
+          const progress =
+            max > 0 ? Math.min(Math.max(scrollTop / max, 0), 1) : 0;
+
+          // Use transform instead of width for better performance
+          contentRef.current.style.setProperty(
+            "--progress",
+            `${progress * 100}%`
+          );
+
+          lastScrollY = scrollTop;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    // Throttle scroll events even more
+    let scrollTimeout;
+    const throttledScroll = () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        handleScroll();
+        scrollTimeout = null;
+      }, 16); // ~60fps
     };
 
     handleScroll(); // init once
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
   }, []);
 
   const fetchNote = async () => {
@@ -132,7 +163,18 @@ export default function NoteViewer() {
 
   const cleanMarkdownContent = (content) => {
     let cleanContent = content;
-    cleanContent = cleanContent.replace(/^---\s*\n[\s\S]*?\n---\s*\n?/m, "");
+    // Only remove YAML frontmatter if it's at the very start and looks like actual YAML
+    // This prevents removing markdown section dividers (---)
+    if (cleanContent.startsWith("---\n")) {
+      const frontmatterEnd = cleanContent.indexOf("\n---\n", 4);
+      if (frontmatterEnd !== -1) {
+        // Check if it contains YAML-like content (key: value)
+        const frontmatter = cleanContent.substring(4, frontmatterEnd);
+        if (frontmatter.includes(":") && /^\w+\s*:/.test(frontmatter.trim())) {
+          cleanContent = cleanContent.substring(frontmatterEnd + 5);
+        }
+      }
+    }
     cleanContent = cleanContent.replace(/^\n+/, "").trim();
     return cleanContent;
   };
@@ -200,7 +242,7 @@ export default function NoteViewer() {
       <div className="mx-auto px-4 sm:px-6 max-w-7xl">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6 rounded-2xl border border-slate-800/70 bg-slate-900/80 backdrop-blur px-4 sm:px-5 py-3 sm:py-4 shadow-sm shadow-slate-950/60">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6 rounded-2xl border border-slate-800/70 bg-slate-900/90 px-4 sm:px-5 py-3 sm:py-4 shadow-sm">
             <div className="flex items-center gap-4 flex-wrap">
               <button
                 onClick={() => navigate(-1)}
@@ -295,14 +337,14 @@ export default function NoteViewer() {
             {note.folder && (
               <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-slate-300">
                 <Folder className="h-3.5 w-3.5" />
-                <span>JavaScript</span>
+                <span>{note.folder.name || "Unknown Folder"}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Markdown content */}
-        <div className="bg-slate-950/95 backdrop-blur-sm rounded-3xl shadow-[0_18px_60px_rgba(15,23,42,0.85)] border border-slate-800/80 overflow-hidden">
+        <div className="bg-slate-950/95 rounded-3xl border border-slate-800/80 overflow-hidden">
           <article
             ref={contentRef}
             className="prose max-w-none p-6 sm:p-8 lg:p-10"
@@ -452,9 +494,7 @@ export default function NoteViewer() {
                 ) : (
                   <div className="flex items-center gap-3 p-3 opacity-60">
                     <div className="min-w-0">
-                      <div className="text-xs text-slate-500">
-                        No next note
-                      </div>
+                      <div className="text-xs text-slate-500">No next note</div>
                     </div>
                     <div className="flex items-center justify-center w-10 h-10 bg-slate-900 rounded-full border border-slate-800">
                       <ChevronRight className="h-5 w-5 text-slate-500" />

@@ -17,51 +17,39 @@
     {
       "src": "/api/(.*)",
       "dest": "server/server.js",
-      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
     },
     {
       "src": "/assets/(.*)",
-      "dest": "/dist/assets/$1"
+      "dest": "/dist/assets/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot))",
-      "dest": "/dist/$1"
-    },
-
-
-    {
-      "src": "/login",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/register",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/app/(.*)",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/note/(.*)",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/folder/(.*)",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/create(.*)",
-      "dest": "/dist/index.html"
-    },
-    {
-      "src": "/edit/(.*)",
-      "dest": "/dist/index.html"
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|eot|map))",
+      "dest": "/dist/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "dest": "/dist/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
     }
   ],
+  "functions": {
+    "server/server.js": {
+      "maxDuration": 30
+    }
+  },
   "env": {
     "NODE_ENV": "production"
   }

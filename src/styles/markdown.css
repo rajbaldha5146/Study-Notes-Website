@@ -659,21 +659,22 @@
 .prose .footnotes ol { padding-left: 1.25rem; }
 
 /* ---------------------------------------------------------
-   ANIMATIONS (stagger, reduced-motion safe)
+   ANIMATIONS (stagger, reduced-motion safe) - Optimized for performance
    --------------------------------------------------------- */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .prose > * {
-  animation: fadeInUp 0.55s ease-out both;
+  animation: fadeInUp 0.3s ease-out both;
+  will-change: transform, opacity;
 }
-.prose > *:nth-child(1) { animation-delay: 0.05s; }
-.prose > *:nth-child(2) { animation-delay: 0.1s; }
-.prose > *:nth-child(3) { animation-delay: 0.15s; }
-.prose > *:nth-child(4) { animation-delay: 0.2s; }
-.prose > *:nth-child(5) { animation-delay: 0.25s; }
-.prose > *:nth-child(n+6) { animation-delay: 0.3s; }
+.prose > *:nth-child(1) { animation-delay: 0.02s; }
+.prose > *:nth-child(2) { animation-delay: 0.04s; }
+.prose > *:nth-child(3) { animation-delay: 0.06s; }
+.prose > *:nth-child(4) { animation-delay: 0.08s; }
+.prose > *:nth-child(5) { animation-delay: 0.1s; }
+.prose > *:nth-child(n+6) { animation-delay: 0.12s; }
 
 /* ---------------------------------------------------------
    ACCESSIBILITY & FOCUS
@@ -684,7 +685,7 @@
   border-radius: 4px;
 }
 
-/* Reading progress bar (set --progress via JS) */
+/* Reading progress bar (set --progress via JS) - Optimized for smooth scrolling */
 .prose::before {
   content: '';
   position: fixed;
@@ -694,7 +695,8 @@
   width: var(--progress);
   background: linear-gradient(to right, rgb(var(--brand)), rgb(var(--brand-2)));
   z-index: 40;
-  transition: width 0.2s ease;
+  will-change: width;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 /* ---------------------------------------------------------

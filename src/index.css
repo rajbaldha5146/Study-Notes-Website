@@ -415,9 +415,25 @@
   scrollbar-color: rgb(59, 130, 246) rgba(17, 24, 39, 0.5);
 }
 
-/* Smooth scrolling */
+/* Optimized scrolling for better performance */
 html {
   scroll-behavior: smooth;
+}
+
+/* Scroll performance optimizations */
+* {
+  /* Improve scroll performance */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize transforms and animations for better scroll performance */
+.prose, .prose * {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Reduce paint operations during scroll */
+.prose img, .prose pre, .prose table {
+  will-change: auto;
 }
 
 /* Prevent layout shift */
