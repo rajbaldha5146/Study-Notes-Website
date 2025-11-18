@@ -1,13 +1,40 @@
+# Dependencies
 node_modules
-.env
+server/node_modules
+
+# Development files
 .env.local
-.env.development
-.env.production
-*.log
-.DS_Store
+.env.development.local
+.env.test.local
+
+# IDE files
 .vscode
 .idea
-.git
-dist
-coverage
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# Cache
 .cache
+.parcel-cache
+
+# Build artifacts (keep dist for deployment)
+# dist
+
+# Test files
+coverage
+*.test.js
+*.spec.js
+
+# Documentation
+README.md
+docs/
+
+# Git
+.git
+.gitignore
