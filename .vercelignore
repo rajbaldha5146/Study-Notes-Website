@@ -24,7 +24,7 @@ logs
 .parcel-cache
 
 # Build artifacts (keep dist for deployment)
-# dist
+# Don't ignore dist - it's needed for deployment
 
 # Test files
 coverage
