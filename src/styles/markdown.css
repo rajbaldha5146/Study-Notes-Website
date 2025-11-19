@@ -52,12 +52,15 @@
    SELECTION
    --------------------------------------------------------- */
 .prose ::selection {
-  background: linear-gradient(
-    120deg,
-    rgba(var(--brand), 0.4),
-    rgba(var(--brand-2), 0.4)
-  );
-  color: #fff;
+  background: rgba(59, 130, 246, 0.6); /* solid blue-500 with opacity */
+  color: #ffffff;
+  text-shadow: none;
+}
+
+.prose *::selection {
+  background: rgba(59, 130, 246, 0.6); /* solid blue-500 with opacity */
+  color: #ffffff;
+  text-shadow: none;
 }
 
 /* ---------------------------------------------------------

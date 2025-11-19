@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global text selection styling */
+::selection {
+  background: rgba(59, 130, 246, 0.7);
+  color: #ffffff;
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: rgba(59, 130, 246, 0.7);
+  color: #ffffff;
+  text-shadow: none;
+}
+
 /* ===================================
    Book Loader Styles
    =================================== */
@@ -415,6 +428,38 @@
   scrollbar-color: rgb(59, 130, 246) rgba(17, 24, 39, 0.5);
 }
 
+/* Custom scrollbar class for specific elements */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(147, 51, 234));
+  border-radius: 6px;
+  border: 2px solid rgba(15, 23, 42, 0.8);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgb(37, 99, 235), rgb(126, 34, 206));
+  border: 2px solid rgba(15, 23, 42, 0.6);
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+/* Firefox custom scrollbar */
+.custom-scrollbar {
+  scrollbar-width: auto;
+  scrollbar-color: rgb(59, 130, 246) rgba(15, 23, 42, 0.8);
+}
+
 /* Optimized scrolling for better performance */
 html {
   scroll-behavior: smooth;
@@ -439,6 +484,32 @@ html {
 /* Prevent layout shift */
 body {
   overflow-x: hidden;
+}
+
+/* Apply custom scrollbar to body and html */
+html, body {
+  scrollbar-width: auto;
+  scrollbar-color: rgb(59, 130, 246) rgba(15, 23, 42, 0.8);
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  width: 12px;
+}
+
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 6px;
+}
+
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(147, 51, 234));
+  border-radius: 6px;
+  border: 2px solid rgba(15, 23, 42, 0.8);
+}
+
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgb(37, 99, 235), rgb(126, 34, 206));
+  border: 2px solid rgba(15, 23, 42, 0.6);
 }
 
 .prose pre code .token.function {

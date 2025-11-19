@@ -293,7 +293,7 @@ export default function Sidebar({ isOpen, onClose }) {
         transition-transform duration-300 ease-in-out 
         lg:translate-x-0 
         ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
-        scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent
+        custom-scrollbar
       `}>
         <div className="p-4 h-full flex flex-col">
           {/* Header */}
