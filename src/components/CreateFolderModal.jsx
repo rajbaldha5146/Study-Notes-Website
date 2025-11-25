@@ -6,33 +6,13 @@ import { sanitizeName } from "../utils/sanitize";
 import toast from "react-hot-toast";
 
 const folderIcons = [
-  "📁",
-  "📚",
-  "💻",
-  "🎯",
-  "🔬",
-  "🎨",
-  "📊",
-  "🏗️",
-  "🌟",
-  "🚀",
-  "💡",
-  "🔥",
-  "⚡",
-  "🎪",
-  "🎭",
-  "🎪",
+  "📁", "📚", "💻", "🎯", "🔬", "🎨", "📊", "🏗️",
+  "🌟", "🚀", "💡", "🔥", "⚡", "🎪", "🎭", "📝",
 ];
 
 const folderColors = [
-  "#6366f1", // Indigo
-  "#8b5cf6", // Purple
-  "#a855f7", // Violet
-  "#ec4899", // Pink
-  "#10b981", // Emerald
-  "#06b6d4", // Cyan
-  "#f59e0b", // Amber
-  "#ef4444", // Red
+  "#6366f1", "#8b5cf6", "#a855f7", "#ec4899",
+  "#10b981", "#06b6d4", "#f59e0b", "#ef4444",
 ];
 
 export default function CreateFolderModal({
@@ -52,9 +32,9 @@ export default function CreateFolderModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const sanitizedName = sanitizeName(formData.name);
-    
+
     if (!sanitizedName.trim()) {
       toast.error("Folder name is required");
       return;
@@ -65,11 +45,11 @@ export default function CreateFolderModal({
       const folderData = {
         ...formData,
         name: sanitizedName,
-        description: formData.description.trim()
+        description: formData.description.trim(),
       };
-      
+
       const newFolder = await createFolder(folderData);
-      toast.success("Folder created successfully!");
+      toast.success("Folder created!");
       refreshFolders();
       onFolderCreated(newFolder);
     } catch (error) {
@@ -81,24 +61,26 @@ export default function CreateFolderModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            Create New Folder
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl w-full max-w-md">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+          <h3 className="text-lg font-semibold text-neutral-100">
+            Create Folder
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="p-1 rounded-lg text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Folder Name *
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
+              Name
             </label>
             <input
               type="text"
@@ -106,14 +88,14 @@ export default function CreateFolderModal({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="e.g., JavaScript, React, Data Structures"
+              className="input"
+              placeholder="Folder name"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Description
             </label>
             <textarea
@@ -121,26 +103,26 @@ export default function CreateFolderModal({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              placeholder="Optional description..."
-              rows={3}
+              className="input resize-none"
+              placeholder="Optional description"
+              rows={2}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Icon
             </label>
-            <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-8 gap-1.5">
               {folderIcons.map((icon) => (
                 <button
                   key={icon}
                   type="button"
                   onClick={() => setFormData({ ...formData, icon })}
-                  className={`p-2 text-lg rounded-md border-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                  className={`p-2 text-lg rounded-lg border ${
                     formData.icon === icon
-                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900"
-                      : "border-gray-200 dark:border-gray-600"
+                      ? "border-indigo-500 bg-indigo-500/10"
+                      : "border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800"
                   }`}
                 >
                   {icon}
@@ -150,7 +132,7 @@ export default function CreateFolderModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
               Color
             </label>
             <div className="flex flex-wrap gap-2">
@@ -161,8 +143,8 @@ export default function CreateFolderModal({
                   onClick={() => setFormData({ ...formData, color })}
                   className={`w-8 h-8 rounded-full border-2 ${
                     formData.color === color
-                      ? "border-gray-800 dark:border-white"
-                      : "border-gray-300 dark:border-gray-600"
+                      ? "border-white"
+                      : "border-neutral-700"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -170,21 +152,21 @@ export default function CreateFolderModal({
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-sm sm:text-base order-2 sm:order-1"
+              className="btn-ghost px-4 py-2"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !formData.name.trim()}
-              className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg font-semibold text-sm sm:text-base order-1 sm:order-2"
-              aria-label={loading ? "Creating folder" : "Create folder"}
+              className="btn-primary px-6 py-2"
             >
-              {loading ? "Creating..." : "Create Folder"}
+              {loading ? "Creating..." : "Create"}
             </button>
           </div>
         </form>

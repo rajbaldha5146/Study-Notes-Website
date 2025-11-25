@@ -27,19 +27,7 @@ export default function CreateNote() {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const initFolders = async () => {
-      if (isMounted) {
-        await loadFolders();
-      }
-    };
-
-    initFolders();
-
-    return () => {
-      isMounted = false;
-    };
+    loadFolders();
   }, []);
 
   const loadFolders = async () => {
@@ -50,7 +38,7 @@ export default function CreateNote() {
       if (foldersData.length === 0) {
         const defaultFolder = await createFolder({
           name: "My Notes",
-          description: "Default folder for your notes",
+          description: "Default folder",
           color: "#6366f1",
           icon: "📝",
         });
@@ -81,9 +69,7 @@ export default function CreateNote() {
     }
 
     if (!sanitizedContent.trim()) {
-      toast.error(
-        "Content is required. Please write content or upload a markdown file."
-      );
+      toast.error("Content is required");
       return;
     }
 
@@ -101,7 +87,7 @@ export default function CreateNote() {
       };
 
       const newNote = await createNote(noteData);
-      toast.success("Note created successfully!");
+      toast.success("Note created!");
       navigate(`/app/note/${newNote._id}`);
     } catch (error) {
       console.error("Error creating note:", error);
@@ -131,9 +117,8 @@ export default function CreateNote() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check if file is markdown
     if (!file.name.endsWith(".md") && !file.name.endsWith(".markdown")) {
-      toast.error("Please select a markdown (.md) file");
+      toast.error("Please select a markdown file");
       return;
     }
 
@@ -148,57 +133,50 @@ export default function CreateNote() {
         content: content,
       }));
       setUploadedFile(file);
-      toast.success("Markdown file loaded successfully!");
+      toast.success("File loaded");
     };
 
-    reader.onerror = () => {
-      toast.error("Error reading file");
-    };
-
+    reader.onerror = () => toast.error("Error reading file");
     reader.readAsText(file);
   };
 
   const clearUploadedFile = () => {
     setUploadedFile(null);
-    setFormData((prev) => ({
-      ...prev,
-      content: "",
-    }));
+    setFormData((prev) => ({ ...prev, content: "" }));
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 sm:mb-6">
-        <div className="flex items-center space-x-3 sm:space-x-4">
+    <div className="page-container py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/app")}
-            className="flex items-center space-x-2 text-slate-400 hover:text-blue-400 transition-colors"
+            className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">
-            Create New Note
+          <h1 className="text-xl font-semibold text-neutral-100">
+            Create Note
           </h1>
         </div>
 
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <button
-            onClick={() => setPreview(!preview)}
-            className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md transition-colors text-sm sm:text-base ${
-              preview
-                ? "bg-blue-600 text-white"
-                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-            }`}
-          >
-            <Eye className="h-4 w-4" />
-            <span>{preview ? "Edit" : "Preview"}</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setPreview(!preview)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+            preview
+              ? "bg-indigo-600 text-white"
+              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+          }`}
+        >
+          <Eye className="h-4 w-4" />
+          <span>{preview ? "Edit" : "Preview"}</span>
+        </button>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-3 mb-6">
         <button
           type="button"
           onClick={() => {
@@ -208,45 +186,40 @@ export default function CreateNote() {
               content: "",
               folder: folders.length > 0 ? folders[0]._id : "",
             });
-            toast.success("Ready to create new note");
           }}
-          className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl sm:rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto sm:min-w-[200px] justify-center"
-          aria-label="Create new note"
+          className="btn-primary flex items-center gap-2"
         >
-          <Plus className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-base sm:text-lg font-semibold">New Note</span>
+          <Plus className="h-4 w-4" />
+          <span>New</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowAIGenerator(!showAIGenerator)}
-          className={`flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r text-white rounded-xl sm:rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto sm:min-w-[200px] justify-center ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
             showAIGenerator
-              ? "from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-              : "from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
+              ? "bg-emerald-600 text-white"
+              : "bg-purple-600 text-white hover:bg-purple-500"
           }`}
         >
-          <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-base sm:text-lg font-semibold">
-            {showAIGenerator ? "Manual Mode" : "AI Generate"}
-          </span>
+          <Sparkles className="h-4 w-4" />
+          <span>{showAIGenerator ? "Manual" : "AI Generate"}</span>
         </button>
 
-        <label className="flex items-center space-x-2 sm:space-x-3 px-6 sm:px-8 py-3 sm:py-4 bg-slate-600 hover:bg-slate-500 text-white rounded-xl sm:rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer w-full sm:w-auto sm:min-w-[200px] justify-center">
-          <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
-          <span className="text-base sm:text-lg font-semibold">Upload MD</span>
+        <label className="btn-secondary flex items-center gap-2 cursor-pointer">
+          <FileText className="h-4 w-4" />
+          <span>Upload</span>
           <input
             type="file"
             className="hidden"
             accept=".md,.markdown"
             onChange={handleFileUpload}
-            aria-label="Upload markdown file"
           />
         </label>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* AI Topic Generator */}
+        {/* AI Generator */}
         <AITopicGenerator
           onContentGenerated={handleAIContentGenerated}
           isVisible={showAIGenerator}
@@ -254,73 +227,59 @@ export default function CreateNote() {
 
         {/* File Status */}
         {uploadedFile && (
-          <div className="bg-slate-800 rounded-lg border border-slate-700 p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <FileText className="w-5 h-5 text-green-400" />
-                <div>
-                  <p className="text-white font-medium">File Loaded</p>
-                  <p className="text-slate-400 text-sm">{uploadedFile.name}</p>
-                </div>
+          <div className="card p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FileText className="h-5 w-5 text-emerald-400" />
+              <div>
+                <p className="text-sm font-medium text-neutral-200">
+                  {uploadedFile.name}
+                </p>
+                <p className="text-xs text-neutral-500">File loaded</p>
               </div>
-              <button
-                type="button"
-                onClick={clearUploadedFile}
-                className="text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded border border-red-400 hover:border-red-300 transition-colors"
-              >
-                Remove
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={clearUploadedFile}
+              className="text-sm text-red-400 hover:text-red-300"
+            >
+              Remove
+            </button>
           </div>
         )}
 
         {/* Basic Info */}
-        <div className="bg-slate-900/50 backdrop-blur-sm rounded-xl shadow-lg border border-slate-700/50 p-4 sm:p-6 lg:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="card p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-3">
-                Title *
+              <label className="block text-sm font-medium text-neutral-300 mb-2">
+                Title
               </label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 bg-slate-900/50 border text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-500 transition-all ${
-                  formData.title
-                    ? "border-emerald-500/50"
-                    : "border-slate-600/50"
-                }`}
-                placeholder={
-                  showAIGenerator
-                    ? "AI will generate title..."
-                    : "Enter note title..."
-                }
+                className="input"
+                placeholder="Enter note title..."
                 required={!showAIGenerator}
                 readOnly={showAIGenerator}
               />
-              {formData.title && !showAIGenerator && (
-                <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  Generated by AI
-                </p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-3">
-                Folder *
+              <label className="block text-sm font-medium text-neutral-300 mb-2">
+                Folder
               </label>
               <select
                 name="folder"
                 value={formData.folder}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="input"
                 required
                 disabled={loadingFolders}
               >
                 {loadingFolders ? (
-                  <option>Loading folders...</option>
+                  <option>Loading...</option>
                 ) : (
                   folders.map((folder) => (
                     <option key={folder._id} value={folder._id}>
@@ -333,91 +292,49 @@ export default function CreateNote() {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 overflow-hidden">
-          <div className="border-b border-gray-700/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gray-900/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-white">
-                  Content
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                  {uploadedFile ? (
-                    "Content loaded from uploaded file"
-                  ) : showAIGenerator ? (
-                    "AI will generate structured content"
-                  ) : formData.content && !uploadedFile ? (
-                    <span className="flex items-center gap-1 text-emerald-400">
-                      <Sparkles className="h-3 w-3" />
-                      Generated by AI
-                    </span>
-                  ) : (
-                    "Write your note in Markdown format"
-                  )}
-                </p>
-              </div>
-            </div>
+        {/* Content Editor */}
+        <div className="card overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-sm font-medium text-neutral-200">Content</h3>
+            <p className="text-xs text-neutral-500 mt-1">
+              Write in Markdown format
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-64 sm:min-h-96">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
             {/* Editor */}
-            <div className={`${preview ? "hidden lg:block" : ""}`}>
+            <div className={preview ? "hidden lg:block" : ""}>
               <textarea
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-64 sm:h-96 p-4 sm:p-6 bg-gray-900 text-white border-0 resize-none focus:ring-0 focus:outline-none font-mono text-xs sm:text-sm placeholder-gray-500"
-                placeholder={
-                  showAIGenerator
-                    ? "AI will generate structured content here..."
-                    : uploadedFile
-                    ? "Content from uploaded file will appear here..."
-                    : `# Your Note Title
+                className="w-full h-[400px] p-6 bg-neutral-950 text-neutral-200 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-600"
+                placeholder={`# Your Note Title
 
-Write your content here using Markdown...
+Write your content here...
 
-## Example Section
+## Section
 
-- Bullet point 1
-- Bullet point 2
+- Point 1
+- Point 2
 
 \`\`\`javascript
-// Code example
-function example() {
-  console.log('Hello World!');
-}
-\`\`\``
-                }
+console.log('Hello!');
+\`\`\``}
                 required
               />
             </div>
 
             {/* Preview */}
             <div
-              className={`border-l border-gray-700 bg-gray-900 ${
+              className={`border-l border-neutral-800 bg-neutral-900 ${
                 !preview ? "hidden lg:block" : ""
               }`}
             >
-              <div className="p-4 sm:p-6 prose prose-sm max-w-none prose-invert overflow-auto h-64 sm:h-96">
+              <div className="p-6 prose max-w-none overflow-auto h-[400px]">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      return (
-                        <code
-                          className={`${className} ${
-                            inline
-                              ? "bg-gray-700 text-gray-200 px-1 py-0.5 rounded text-sm"
-                              : "block bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
-                          }`}
-                          {...props}
-                        >
-                          {children}
-                        </code>
-                      );
-                    },
-                  }}
                 >
                   {formData.content || "*Preview will appear here...*"}
                 </ReactMarkdown>
@@ -431,10 +348,9 @@ function example() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm sm:text-base w-full sm:w-auto justify-center"
-            aria-label={loading ? "Creating note" : "Create note"}
+            className="btn-primary flex items-center gap-2 px-6 py-2.5"
           >
-            <Save className="h-4 w-4 sm:h-5 sm:w-5" />
+            <Save className="h-4 w-4" />
             <span>{loading ? "Creating..." : "Create Note"}</span>
           </button>
         </div>

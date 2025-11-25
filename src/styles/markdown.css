@@ -1,71 +1,14 @@
 /* =========================================================
-   MARKDOWN VIEWER — ENHANCED PROSE STYLES
-   - Tokens for easy theming
-   - Accessible focus + reduced motion
-   - Better code, tables, images, blockquotes
-   - Footnotes, details/summary, TOC
-   - Safe, performant transitions
+   MARKDOWN VIEWER - Clean Professional Styles
    ========================================================= */
 
-/* ---------------------------------------------------------
-   THEME TOKENS (override per theme or container)
-   --------------------------------------------------------- */
-.prose {
-  /* Brand and UI colors (RGB for easy alpha) */
-  --brand: 99 102 241;          /* indigo-500 */
-  --brand-2: 139 92 246;        /* violet-500 */
-  --danger: 239 68 68;          /* red-500 */
-  --surface: 17 24 39;          /* slate-900 bg used in hr badge */
-  --muted: 156 163 175;         /* gray-400 */
-  --border: 39 39 42;           /* zinc-800 */
-
-  /* Typography/spacing */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 10px 40px rgba(0, 0, 0, 0.25);
-  --anchor-offset: 72px;        /* sticky header height */
-  --progress: 0%;               /* set via JS for progress bar */
-
-  /* Code */
-  --code-bg: 30 30 30;          /* VSCode dark-ish */
-  --code-text: 212 212 212;     /* neutral-300 */
-  --code-border: 99 102 241;    /* brand-ish */
-
-  /* Link underline thickness */
-  --underline: 2px;
-
-  scroll-behavior: smooth;
-  position: relative;
-  color-scheme: dark light; /* lets form controls style match */
-}
-
-/* Light/Dark toggle via data-theme (optional) */
-.prose[data-theme="light"] {
-  --surface: 255 255 255;
-  --border: 229 231 235; /* gray-200 */
-  --code-bg: 245 245 247;
-  --code-text: 17 24 39;
-}
-
-/* ---------------------------------------------------------
-   SELECTION
-   --------------------------------------------------------- */
+/* Selection */
 .prose ::selection {
-  background: rgba(59, 130, 246, 0.6); /* solid blue-500 with opacity */
+  background: rgba(99, 102, 241, 0.3);
   color: #ffffff;
-  text-shadow: none;
 }
 
-.prose *::selection {
-  background: rgba(59, 130, 246, 0.6); /* solid blue-500 with opacity */
-  color: #ffffff;
-  text-shadow: none;
-}
-
-/* ---------------------------------------------------------
-   HEADINGS
-   --------------------------------------------------------- */
+/* Headings */
 .prose h1,
 .prose h2,
 .prose h3,
@@ -73,686 +16,448 @@
 .prose h5,
 .prose h6 {
   position: relative;
-  scroll-margin-top: var(--anchor-offset);
-  letter-spacing: -0.02em;
-  transition: color 0.2s ease;
-  text-wrap: balance;
+  scroll-margin-top: 80px;
+  color: #fafafa;
+  font-weight: 600;
 }
 
-/* Gradient H1 + subtle rules for hierarchy */
 .prose h1 {
-  background: linear-gradient(135deg, rgb(var(--brand)), rgb(var(--brand-2)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  padding-bottom: 0.5rem;
-  border-bottom: 3px solid rgba(var(--brand), 0.2);
-}
-.prose h2 {
-  padding-left: 0.9rem;
-  border-left: 4px solid rgb(var(--brand));
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #262626;
 }
 
-/* GitHub-style anchor hash on hover (works with <a class="anchor">) */
+.prose h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Anchor links */
+.prose .anchor {
+  position: absolute;
+  left: -1.25rem;
+  opacity: 0;
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
 .prose h1:hover .anchor,
 .prose h2:hover .anchor,
 .prose h3:hover .anchor,
-.prose h4:hover .anchor,
-.prose h5:hover .anchor,
-.prose h6:hover .anchor {
+.prose h4:hover .anchor {
   opacity: 1;
 }
-.prose .anchor {
-  position: absolute;
-  left: -1.4rem;
-  top: 0;
-  opacity: 0;
-  color: rgb(var(--brand));
-  text-decoration: none;
-  font-weight: 500;
-  padding-right: 0.25rem;
-  transition: opacity 0.2s ease;
-}
 
-/* Drop cap disabled - keeping normal text */
-.prose h1 + p::first-letter {
-  font-size: inherit;
-  font-weight: inherit;
-  float: none;
-  line-height: inherit;
-  margin: 0;
-  background: none;
-  -webkit-background-clip: unset;
-  background-clip: unset;
-  -webkit-text-fill-color: inherit;
-}
-
-/* ---------------------------------------------------------
-   PARAGRAPHS & INLINE TEXT
-   --------------------------------------------------------- */
+/* Paragraphs */
 .prose p {
-  line-height: 1.8;
-  margin: 0.8em 0 1.25em;
-  text-wrap: pretty;
-  overflow-wrap: anywhere;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+  color: #d4d4d4;
 }
 
-/* Emphasis highlight band */
-.prose em {
-  position: relative;
-  font-style: italic;
-  padding: 0 0.1em;
-}
-.prose em::before {
-  content: '';
-  position: absolute;
-  bottom: 0.05em;
-  left: 0;
-  width: 100%;
-  height: 8px;
-  background: linear-gradient(
-    to right,
-    rgba(var(--brand), 0.2),
-    rgba(var(--brand-2), 0.2)
-  );
-  z-index: -1;
-  border-radius: 4px;
+/* Links */
+.prose a {
+  color: #818cf8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-/* Strong with soft glow */
+.prose a:hover {
+  color: #a5b4fc;
+}
+
+/* Strong & Emphasis */
 .prose strong {
-  text-shadow: 0 0 18px rgba(var(--brand), 0.28);
+  color: #fafafa;
+  font-weight: 600;
 }
 
-/* Strikethrough */
-.prose del {
-  text-decoration-color: rgb(var(--danger));
-  text-decoration-thickness: 2px;
-  opacity: 0.8;
+.prose em {
+  font-style: italic;
+}
+
+/* Lists */
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  line-height: 1.75;
+  margin-bottom: 0.25rem;
+  color: #d4d4d4;
+}
+
+.prose ul > li {
+  list-style-type: disc;
+}
+
+.prose ol > li {
+  list-style-type: decimal;
+}
+
+.prose ul > li::marker,
+.prose ol > li::marker {
+  color: #6366f1;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  padding-left: 1.25rem;
+  border-left: 3px solid #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #a3a3a3;
+  font-style: italic;
+}
+
+.prose blockquote p {
+  margin: 0;
+}
+
+/* Inline code */
+.prose :not(pre) > code {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  color: #c4b5fd;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  border: 1px solid #3730a3;
+  font-weight: 500;
+}
+
+/* Code blocks container */
+.prose pre {
+  position: relative;
+  margin: 1.75rem 0;
+  padding: 0;
+  background: linear-gradient(165deg, #0f0d1a 0%, #1a1625 40%, #12101c 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 0 0 1px rgba(99, 102, 241, 0.05);
+}
+
+/* Code block header bar */
+.prose pre::before {
+  content: attr(data-language);
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(99, 102, 241, 0.15) 100%);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #a5b4fc;
+  font-weight: 700;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* Language-specific header colors */
+.prose pre[data-language="javascript"]::before,
+.prose pre[data-language="js"]::before {
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.15) 0%, rgba(250, 204, 21, 0.08) 100%);
+  color: #fcd34d;
+  border-bottom-color: rgba(250, 204, 21, 0.2);
+}
+
+.prose pre[data-language="typescript"]::before,
+.prose pre[data-language="ts"]::before {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%);
+  color: #93c5fd;
+  border-bottom-color: rgba(59, 130, 246, 0.2);
+}
+
+.prose pre[data-language="python"]::before,
+.prose pre[data-language="py"]::before {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+  color: #86efac;
+  border-bottom-color: rgba(34, 197, 94, 0.2);
+}
+
+.prose pre[data-language="html"]::before {
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.15) 0%, rgba(249, 115, 22, 0.08) 100%);
+  color: #fdba74;
+  border-bottom-color: rgba(249, 115, 22, 0.2);
+}
+
+.prose pre[data-language="css"]::before {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.08) 100%);
+  color: #c4b5fd;
+  border-bottom-color: rgba(147, 51, 234, 0.2);
+}
+
+.prose pre[data-language="json"]::before {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%);
+  color: #86efac;
+  border-bottom-color: rgba(34, 197, 94, 0.2);
+}
+
+.prose pre[data-language="bash"]::before,
+.prose pre[data-language="shell"]::before,
+.prose pre[data-language="sh"]::before {
+  background: linear-gradient(90deg, rgba(163, 163, 163, 0.12) 0%, rgba(163, 163, 163, 0.06) 100%);
+  color: #d4d4d4;
+  border-bottom-color: rgba(163, 163, 163, 0.2);
+}
+
+.prose pre[data-language="java"]::before {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+  color: #fca5a5;
+  border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+.prose pre[data-language="sql"]::before {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.08) 100%);
+  color: #67e8f9;
+  border-bottom-color: rgba(6, 182, 212, 0.2);
+}
+
+/* Default header for unknown languages */
+.prose pre:not([data-language])::before,
+.prose pre[data-language=""]::before {
+  content: "CODE";
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.06) 100%);
+}
+
+/* Code content */
+.prose pre code {
+  display: block;
+  padding: 1.25rem 1.5rem;
+  padding-left: 1.25rem;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-x: auto;
+  tab-size: 2;
+}
+
+/* Left accent border for code */
+.prose pre code {
+  border-left: 3px solid;
+  border-image: linear-gradient(180deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%) 1;
+}
+
+/* Code scrollbar */
+.prose pre code::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.prose pre code::-webkit-scrollbar-track {
+  background: rgba(30, 27, 75, 0.5);
+  border-radius: 5px;
+  margin: 4px;
+}
+
+.prose pre code::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 5px;
+  border: 2px solid rgba(30, 27, 75, 0.5);
+}
+
+.prose pre code::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 100%);
+}
+
+.prose pre code::-webkit-scrollbar-corner {
+  background: rgba(30, 27, 75, 0.5);
+}
+
+/* Tables */
+.prose table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.prose th {
+  padding: 0.75rem 1rem;
+  background: #171717;
+  color: #a3a3a3;
+  text-align: left;
+  font-weight: 500;
+  border: 1px solid #262626;
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  color: #d4d4d4;
+  border: 1px solid #262626;
+}
+
+.prose tbody tr:hover {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+/* Horizontal rule */
+.prose hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid #262626;
+}
+
+/* Images */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Task lists */
+.prose input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  accent-color: #6366f1;
+  vertical-align: middle;
 }
 
 /* Mark/Highlight */
 .prose mark {
-  background: linear-gradient(
-    to right,
-    rgba(251, 191, 36, 0.35),
-    rgba(245, 158, 11, 0.35)
-  );
-  border-radius: 4px;
-  padding: 0.1em 0.25em;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fafafa;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
 }
 
 /* Keyboard keys */
 .prose kbd {
   display: inline-block;
-  padding: 0.15em 0.5em;
-  border: 1px solid rgba(var(--brand), 0.3);
-  border-radius: 6px;
-  background: linear-gradient(
-    to bottom,
-    rgba(55, 65, 81, 0.85),
-    rgba(31, 41, 55, 0.85)
-  );
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.4);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 0.85em;
-  vertical-align: middle;
+  padding: 0.125rem 0.5rem;
+  background: #262626;
+  border: 1px solid #404040;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8em;
+  box-shadow: 0 1px 0 #404040;
 }
 
-/* Abbreviation hints */
-.prose abbr {
-  text-decoration: underline dotted rgba(var(--brand), 0.6);
-  cursor: help;
-}
-
-/* Sub/Sup tint */
-.prose sub,
-.prose sup {
-  color: rgb(var(--brand-2));
+/* Syntax highlighting - Vibrant colors for dark background */
+.hljs-keyword { 
+  color: #c084fc; 
   font-weight: 600;
 }
-
-/* ---------------------------------------------------------
-   LINKS
-   --------------------------------------------------------- */
-.prose a {
-  position: relative;
-  color: rgb(var(--brand));
-  text-decoration: none;
-  text-underline-offset: 3px;
-  text-decoration-thickness: var(--underline);
-  transition: color 0.2s ease;
+.hljs-string { 
+  color: #86efac; 
 }
-.prose a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0;
-  height: var(--underline);
-  background: linear-gradient(to right, rgb(var(--brand)), rgb(var(--brand-2)));
-  transition: width 0.25s ease;
-}
-.prose a:hover {
-  color: rgb(var(--brand-2));
-}
-.prose a:hover::after {
-  width: 100%;
-}
-/* External link marker (optional) */
-.prose a[href^="http"]:not([href*="yourdomain.com"])::before {
-  content: '↗';
-  font-size: 0.75em;
-  margin-right: 0.25em;
-  opacity: 0.6;
-}
-
-/* ---------------------------------------------------------
-   LISTS & TASKS
-   --------------------------------------------------------- */
-.prose ul,
-.prose ol {
-  padding-left: 1.25rem;
-  margin: 1rem 0;
-}
-.prose li {
-  line-height: 1.7;
-  padding-left: 0.5rem;
-  border-left: 2px solid transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-}
-.prose li:hover {
-  border-left-color: rgb(var(--brand));
-  background: linear-gradient(to right, rgba(var(--brand), 0.05), transparent);
-  transform: translateX(2px); /* small move to avoid layout shift */
-}
-/* Custom markers */
-.prose ul > li::marker {
-  color: rgb(var(--brand));
-  font-size: 1.1em;
-}
-.prose ol > li::marker {
-  color: rgb(var(--brand));
-  font-weight: 700;
-}
-/* Nested list spacing */
-.prose li > ul,
-.prose li > ol {
-  margin: 0.35rem 0;
-}
-
-/* Task lists */
-.prose input[type="checkbox"] {
-  width: 1.1rem;
-  height: 1.1rem;
-  margin-right: 0.6rem;
-  accent-color: rgb(var(--brand));
-  vertical-align: text-bottom;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-.prose input[type="checkbox"]:hover { transform: scale(1.08); }
-.prose input[type="checkbox"]:checked + * {
-  opacity: 0.8;
-  text-decoration: line-through;
-}
-
-/* ---------------------------------------------------------
-   BLOCKQUOTES & CALLOUTS
-   --------------------------------------------------------- */
-.prose blockquote {
-  position: relative;
-  margin: 1.75rem 0;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(to right, rgba(var(--brand), 0.06), transparent);
-  border-left: 4px solid rgb(var(--brand));
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-style: italic;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-}
-.prose blockquote:hover {
-  transform: translateX(6px);
-  box-shadow: -6px 0 0 0 rgb(var(--brand)), 0 8px 24px rgba(var(--brand), 0.18);
-  background: linear-gradient(to right, rgba(var(--brand), 0.08), transparent);
-}
-.prose blockquote p { margin: 0; }
-
-/* Optional callout types via data-callout attribute */
-.prose blockquote[data-callout="note"] { border-left-color: rgb(var(--brand)); }
-.prose blockquote[data-callout="warning"] { border-left-color: rgb(var(--danger)); background: linear-gradient(to right, rgba(var(--danger), 0.06), transparent); }
-.prose blockquote[data-callout="tip"] { border-left-color: rgb(var(--brand-2)); background: linear-gradient(to right, rgba(var(--brand-2), 0.06), transparent); }
-
-/* ---------------------------------------------------------
-   CODE — INLINE & BLOCKS
-   --------------------------------------------------------- */
-/* Inline code */
-.prose :not(pre) > code {
-  background: rgba(var(--brand), 0.08);
-  color: rgb(var(--brand-2));
-  padding: 0.15em 0.35em;
-  border-radius: 4px;
-  border: none;
-  font-size: 0.92em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  white-space: break-spaces;
-  transition: background-color 0.15s ease;
-}
-.prose :not(pre) > code:hover {
-  background: rgba(var(--brand), 0.12);
-}
-
-/* Code blocks */
-.prose pre {
-  position: relative;
-  margin: 1.25rem 0;
-  padding: 1.25rem 1.5rem;
-  border-radius: var(--radius);
-  background: rgb(var(--code-bg));
-  border: none;
-  box-shadow: none;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.prose pre:hover {
-  border: none;
-  box-shadow: none;
-}
-.prose pre code {
-  display: block;
-  padding: 0;
-  background: transparent;
-  color: rgb(var(--code-text));
-  font-size: 0.95rem;
-  line-height: 1.7;
-  counter-reset: line;
-}
-
-/* Language badge: <pre data-language="js"> or data-lang */
-.prose pre::before {
-  content: attr(data-language) attr(data-lang);
-  position: absolute;
-  top: 0.65rem;
-  right: 0.85rem;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(var(--muted), 0.85);
-  font-weight: 700;
-}
-
-/* Optional copy button (place a button.copy inside pre via JS) */
-.prose pre .copy {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  transform: translateY(-120%);
-  opacity: 0;
-  padding: 0.35rem 0.55rem;
-  border-radius: 6px;
-  background: rgba(17, 24, 39, 0.7);
-  color: #fff;
-  border: 1px solid rgba(var(--brand), 0.35);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
-}
-.prose pre:hover .copy { opacity: 1; transform: translateY(0); }
-.prose pre .copy:active { transform: translateY(1px); }
-
-/* Line numbers – works with <span class="line"> per line */
-.prose pre code .line {
-  display: block;
-  padding-left: 0.5rem;
-}
-.prose pre code .line::before {
-  counter-increment: line;
-  content: counter(line);
-  display: inline-block;
-  width: 2.2rem;
-  margin-right: 1rem;
-  text-align: right;
-  color: rgba(var(--muted), 0.45);
-  user-select: none;
-}
-
-/* Highlighted lines: add [data-highlighted] or .highlighted */
-.prose pre code .line[data-highlighted],
-.prose pre code .line.highlighted {
-  background: rgba(var(--brand), 0.12);
-  border-left: 3px solid rgb(var(--brand));
-}
-
-/* Code scrollbars */
-.prose pre::-webkit-scrollbar { height: 10px; }
-.prose pre::-webkit-scrollbar-track { background: rgba(31, 41, 55, 0.5); border-radius: 5px; }
-.prose pre::-webkit-scrollbar-thumb {
-  background: linear-gradient(to right, rgba(var(--brand), 0.5), rgba(var(--brand-2), 0.5));
-  border-radius: 5px;
-}
-.prose pre::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to right, rgba(var(--brand), 0.8), rgba(var(--brand-2), 0.8));
-}
-
-/* ---------------------------------------------------------
-   TABLES - Dark Minimal Theme
-   --------------------------------------------------------- */
-.prose table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin: 2rem 0;
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgb(2 6 23); /* slate-950 darker */
-  border: 1px solid rgb(30 41 59 / 0.6); /* slate-800/60 */
-  box-shadow: none;
-}
-
-.prose thead {
-  background: rgb(15 23 42); /* slate-950 */
-  border-bottom: 1px solid rgb(30 41 59 / 0.5); /* slate-800/50 */
-}
-
-.prose thead th {
-  padding: 0.875rem 1rem;
-  text-align: left;
+.hljs-number { 
+  color: #fdba74; 
   font-weight: 500;
-  font-size: 0.875rem;
-  color: rgb(148 163 184); /* slate-400 */
-  text-transform: none;
-  position: relative;
 }
-
-.prose thead th:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 30%;
-  height: 40%;
-  width: 1px;
-  background: rgb(30 41 59 / 0.4); /* slate-800/40 */
+.hljs-comment { 
+  color: #6b7280; 
+  font-style: italic; 
 }
-
-.prose tbody {
-  background: rgb(2 6 23); /* slate-950 darker */
-}
-
-.prose tbody tr {
-  transition: background-color 0.15s ease;
-  border-bottom: 1px solid rgb(30 41 59 / 0.25); /* slate-800/25 */
-}
-
-.prose tbody tr:hover {
-  background: rgb(30 41 59 / 0.15); /* slate-800/15 */
-}
-
-.prose tbody tr:last-child {
-  border-bottom: none;
-}
-
-.prose td {
-  padding: 0.75rem 1rem;
-  color: rgb(148 163 184); /* slate-400 */
-  font-size: 0.875rem;
-  line-height: 1.5;
-  vertical-align: top;
-}
-
-.prose td:not(:last-child) {
-  border-right: 1px solid rgb(30 41 59 / 0.2); /* slate-800/20 */
-}
-
-/* Code in table cells */
-.prose td code {
-  background: rgb(15 23 42 / 0.8); /* slate-950/80 */
-  color: rgb(59 130 246); /* blue-500 */
-  padding: 0.125rem 0.25rem;
-  border-radius: 3px;
-  font-size: 0.8125rem;
-  border: none;
-}
-
-/* Special styling for first column (often headers/labels) */
-.prose td:first-child {
+.hljs-function { 
+  color: #93c5fd; 
   font-weight: 500;
-  color: rgb(203 213 225); /* slate-300 */
-  background: rgb(15 23 42 / 0.4); /* slate-950/40 */
 }
-
-/* Zebra striping with subtle slate tones */
-.prose tbody tr:nth-child(even) {
-  background: rgb(15 23 42 / 0.3); /* slate-950/30 */
-}
-
-.prose tbody tr:nth-child(even):hover {
-  background: rgb(30 41 59 / 0.2); /* slate-800/20 */
-}
-
-/* Responsive table wrapper */
-.prose .table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 12px;
-  margin: 2rem 0;
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .prose table {
-    font-size: 0.8125rem;
-  }
-  
-  .prose thead th,
-  .prose td {
-    padding: 0.75rem 0.875rem;
-  }
-  
-  .prose tbody tr:hover {
-    transform: none;
-  }
-}
-
-/* Scrollbar for table wrapper */
-.prose .table-wrap::-webkit-scrollbar {
-  height: 8px;
-}
-
-.prose .table-wrap::-webkit-scrollbar-track {
-  background: rgb(30 41 59 / 0.5); /* slate-800/50 */
-  border-radius: 4px;
-}
-
-.prose .table-wrap::-webkit-scrollbar-thumb {
-  background: rgb(59 130 246 / 0.6); /* blue-500/60 */
-  border-radius: 4px;
-}
-
-.prose .table-wrap::-webkit-scrollbar-thumb:hover {
-  background: rgb(59 130 246 / 0.8); /* blue-500/80 */
-}
-
-/* ---------------------------------------------------------
-   HORIZONTAL RULE
-   --------------------------------------------------------- */
-.prose hr {
-  margin: 2.2rem 0;
-  background: linear-gradient(to right, transparent, rgb(var(--brand)), transparent);
-  height: 2px;
-  border: 0;
-  position: relative;
-}
-.prose hr::before {
-  content: '✦';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -55%);
-  background: rgb(var(--surface));
-  padding: 0 1rem;
-  color: rgb(var(--brand));
-  font-size: 1.35rem;
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
-
-/* ---------------------------------------------------------
-   IMAGES & FIGURES
-   --------------------------------------------------------- */
-.prose img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border-radius: var(--radius);
-  margin: 1.5rem auto;
-  box-shadow: var(--shadow-md);
-  border: 2px solid rgba(var(--brand), 0.2);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  cursor: zoom-in;
-}
-.prose img:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(var(--brand), 0.45);
-}
-.prose figure { margin: 1.5rem 0; }
-.prose figcaption {
-  margin-top: 0.6rem;
-  text-align: center;
-  font-size: 0.87rem;
-  color: rgba(var(--muted), 0.9);
-  font-style: italic;
-}
-
-/* ---------------------------------------------------------
-   DETAILS / SUMMARY
-   --------------------------------------------------------- */
-.prose details {
-  border: 1px solid rgba(var(--brand), 0.25);
-  border-radius: var(--radius-sm);
-  padding: 0.75rem 1rem;
-  background: rgba(var(--brand), 0.03);
-  margin: 1rem 0 1.25rem;
-}
-.prose summary {
-  cursor: pointer;
+.hljs-class { 
+  color: #fcd34d; 
   font-weight: 600;
-  color: rgb(var(--brand));
-  outline: none;
 }
-.prose details[open] {
-  background: rgba(var(--brand), 0.06);
+.hljs-variable { 
+  color: #fca5a5; 
 }
-
-/* ---------------------------------------------------------
-   FOOTNOTES
-   --------------------------------------------------------- */
-.prose sup.footnote-ref a {
-  text-decoration: none;
-  border-bottom: 1px dotted rgba(var(--brand), 0.6);
-  padding: 0 0.15em;
+.hljs-operator { 
+  color: #67e8f9; 
 }
-.prose .footnotes {
-  font-size: 0.9em;
-  opacity: 0.95;
-  border-top: 1px dashed rgba(var(--brand), 0.25);
-  margin-top: 2rem;
-  padding-top: 0.75rem;
+.hljs-punctuation { 
+  color: #9ca3af; 
 }
-.prose .footnotes ol { padding-left: 1.25rem; }
-
-/* ---------------------------------------------------------
-   ANIMATIONS (stagger, reduced-motion safe) - Optimized for performance
-   --------------------------------------------------------- */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.hljs-property { 
+  color: #fcd34d; 
 }
-.prose > * {
-  animation: fadeInUp 0.3s ease-out both;
-  will-change: transform, opacity;
+.hljs-attr { 
+  color: #93c5fd; 
 }
-.prose > *:nth-child(1) { animation-delay: 0.02s; }
-.prose > *:nth-child(2) { animation-delay: 0.04s; }
-.prose > *:nth-child(3) { animation-delay: 0.06s; }
-.prose > *:nth-child(4) { animation-delay: 0.08s; }
-.prose > *:nth-child(5) { animation-delay: 0.1s; }
-.prose > *:nth-child(n+6) { animation-delay: 0.12s; }
-
-/* ---------------------------------------------------------
-   ACCESSIBILITY & FOCUS
-   --------------------------------------------------------- */
-.prose *:focus-visible {
-  outline: 2px solid rgb(var(--brand));
-  outline-offset: 3px;
-  border-radius: 4px;
+.hljs-tag { 
+  color: #f87171; 
 }
-
-/* Reading progress bar (set --progress via JS) - Optimized for smooth scrolling */
-.prose::before {
-  content: '';
-  position: fixed;
-  top: env(safe-area-inset-top, 0);
-  left: 0;
-  height: 4px;
-  width: var(--progress);
-  background: linear-gradient(to right, rgb(var(--brand)), rgb(var(--brand-2)));
-  z-index: 40;
-  will-change: width;
-  transform: translateZ(0); /* Force hardware acceleration */
+.hljs-built_in { 
+  color: #67e8f9; 
+  font-weight: 500;
 }
-
-/* ---------------------------------------------------------
-   REDUCED MOTION
-   --------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  .prose, .prose * {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto;
-  }
+.hljs-literal { 
+  color: #f9a8d4; 
+  font-weight: 600;
+}
+.hljs-title { 
+  color: #93c5fd; 
+  font-weight: 600;
+}
+.hljs-params { 
+  color: #fdba74; 
+}
+.hljs-meta { 
+  color: #a78bfa; 
+}
+.hljs-regexp { 
+  color: #fca5a5; 
+}
+.hljs-symbol { 
+  color: #67e8f9; 
+}
+.hljs-selector-tag { 
+  color: #f87171; 
+}
+.hljs-selector-class { 
+  color: #fcd34d; 
+}
+.hljs-selector-id { 
+  color: #93c5fd; 
+}
+.hljs-attribute { 
+  color: #c084fc; 
+}
+.hljs-name { 
+  color: #f87171; 
+}
+.hljs-doctag { 
+  color: #86efac; 
+}
+.hljs-type { 
+  color: #67e8f9; 
+  font-weight: 500;
 }
 
-/* ---------------------------------------------------------
-   RESPONSIVE
-   --------------------------------------------------------- */
-@media (max-width: 768px) {
-  .prose pre { padding: 1rem; font-size: 0.9rem; }
-  .prose h1 + p::first-letter { font-size: inherit; }
-  .prose img:hover { transform: none; }
-}
-@media (max-width: 480px) {
-  .prose li:hover,
-  .prose tbody tr:hover {
-    transform: none;
-  }
-  .prose h1 + p::first-letter { font-size: inherit; }
-}
-
-/* ---------------------------------------------------------
-   PRINT
-   --------------------------------------------------------- */
+/* Print styles */
 @media print {
   .prose {
     color: #000;
     background: #fff;
   }
-  .prose *, .prose *::before, .prose *::after {
-    animation: none !important;
-    transition: none !important;
-    box-shadow: none !important;
-  }
+  
   .prose pre {
     background: #f5f5f5;
-    border: 1px solid #000;
-    page-break-inside: avoid;
+    border: 1px solid #ccc;
   }
-  .prose h1, .prose h2, .prose h3 { page-break-after: avoid; color: #000; }
-  .prose a { color: #000; text-decoration: underline; }
-  .prose a::after { display: none; }
-  .prose img { page-break-inside: avoid; }
-  .prose blockquote {
-    border-left: 4px solid #000;
-    background: #f5f5f5;
+  
+  .prose a {
+    color: #000;
+    text-decoration: underline;
   }
 }

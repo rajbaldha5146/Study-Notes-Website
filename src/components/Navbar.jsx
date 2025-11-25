@@ -1,42 +1,36 @@
-import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, Plus, Home, User, LogOut, Menu, X, Settings } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
-import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation } from "react-router-dom";
+import { Plus, Home, LogOut, Menu, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useState, useEffect, useRef } from "react";
 
 export default function Navbar({ onToggleSidebar, sidebarOpen }) {
-  const { user, logout } = useAuth()
-  const [showUserMenu, setShowUserMenu] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const menuRef = useRef(null)
-  const buttonRef = useRef(null)
-  const location = useLocation()
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const menuRef = useRef(null);
+  const buttonRef = useRef(null);
+  const location = useLocation();
 
   const handleLogout = () => {
-    logout()
-    setShowUserMenu(false)
-  }
+    logout();
+    setShowUserMenu(false);
+  };
 
-  // Get user initials for avatar
   const getUserInitials = () => {
-    if (!user?.name) return 'U'
-    const names = user.name.split(' ')
+    if (!user?.name) return "U";
+    const names = user.name.split(" ");
     if (names.length >= 2) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase()
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
     }
-    return user.name.substring(0, 2).toUpperCase()
-  }
+    return user.name.substring(0, 2).toUpperCase();
+  };
 
-  // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -46,53 +40,47 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
         !menuRef.current.contains(event.target) &&
         !buttonRef.current.contains(event.target)
       ) {
-        setShowUserMenu(false)
+        setShowUserMenu(false);
       }
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showUserMenu]);
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showUserMenu])
-
-  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && showUserMenu) {
-        setShowUserMenu(false)
-        buttonRef.current?.focus()
+      if (event.key === "Escape" && showUserMenu) {
+        setShowUserMenu(false);
+        buttonRef.current?.focus();
       }
-    }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showUserMenu]);
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [showUserMenu])
-
-  // Close user menu on route change
   useEffect(() => {
-    setShowUserMenu(false)
-  }, [location.pathname])
+    setShowUserMenu(false);
+  }, [location.pathname]);
 
-  const isActive = (path) => {
-    return location.pathname === path
-  }
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 ${
           scrolled
-            ? 'bg-slate-950/95 backdrop-blur-xl shadow-2xl shadow-slate-950/20 border-b border-slate-800/80'
-            : 'bg-slate-950/80 backdrop-blur-md border-b border-slate-800/50'
+            ? "bg-neutral-950/95 backdrop-blur-sm border-b border-neutral-800"
+            : "bg-neutral-950 border-b border-neutral-900"
         }`}
       >
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14">
             {/* Left Section */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* Mobile Sidebar Toggle */}
               <button
                 onClick={onToggleSidebar}
-                className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all duration-200"
+                className="lg:hidden p-2 rounded-lg text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800"
                 aria-label="Toggle sidebar"
                 aria-expanded={sidebarOpen}
               >
@@ -104,15 +92,11 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
               </button>
 
               {/* Logo */}
-              <Link
-                to="/app"
-                className="group flex items-center gap-2.5 hover:opacity-90 transition-opacity"
-              >
-                <div className="relative w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
-                  <span className="text-white text-lg">📝</span>
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <Link to="/app" className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">N</span>
                 </div>
-                <span className="text-xl font-bold text-blue-400 hidden sm:block">
+                <span className="text-base font-semibold text-neutral-100 hidden sm:block">
                   NoteMaster
                 </span>
               </Link>
@@ -123,58 +107,48 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
               {/* Home Link */}
               <Link
                 to="/app"
-                className={`group relative flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
-                  isActive('/app')
-                    ? 'text-blue-400 bg-blue-500/10'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+                  isActive("/app")
+                    ? "text-indigo-400 bg-indigo-500/10"
+                    : "text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800"
                 }`}
               >
                 <Home className="h-4 w-4" />
-                <span className="hidden md:inline text-sm">Home</span>
-                {isActive('/app') && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent rounded-full"></div>
-                )}
+                <span className="hidden md:inline">Home</span>
               </Link>
 
               {/* New Note Button */}
               <Link
                 to="/app/create"
-                className="group relative flex items-center gap-2 px-3 sm:px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 overflow-hidden"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                <Plus className="h-4 w-4 relative z-10 group-hover:rotate-90 transition-transform duration-300" />
-                <span className="hidden sm:inline text-sm relative z-10">New Note</span>
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">New Note</span>
               </Link>
 
               {/* User Menu */}
-              <div className="relative">
+              <div className="relative ml-2">
                 <button
                   ref={buttonRef}
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={`group flex items-center gap-2 sm:gap-2.5 px-2 sm:px-3 py-2 rounded-xl transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${
                     showUserMenu
-                      ? 'bg-slate-800 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? "bg-neutral-800"
+                      : "hover:bg-neutral-800"
                   }`}
                   aria-label="User menu"
                   aria-expanded={showUserMenu}
                   aria-haspopup="true"
                 >
-                  {/* Avatar */}
-                  <div className="relative">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all duration-300">
-                      {getUserInitials()}
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    {/* Online indicator */}
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-400 border-2 border-slate-900 rounded-full"></div>
+                  <div className="w-8 h-8 bg-neutral-700 rounded-full flex items-center justify-center text-neutral-200 text-xs font-semibold">
+                    {getUserInitials()}
                   </div>
-                  <span className="hidden md:block text-sm font-medium truncate max-w-[120px]">
+                  <span className="hidden md:block text-sm text-neutral-300 max-w-[100px] truncate">
                     {user?.name}
                   </span>
                   <svg
-                    className={`hidden sm:block w-4 h-4 transition-transform duration-200 ${
-                      showUserMenu ? 'rotate-180' : ''
+                    className={`hidden sm:block w-4 h-4 text-neutral-500 ${
+                      showUserMenu ? "rotate-180" : ""
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -192,33 +166,27 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
                 {/* Dropdown Menu */}
                 {showUserMenu && (
                   <>
-                    {/* Backdrop for mobile */}
                     <div
                       className="fixed inset-0 z-40 sm:hidden"
                       onClick={() => setShowUserMenu(false)}
-                    ></div>
+                    />
 
                     <div
                       ref={menuRef}
-                      className={`absolute right-0 mt-2 w-64 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-slate-950/40 border border-slate-700/80 z-50 overflow-hidden transform origin-top-right transition-all duration-200 ${
-                        showUserMenu
-                          ? 'opacity-100 scale-100'
-                          : 'opacity-0 scale-95 pointer-events-none'
-                      }`}
+                      className="absolute right-0 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl z-50 overflow-hidden"
                       role="menu"
-                      aria-orientation="vertical"
                     >
-                      {/* User Info Header */}
-                      <div className="relative px-4 py-4 bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-b border-slate-700/80">
+                      {/* User Info */}
+                      <div className="px-4 py-4 border-b border-neutral-800">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                          <div className="w-10 h-10 bg-neutral-700 rounded-full flex items-center justify-center text-neutral-200 text-sm font-semibold">
                             {getUserInitials()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">
+                            <p className="text-sm font-medium text-neutral-100 truncate">
                               {user?.name}
                             </p>
-                            <p className="text-xs text-slate-400 truncate">
+                            <p className="text-xs text-neutral-500 truncate">
                               {user?.email}
                             </p>
                           </div>
@@ -227,23 +195,15 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
 
                       {/* Menu Items */}
                       <div className="py-2">
-                        {/* Profile Link (optional) */}
-                       
-                        {/* Logout Button */}
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-red-500/10 transition-all duration-200 group"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-400 hover:text-red-400 hover:bg-neutral-800"
                           role="menuitem"
                         >
-                          <div className="p-1.5 bg-red-500/10 rounded-lg group-hover:bg-red-500/20 transition-colors">
-                            <LogOut className="h-4 w-4 text-red-400" />
-                          </div>
+                          <LogOut className="h-4 w-4" />
                           <span>Sign out</span>
                         </button>
                       </div>
-
-                      {/* Decorative gradient at bottom */}
-                      <div className="h-1 bg-blue-500"></div>
                     </div>
                   </>
                 )}
@@ -251,13 +211,10 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
             </div>
           </div>
         </div>
-
-        {/* Progress bar indicator (optional - for loading states) */}
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0"></div>
       </nav>
 
-      {/* Spacer to prevent content from going under fixed navbar */}
-      <div className="h-16"></div>
+      {/* Spacer */}
+      <div className="h-14" />
     </>
-  )
+  );
 }

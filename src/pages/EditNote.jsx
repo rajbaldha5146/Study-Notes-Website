@@ -7,7 +7,7 @@ import rehypeHighlight from "rehype-highlight";
 import { getNote, updateNote } from "../services/api";
 import toast from "react-hot-toast";
 import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
-import LoadingSpinner from "../components/LoadingSpinner";
+import BookLoader from "../components/BookLoader";
 
 export default function EditNote() {
   const { id } = useParams();
@@ -21,19 +21,7 @@ export default function EditNote() {
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadNote = async () => {
-      if (isMounted) {
-        await fetchNote();
-      }
-    };
-
-    loadNote();
-
-    return () => {
-      isMounted = false;
-    };
+    fetchNote();
   }, [id]);
 
   const fetchNote = async () => {
@@ -64,30 +52,14 @@ export default function EditNote() {
 
     setLoading(true);
     try {
-      const noteData = {
+      await updateNote(id, {
         title: sanitizedTitle,
         content: sanitizedContent,
-      };
-
-      // Debug logging
-      console.log("Updating note with data:", {
-        id,
-        title: sanitizedTitle,
-        contentLength: sanitizedContent.length,
-        contentPreview: sanitizedContent.substring(0, 100) + "..."
       });
-
-      await updateNote(id, noteData);
-      toast.success("Note updated successfully!");
+      toast.success("Note updated!");
       navigate(`/app/note/${id}`);
     } catch (error) {
       console.error("Error updating note:", error);
-      console.error("Error details:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
-      });
       toast.error(error.response?.data?.message || "Failed to update note");
     } finally {
       setLoading(false);
@@ -103,112 +75,89 @@ export default function EditNote() {
 
   if (initialLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner size="lg" message="Loading note..." />
+      <div className="flex justify-center items-center h-[60vh]">
+        <BookLoader message="Loading note..." />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 sm:mb-6">
-        <div className="flex items-center space-x-3 sm:space-x-4">
+    <div className="page-container py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/app/note/${id}`)}
-            className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors"
+            className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">
-            Edit Note
-          </h1>
+          <h1 className="text-xl font-semibold text-neutral-100">Edit Note</h1>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setPreview(!preview)}
-            className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md transition-colors text-sm sm:text-base ${
-              preview
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-          >
-            <Eye className="h-4 w-4" />
-            <span>{preview ? "Edit" : "Preview"}</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setPreview(!preview)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+            preview
+              ? "bg-indigo-600 text-white"
+              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+          }`}
+        >
+          <Eye className="h-4 w-4" />
+          <span>{preview ? "Edit" : "Preview"}</span>
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Info */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 p-4 sm:p-6 lg:p-8">
-          <div>
-            <label className="block text-sm font-semibold text-gray-200 mb-2 sm:mb-3">
-              Title *
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900/50 border border-gray-600/50 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500 transition-all text-sm sm:text-base"
-              placeholder="Enter note title..."
-              required
-            />
-          </div>
+        {/* Title */}
+        <div className="card p-6">
+          <label className="block text-sm font-medium text-neutral-300 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            className="input"
+            placeholder="Note title"
+            required
+          />
         </div>
 
-        {/* Content */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-700/50 overflow-hidden">
-          <div className="border-b border-gray-700/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-gray-900/30">
-            <h3 className="text-base sm:text-lg font-semibold text-white">
-              Content
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1">
-              Write your note in Markdown format
+        {/* Content Editor */}
+        <div className="card overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-800">
+            <h3 className="text-sm font-medium text-neutral-200">Content</h3>
+            <p className="text-xs text-neutral-500 mt-1">
+              Write in Markdown format
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-64 sm:min-h-96">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
             {/* Editor */}
-            <div className={`${preview ? "hidden lg:block" : ""}`}>
+            <div className={preview ? "hidden lg:block" : ""}>
               <textarea
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-64 sm:h-96 p-4 sm:p-6 bg-gray-900 text-white border-0 resize-none focus:ring-0 focus:outline-none font-mono text-xs sm:text-sm placeholder-gray-500"
-                placeholder="Write your content here using Markdown..."
+                className="w-full h-[400px] p-6 bg-neutral-950 text-neutral-200 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-600"
+                placeholder="Write your content here..."
                 required
               />
             </div>
 
             {/* Preview */}
             <div
-              className={`border-l border-gray-700 bg-gray-900 ${
+              className={`border-l border-neutral-800 bg-neutral-900 ${
                 !preview ? "hidden lg:block" : ""
               }`}
             >
-              <div className="p-4 sm:p-6 prose prose-sm max-w-none prose-invert overflow-auto h-64 sm:h-96">
+              <div className="p-6 prose max-w-none overflow-auto h-[400px]">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
-                  components={{
-                    code({ node, inline, className, children, ...props }) {
-                      return (
-                        <code
-                          className={`${className} ${
-                            inline
-                              ? "bg-gray-700 text-gray-200 px-1 py-0.5 rounded text-sm"
-                              : "block bg-gray-800 text-white p-4 rounded-lg overflow-x-auto"
-                          }`}
-                          {...props}
-                        >
-                          {children}
-                        </code>
-                      );
-                    },
-                  }}
                 >
                   {formData.content || "*Preview will appear here...*"}
                 </ReactMarkdown>
@@ -222,11 +171,10 @@ export default function EditNote() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm sm:text-base w-full sm:w-auto justify-center"
-            aria-label={loading ? "Updating note" : "Update note"}
+            className="btn-primary flex items-center gap-2 px-6 py-2.5"
           >
-            <Save className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span>{loading ? "Updating..." : "Update Note"}</span>
+            <Save className="h-4 w-4" />
+            <span>{loading ? "Saving..." : "Save Changes"}</span>
           </button>
         </div>
       </form>
