@@ -128,7 +128,7 @@ export default function EditNote() {
 
         {/* Content Editor */}
         <div className="card overflow-hidden">
-          <div className="px-6 py-4 border-b border-neutral-800">
+          <div className="px-6 py-4 border-b-2 border-neutral-700">
             <h3 className="text-sm font-medium text-neutral-200">Content</h3>
             <p className="text-xs text-neutral-500 mt-1">
               Write in Markdown format
@@ -142,19 +142,30 @@ export default function EditNote() {
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[400px] p-6 bg-neutral-950 text-neutral-200 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-600"
-                placeholder="Write your content here..."
+                className="w-full h-[400px] p-6 bg-neutral-900 text-neutral-100 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-500 leading-relaxed"
+                placeholder={`# Your Note Title
+
+Write your content here...
+
+## Section
+
+- Point 1
+- Point 2
+
+\`\`\`javascript
+console.log('Hello!');
+\`\`\``}
                 required
               />
             </div>
 
             {/* Preview */}
             <div
-              className={`border-l border-neutral-800 bg-neutral-900 ${
+              className={`border-l-2 border-neutral-700 bg-neutral-900 ${
                 !preview ? "hidden lg:block" : ""
               }`}
             >
-              <div className="p-6 prose max-w-none overflow-auto h-[400px]">
+              <div className="p-6 prose max-w-none overflow-auto h-[400px] custom-scrollbar">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}

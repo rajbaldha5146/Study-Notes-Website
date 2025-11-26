@@ -68,11 +68,6 @@ export const deleteNote = async (id) => {
   return response.data;
 };
 
-export const updateDrawings = async (id, drawings) => {
-  const response = await api.patch(`/notes/${id}/drawings`, { drawings });
-  return response.data;
-};
-
 // Folders API
 export const getFolders = async () => {
   const response = await api.get("/folders");
