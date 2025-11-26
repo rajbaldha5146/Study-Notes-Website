@@ -22,6 +22,7 @@ import {
   createNote,
 } from "../services/api";
 import BookLoader from "../components/BookLoader";
+import ShareButton from "../components/ShareButton";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
 
@@ -257,13 +258,21 @@ export default function FolderView() {
             </div>
           </div>
 
-          <button
-            onClick={handleDeleteFolder}
-            className="btn-danger flex items-center gap-2 px-3 py-2 text-sm"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Delete</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <ShareButton
+              type="folder"
+              resourceId={id}
+              resourceName={folder.name}
+              size="default"
+            />
+            <button
+              onClick={handleDeleteFolder}
+              className="btn-danger flex items-center gap-2 px-3 py-2 text-sm"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
+          </div>
         </div>
 
         {/* Actions Bar */}

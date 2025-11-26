@@ -1,11 +1,13 @@
 import React from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import RegisterForm from "../components/auth/RegisterForm";
 import { useAuth } from "../contexts/AuthContext";
+import { consumePendingShareRedirect } from "../utils/shareRedirect";
 
 const Register = () => {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -16,12 +18,18 @@ const Register = () => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
+    // Consume the pending share redirect (clears storage) when actually redirecting
+    const pendingShare = consumePendingShareRedirect();
+    const redirectTo = location.state?.from?.pathname || pendingShare || "/app";
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleRegistrationSuccess = () => {
+    // Consume the pending share redirect when navigating after registration
+    const pendingShare = consumePendingShareRedirect();
+    const redirectTo = location.state?.from?.pathname || pendingShare || "/app";
     setTimeout(() => {
-      navigate("/app", { replace: true });
+      navigate(redirectTo, { replace: true });
     }, 2000);
   };
 

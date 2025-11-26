@@ -13,6 +13,7 @@ import FolderView from "./pages/FolderView";
 import NoteViewer from "./pages/NoteViewer";
 import CreateNote from "./pages/CreateNote";
 import EditNote from "./pages/EditNote";
+import SharedContentView from "./pages/SharedContentView";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -53,7 +54,15 @@ export default function App() {
                   }
                 />
 
-
+                {/* Share route - requires authentication */}
+                <Route
+                  path="/share/:shareId"
+                  element={
+                    <ProtectedRoute>
+                      <SharedContentView />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Protected routes with shared layout */}
                 <Route

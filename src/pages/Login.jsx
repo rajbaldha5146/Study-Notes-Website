@@ -2,12 +2,11 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import LoginForm from "../components/auth/LoginForm";
 import { useAuth } from "../contexts/AuthContext";
+import { consumePendingShareRedirect } from "../utils/shareRedirect";
 
 const Login = () => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
-
-  const from = location.state?.from?.pathname || "/app";
 
   if (loading) {
     return (
@@ -18,7 +17,10 @@ const Login = () => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={from} replace />;
+    // Consume the pending share redirect (clears storage) when actually redirecting
+    const pendingShare = consumePendingShareRedirect();
+    const redirectTo = location.state?.from?.pathname || pendingShare || "/app";
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (

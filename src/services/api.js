@@ -104,4 +104,30 @@ export const deleteFolder = async (id) => {
   return response.data;
 };
 
+// Shares API
+export const createShare = async (type, resourceId) => {
+  const response = await api.post("/shares", { type, resourceId });
+  return response.data;
+};
+
+export const getSharedContent = async (shareId) => {
+  const response = await api.get(`/shares/${shareId}`);
+  return response.data;
+};
+
+export const saveSharedContent = async (shareId, destinationFolderId) => {
+  const response = await api.post(`/shares/${shareId}/save`, { destinationFolderId });
+  return response.data;
+};
+
+export const revokeShare = async (shareId) => {
+  const response = await api.delete(`/shares/${shareId}`);
+  return response.data;
+};
+
+export const checkResourceShared = async (type, resourceId) => {
+  const response = await api.get(`/shares/resource/${type}/${resourceId}`);
+  return response.data;
+};
+
 export default api;

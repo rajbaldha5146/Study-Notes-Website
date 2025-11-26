@@ -8,6 +8,7 @@ import notesRoutes from "./routes/notes.js";
 import foldersRoutes from "./routes/folders.js";
 import authRoutes from "./routes/auth.js";
 import aiRoutes from "./routes/ai.js";
+import sharesRoutes from "./routes/shares.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -77,6 +78,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/folders", foldersRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/shares", sharesRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

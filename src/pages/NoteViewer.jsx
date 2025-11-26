@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BookLoader from "../components/BookLoader";
+import ShareButton from "../components/ShareButton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -236,13 +237,21 @@ export default function NoteViewer() {
               )}
             </div>
 
-            <Link
-              to={`/app/edit/${note._id}`}
-              className="btn-primary flex items-center gap-2 text-sm"
-            >
-              <Edit className="h-4 w-4" />
-              <span>Edit</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <ShareButton
+                type="note"
+                resourceId={note._id}
+                resourceName={note.title}
+                size="default"
+              />
+              <Link
+                to={`/app/edit/${note._id}`}
+                className="btn-primary flex items-center gap-2 text-sm"
+              >
+                <Edit className="h-4 w-4" />
+                <span>Edit</span>
+              </Link>
+            </div>
           </div>
 
           {/* Title */}
