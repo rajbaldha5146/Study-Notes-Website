@@ -104,6 +104,11 @@ export const deleteFolder = async (id) => {
   return response.data;
 };
 
+export const reorderFolders = async (folderOrders) => {
+  const response = await api.patch("/folders/reorder", { folderOrders });
+  return response.data;
+};
+
 // Shares API
 export const createShare = async (type, resourceId) => {
   const response = await api.post("/shares", { type, resourceId });

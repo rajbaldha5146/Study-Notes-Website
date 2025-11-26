@@ -28,7 +28,9 @@ export default function Sidebar({ isOpen, onClose }) {
     try {
       setLoading(true);
       const data = await getFolderTree();
-      setFolders(data);
+      // Sort folders by order
+      const sortedData = data.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setFolders(sortedData);
     } catch (error) {
       console.error("Failed to fetch folders:", error);
       toast.error("Failed to load folders");
@@ -142,6 +144,9 @@ export default function Sidebar({ isOpen, onClose }) {
     const isActive = location.pathname === `/app/folder/${folder._id}`;
     const isHovered = hoveredFolder === folder._id;
     const noteCount = countNotes(folder);
+    
+    // Sort children by order
+    const sortedChildren = folder.children?.sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
 
     return (
       <div key={folder._id}>
@@ -228,7 +233,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Children */}
         {hasChildren && isExpanded && (
           <div className="mt-0.5">
-            {folder.children.map((child) => renderFolder(child, level + 1))}
+            {sortedChildren.map((child) => renderFolder(child, level + 1))}
           </div>
         )}
       </div>

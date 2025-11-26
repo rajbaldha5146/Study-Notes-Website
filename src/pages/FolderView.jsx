@@ -197,9 +197,7 @@ export default function FolderView() {
 
   const sortedSubfolders = useMemo(() => {
     if (!folderData?.subfolders) return [];
-    return [...folderData.subfolders].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    return [...folderData.subfolders].sort((a, b) => (a.order || 0) - (b.order || 0));
   }, [folderData?.subfolders]);
 
   if (loading) {

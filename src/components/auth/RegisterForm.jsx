@@ -192,7 +192,9 @@ const RegisterForm = ({ onSuccess }) => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className={`w-full pl-10 pr-12 py-2.5 bg-neutral-900 border rounded-lg text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 ${
-                  errors.confirmPassword ? "border-red-500" : "border-neutral-800"
+                  errors.confirmPassword
+                    ? "border-red-500"
+                    : "border-neutral-800"
                 }`}
                 placeholder="••••••••"
               />

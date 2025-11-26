@@ -28,6 +28,10 @@ const folderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  order: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

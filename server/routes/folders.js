@@ -12,7 +12,7 @@ router.use(authenticateToken);
 // Get all folders for the authenticated user
 router.get('/', async (req, res) => {
   try {
-    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder').sort({ createdAt: -1 });
+    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder').sort({ order: 1, createdAt: -1 });
     res.json(folders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -97,6 +97,30 @@ router.put('/:id', async (req, res) => {
     res.json(folder);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+// Update folder order
+router.patch('/reorder', async (req, res) => {
+  try {
+    const { folderOrders } = req.body; // Array of { id, order }
+    
+    if (!Array.isArray(folderOrders)) {
+      return res.status(400).json({ message: 'folderOrders must be an array' });
+    }
+    
+    // Update all folders in a single operation
+    const bulkOps = folderOrders.map(({ id, order }) => ({
+      updateOne: {
+        filter: { _id: id, user: req.user._id },
+        update: { $set: { order } }
+      }
+    }));
+    
+    await Folder.bulkWrite(bulkOps);
+    res.json({ success: true, message: 'Folder order updated' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

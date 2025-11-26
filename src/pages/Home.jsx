@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Folder, FolderPlus, FileText, ArrowRight, Plus } from "lucide-react";
-import { getFolderTree } from "../services/api";
+import { Folder, FolderPlus, FileText, ArrowRight, Plus, GripVertical } from "lucide-react";
+import { getFolderTree, reorderFolders } from "../services/api";
 import BookLoader from "../components/BookLoader";
 import { useFolders } from "../contexts/FolderContext";
 import toast from "react-hot-toast";
@@ -9,7 +9,8 @@ import toast from "react-hot-toast";
 export default function Home() {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { refreshTrigger } = useFolders();
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const { refreshTrigger, refreshFolders } = useFolders();
 
   useEffect(() => {
     let isMounted = true;
@@ -18,7 +19,9 @@ export default function Home() {
       try {
         setLoading(true);
         const data = await getFolderTree();
-        if (isMounted) setFolders(data);
+        // Sort folders by order to maintain the saved order
+        const sortedData = data.sort((a, b) => (a.order || 0) - (b.order || 0));
+        if (isMounted) setFolders(sortedData);
       } catch (error) {
         console.error("Failed to fetch folders:", error);
         if (isMounted) {
@@ -35,6 +38,44 @@ export default function Home() {
       isMounted = false;
     };
   }, [refreshTrigger]);
+
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newFolders = [...folders];
+    const draggedFolder = newFolders[draggedIndex];
+    newFolders.splice(draggedIndex, 1);
+    newFolders.splice(index, 0, draggedFolder);
+
+    setFolders(newFolders);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = async () => {
+    if (draggedIndex === null) return;
+
+    try {
+      const folderOrders = folders.map((folder, index) => ({
+        id: folder._id,
+        order: index,
+      }));
+      await reorderFolders(folderOrders);
+      toast.success("Folder order updated");
+      // Trigger sidebar refresh
+      refreshFolders();
+    } catch (error) {
+      console.error("Failed to update folder order:", error);
+      toast.error("Failed to update folder order");
+    } finally {
+      setDraggedIndex(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -134,21 +175,48 @@ export default function Home() {
         <div>
           {/* Section Header */}
           <div className="section-header">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Folder className="h-5 w-5 text-neutral-500" />
               <h2 className="section-title">Your Folders</h2>
               <span className="badge badge-neutral">{folders.length}</span>
+              <div className="flex items-center gap-2 text-xs text-neutral-500 ml-auto">
+                <GripVertical className="h-3.5 w-3.5" />
+                <span>Drag to reorder</span>
+              </div>
             </div>
           </div>
 
           {/* Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {folders.map((folder) => (
-              <Link
+            {folders.map((folder, index) => (
+              <div
                 key={folder._id}
-                to={`/app/folder/${folder._id}`}
-                className="card card-hover p-5 group"
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`relative transition-all duration-200 ${
+                  draggedIndex === index 
+                    ? "opacity-40 scale-95 rotate-2" 
+                    : draggedIndex !== null 
+                    ? "hover:scale-105" 
+                    : ""
+                }`}
               >
+                {/* Drag Handle - Always visible with subtle styling */}
+                <div className="absolute top-3 left-3 z-10 cursor-grab active:cursor-grabbing p-1.5 rounded-lg bg-neutral-800/60 hover:bg-neutral-700/80 border border-neutral-700/50 transition-all duration-200 hover:scale-110">
+                  <GripVertical className="h-4 w-4 text-neutral-400 hover:text-neutral-200" />
+                </div>
+                
+                {/* Dragging indicator */}
+                {draggedIndex === index && (
+                  <div className="absolute inset-0 border-2 border-dashed border-indigo-500/50 rounded-xl pointer-events-none z-20" />
+                )}
+                
+                <Link
+                  to={`/app/folder/${folder._id}`}
+                  className="card card-hover p-5 group block pl-12"
+                >
                 <div className="flex items-start gap-4 mb-4">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
@@ -189,7 +257,8 @@ export default function Home() {
                   </div>
                   <ArrowRight className="h-4 w-4 text-neutral-600 group-hover:text-indigo-400" />
                 </div>
-              </Link>
+                </Link>
+              </div>
             ))}
 
             {/* Add Folder Card */}

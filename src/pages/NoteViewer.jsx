@@ -278,7 +278,7 @@ export default function NoteViewer() {
         </div>
 
         {/* Content */}
-        <article className="card p-6 sm:p-8">
+        <article className="card p-6 sm:p-8 note-viewer">
           <div className="prose max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
