@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, FileText } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
+import { consumePendingShareRedirect } from "../../utils/shareRedirect";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const LoginForm = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     setFormData({
@@ -28,8 +30,11 @@ const LoginForm = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
+      // Check for pending share redirect first, then location state, then default to /app
+      const pendingShare = consumePendingShareRedirect();
+      const redirectTo = location.state?.from?.pathname || pendingShare || "/app";
       setTimeout(() => {
-        navigate("/app", { replace: true });
+        navigate(redirectTo, { replace: true });
       }, 1500);
     }
 
