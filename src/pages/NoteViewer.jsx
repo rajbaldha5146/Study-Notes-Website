@@ -269,10 +269,13 @@ export default function NoteViewer() {
               {new Date(note.createdAt).toLocaleDateString()}
             </span>
             {note.folder && (
-              <span className="flex items-center gap-1.5 text-neutral-500">
+              <Link
+                to={`/app/folder/${note.folder._id}`}
+                className="flex items-center gap-1.5 text-neutral-500 hover:text-indigo-400 transition-colors cursor-pointer"
+              >
                 <Folder className="h-4 w-4" />
-                {note.folder.name || "Unknown"}
-              </span>
+                <span className="hover:underline">{note.folder.name || "Unknown"}</span>
+              </Link>
             )}
           </div>
         </div>

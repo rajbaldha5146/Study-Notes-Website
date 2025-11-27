@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save, Eye, FileText, Plus, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,6 +12,7 @@ import AITopicGenerator from "../components/ai/AITopicGenerator";
 
 export default function CreateNote() {
   const navigate = useNavigate();
+  const { folderId } = useParams();
   const { refreshFolders } = useFolders();
 
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ export default function CreateNote() {
 
   useEffect(() => {
     loadFolders();
-  }, []);
+  }, [folderId]);
 
   const loadFolders = async () => {
     try {
@@ -47,7 +48,9 @@ export default function CreateNote() {
         refreshFolders();
       } else {
         setFolders(foldersData);
-        setFormData((prev) => ({ ...prev, folder: foldersData[0]._id }));
+        // If folderId is provided in URL, use it; otherwise use first folder
+        const defaultFolderId = folderId || foldersData[0]._id;
+        setFormData((prev) => ({ ...prev, folder: defaultFolderId }));
       }
     } catch (error) {
       console.error("Error loading folders:", error);
@@ -184,7 +187,7 @@ export default function CreateNote() {
             setFormData({
               title: "",
               content: "",
-              folder: folders.length > 0 ? folders[0]._id : "",
+              folder: folderId || (folders.length > 0 ? folders[0]._id : ""),
             });
           }}
           className="btn-primary flex items-center gap-2"
