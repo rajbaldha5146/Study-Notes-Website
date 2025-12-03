@@ -14,7 +14,10 @@ import {
   ChevronDown,
   X,
   Check,
+  Download,
 } from "lucide-react";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import {
   getFolder,
   deleteNote,
@@ -39,6 +42,7 @@ export default function FolderView() {
   const [sortOrder, setSortOrder] = useState("desc");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState([]);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const fetchFolderData = async () => {
     try {
@@ -157,6 +161,33 @@ export default function FolderView() {
       toast.error("Failed to delete folder");
     }
   }, [id, folderData?.folder?.name, navigate]);
+
+  const handleDownloadZip = useCallback(async () => {
+    if (!folderData?.notes || folderData.notes.length === 0) {
+      toast.error("No notes to download");
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      const zip = new JSZip();
+      const folderName = folderData.folder?.name || "notes";
+
+      folderData.notes.forEach((note) => {
+        const fileName = `${note.title.replace(/[^a-zA-Z0-9\s-]/g, "").trim()}.md`;
+        zip.file(fileName, note.content);
+      });
+
+      const blob = await zip.generateAsync({ type: "blob" });
+      saveAs(blob, `${folderName}.zip`);
+      toast.success(`Downloaded ${folderData.notes.length} notes`);
+    } catch (error) {
+      console.error("Failed to create zip:", error);
+      toast.error("Failed to download notes");
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [folderData]);
 
   // Filter + sort notes
   const filteredNotes = useMemo(() => {
@@ -308,6 +339,19 @@ export default function FolderView() {
                 <Presentation className="h-4 w-4" />
                 <span className="hidden sm:inline">Present</span>
               </Link>
+            )}
+
+            {folderData?.notes?.length > 0 && (
+              <button
+                onClick={handleDownloadZip}
+                disabled={isDownloading}
+                className="btn-secondary flex items-center gap-2 text-sm"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {isDownloading ? "Downloading..." : "Download"}
+                </span>
+              </button>
             )}
           </div>
 
