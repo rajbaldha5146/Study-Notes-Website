@@ -155,7 +155,7 @@ export default function NoteViewer() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-neutral-950">
+      <div className="flex items-center justify-center h-screen" style={{ background: "var(--bg-base)" }}>
         <BookLoader message="Loading note..." />
       </div>
     );
@@ -163,7 +163,7 @@ export default function NoteViewer() {
 
   if (error || !note) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-neutral-950">
+      <div className="flex flex-col items-center justify-center h-screen" style={{ background: "var(--bg-base)" }}>
         <h2 className="text-xl font-semibold text-neutral-200 mb-4">
           {error || "Note not found"}
         </h2>
@@ -179,12 +179,12 @@ export default function NoteViewer() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 pb-12">
+    <div className="min-h-screen pb-12" style={{ background: "var(--bg-base)" }}>
       {/* Progress bar */}
       <div
         ref={contentRef}
-        className="fixed top-0 left-0 h-1 bg-indigo-500 z-50"
-        style={{ width: "var(--progress, 0%)" }}
+        className="fixed top-0 left-0 h-0.5 z-50 transition-all"
+        style={{ width: "var(--progress, 0%)", background: "linear-gradient(90deg, var(--violet), var(--cyan))" }}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8">
@@ -255,7 +255,7 @@ export default function NoteViewer() {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-neutral-100 mb-4">
+          <h1 className="font-extrabold mb-4" style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
             {note.title}
           </h1>
 
@@ -281,7 +281,14 @@ export default function NoteViewer() {
         </div>
 
         {/* Content */}
-        <article className="card p-6 sm:p-8 note-viewer">
+        <article
+          className="rounded-2xl p-6 sm:p-8 note-viewer"
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-subtle)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+          }}
+        >
           <div className="prose max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -320,7 +327,10 @@ export default function NoteViewer() {
 
         {/* Bottom Navigation */}
         {folderId && folderNotes.length > 1 && (
-          <div className="mt-8 card p-6">
+          <div
+            className="mt-8 rounded-2xl p-6"
+            style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+          >
             <div className="flex items-center justify-between gap-4">
               {/* Previous */}
               <div className="flex-1">
@@ -359,12 +369,12 @@ export default function NoteViewer() {
                       onClick={() =>
                         navigate(`/app/note/${n._id}?folder=${folderId}`)
                       }
-                      className={`w-2 h-2 rounded-full ${
+                      className={`w-2 h-2 rounded-full transition-all ${
                         i === currentNoteIndex
-                          ? "bg-indigo-500"
+                          ? "bg-violet-500 scale-125"
                           : i < currentNoteIndex
                           ? "bg-emerald-500"
-                          : "bg-neutral-700"
+                          : "bg-slate-700"
                       }`}
                       title={n.title}
                     />

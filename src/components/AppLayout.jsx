@@ -23,15 +23,46 @@ export default function AppLayout() {
     } else {
       document.body.style.overflow = "unset";
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    return () => { document.body.style.overflow = "unset"; };
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+    <div
+      className="min-h-screen"
+      style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}
+    >
+      {/* Ambient background blobs — fixed, decorative */}
+      <div
+        className="fixed inset-0 pointer-events-none overflow-hidden"
+        style={{ zIndex: 0 }}
+        aria-hidden="true"
+      >
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: "600px",
+            height: "600px",
+            top: "-200px",
+            left: "-200px",
+            background: "radial-gradient(circle, rgba(109,40,217,0.07) 0%, transparent 70%)",
+            animation: "float-slow 18s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: "500px",
+            height: "500px",
+            bottom: "-150px",
+            right: "-150px",
+            background: "radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)",
+            animation: "float-mid 22s ease-in-out infinite",
+          }}
+        />
+      </div>
+
       {/* Navbar */}
-      <div data-navbar>
+      <div data-navbar style={{ position: "relative", zIndex: 50 }}>
         <Navbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
       </div>
 
@@ -41,7 +72,10 @@ export default function AppLayout() {
       </div>
 
       {/* Main content */}
-      <main className="lg:ml-64 min-h-screen pt-4 pb-8">
+      <main
+        className="lg:ml-64 min-h-screen pt-4 pb-12"
+        style={{ position: "relative", zIndex: 1 }}
+      >
         <Outlet />
       </main>
 
@@ -49,10 +83,15 @@ export default function AppLayout() {
       {scrolled && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 p-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg border border-neutral-700"
+          className="fixed bottom-6 right-6 z-50 p-2.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+          style={{
+            background: "linear-gradient(135deg, var(--violet-dark), var(--violet))",
+            boxShadow: "0 4px 16px rgba(139,92,246,0.35)",
+            border: "1px solid rgba(139,92,246,0.3)",
+          }}
           aria-label="Scroll to top"
         >
-          <ChevronUp className="w-5 h-5" />
+          <ChevronUp className="w-4 h-4 text-white" />
         </button>
       )}
     </div>

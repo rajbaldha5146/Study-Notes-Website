@@ -11,7 +11,7 @@ const Register = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
         <div className="spinner w-8 h-8" />
       </div>
     );
@@ -34,8 +34,33 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <RegisterForm onSuccess={handleRegistrationSuccess} />
+    <div
+      className="min-h-screen flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      style={{ background: "var(--bg-base)" }}
+    >
+      <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: "700px", height: "700px",
+            top: "-250px", right: "-250px",
+            background: "radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 65%)",
+            animation: "float-mid 22s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: "500px", height: "500px",
+            bottom: "-150px", left: "-150px",
+            background: "radial-gradient(circle, rgba(109,40,217,0.1) 0%, transparent 65%)",
+            animation: "float-slow 18s ease-in-out infinite",
+          }}
+        />
+      </div>
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <RegisterForm onSuccess={handleRegistrationSuccess} />
+      </div>
     </div>
   );
 };

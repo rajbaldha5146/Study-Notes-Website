@@ -167,11 +167,20 @@ export default function CreateNote() {
 
         <button
           onClick={() => setPreview(!preview)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
             preview
-              ? "bg-indigo-600 text-white"
-              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+              ? "text-white"
+              : "hover:opacity-80"
           }`}
+          style={preview ? {
+            background: "linear-gradient(135deg, var(--violet-dark), var(--violet))",
+            boxShadow: "0 0 12px rgba(139,92,246,0.3)",
+            border: "1px solid rgba(139,92,246,0.3)"
+          } : {
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)"
+          }}
         >
           <Eye className="h-4 w-4" />
           <span>{preview ? "Edit" : "Preview"}</span>
@@ -296,12 +305,16 @@ export default function CreateNote() {
         </div>
 
         {/* Content Editor */}
-        <div className="card overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-neutral-700">
-            <h3 className="text-sm font-medium text-neutral-200">Content</h3>
-            <p className="text-xs text-neutral-500 mt-1">
-              Write in Markdown format
-            </p>
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+        >
+          <div
+            className="px-6 py-4"
+            style={{ borderBottom: "1px solid var(--border-subtle)" }}
+          >
+            <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Content</h3>
+            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Write in Markdown format</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
@@ -311,7 +324,13 @@ export default function CreateNote() {
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[400px] p-6 bg-neutral-900 text-neutral-100 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-500 leading-relaxed"
+                className="w-full h-[400px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
+                style={{
+                  background: "var(--bg-elevated)",
+                  color: "var(--text-primary)",
+                  border: "none",
+                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                }}
                 placeholder={`# Your Note Title
 
 Write your content here...
@@ -330,9 +349,10 @@ console.log('Hello!');
 
             {/* Preview */}
             <div
-              className={`border-l-2 border-neutral-700 bg-neutral-900 ${
+              className={`border-l border-neutral-700 ${
                 !preview ? "hidden lg:block" : ""
               }`}
+              style={{ background: "var(--bg-elevated)" }}
             >
               <div className="p-6 prose max-w-none overflow-auto h-[400px] custom-scrollbar">
                 <ReactMarkdown

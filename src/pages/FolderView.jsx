@@ -264,14 +264,20 @@ export default function FolderView() {
           <div className="flex items-center gap-3 min-w-0">
             <Link
               to="/app"
-              className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Back</span>
+                className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline" style={{ color: "var(--text-secondary)" }}>Back</span>
             </Link>
 
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-xl">
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                style={{
+                  background: folder.color ? `${folder.color}18` : "rgba(139,92,246,0.12)",
+                  border: `1px solid ${folder.color ? folder.color + "30" : "rgba(139,92,246,0.2)"}`,
+                }}
+              >
                 {folder.icon || "📁"}
               </div>
               <div className="min-w-0">
@@ -376,7 +382,12 @@ export default function FolderView() {
                   setSortBy(by);
                   setSortOrder(order);
                 }}
-                className="appearance-none px-3 py-2.5 pr-8 bg-neutral-900 border border-neutral-800 rounded-lg text-sm text-neutral-300 cursor-pointer"
+                className="appearance-none px-3 py-2.5 pr-8 rounded-lg text-sm cursor-pointer transition-all"
+                style={{
+                  background: "var(--bg-elevated)",
+                  border: "1px solid var(--border-subtle)",
+                  color: "var(--text-secondary)",
+                }}
               >
                 <option value="createdAt-desc">Newest</option>
                 <option value="createdAt-asc">Oldest</option>
@@ -460,10 +471,23 @@ export default function FolderView() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredNotes.map((note) => (
-              <div key={note._id} className="card card-hover p-5 group">
-                {/* Header */}
+          <div key={note._id} className="group relative rounded-xl overflow-hidden transition-all duration-200" style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--border-default)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3), 0 0 16px rgba(139,92,246,0.08)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            {/* Left accent bar */}
+            <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ background: "linear-gradient(180deg, var(--violet), var(--cyan))" }} />
+            <div className="p-5 pl-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="font-semibold text-neutral-100 line-clamp-2 group-hover:text-indigo-400">
+                  <h3 className="font-bold line-clamp-2 transition-colors" style={{ color: "var(--text-primary)", fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>
                     {note.title}
                   </h3>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
@@ -485,24 +509,24 @@ export default function FolderView() {
                 </div>
 
                 {/* Preview */}
-                <p className="text-sm text-neutral-500 line-clamp-3 mb-4">
+                <p className="text-sm line-clamp-3 mb-4" style={{ color: "var(--text-muted)", lineHeight: 1.6 }}>
                   {note.content.substring(0, 150)}...
                 </p>
 
-                {/* Meta */}
-                <div className="flex items-center gap-2 text-xs text-neutral-600 mb-4">
-                  <Calendar className="h-3.5 w-3.5" />
+                <div className="flex items-center gap-2 text-xs mb-4" style={{ color: "var(--text-faint)" }}>
+                  <Calendar className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
                   <span>{new Date(note.createdAt).toLocaleDateString()}</span>
                 </div>
 
-                {/* Action */}
                 <Link
                   to={`/app/note/${note._id}`}
-                  className="block w-full text-center py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg"
+                  className="btn-primary block w-full text-center text-sm"
+                  style={{ padding: "0.5rem", borderRadius: "0.5rem" }}
                 >
                   View Note
                 </Link>
               </div>
+            </div>
             ))}
           </div>
         )}
@@ -510,8 +534,8 @@ export default function FolderView() {
 
       {/* Upload Progress Modal */}
       {isUploading && uploadProgress.length > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
+          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: "rgba(15,23,42,0.95)", border: "1px solid var(--border-subtle)", backdropFilter: "blur(20px)", boxShadow: "0 24px 60px rgba(0,0,0,0.5)" }}>
             <h3 className="text-lg font-semibold text-neutral-100 mb-4">
               Uploading Files
             </h3>
