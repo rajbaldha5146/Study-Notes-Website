@@ -24,6 +24,8 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const { refreshTrigger, refreshFolders: triggerGlobalRefresh } = useFolders();
 
+  const SIDEBAR_WIDTH = 240;
+
   const fetchFolders = useCallback(async () => {
     try {
       setLoading(true);
@@ -70,6 +72,14 @@ export default function Sidebar({ isOpen, onClose }) {
       expandParentFolders(folders, location.pathname);
     }
   }, [location.pathname, folders]);
+
+  // Update CSS variable for main content margin
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--sidebar-width",
+      isOpen ? `${SIDEBAR_WIDTH}px` : "0px"
+    );
+  }, [isOpen]);
 
   const toggleFolder = useCallback((folderId, e) => {
     e?.stopPropagation();
@@ -129,36 +139,29 @@ export default function Sidebar({ isOpen, onClose }) {
     const noteCount = countNotes(folder);
     const sortedChildren = folder.children?.sort((a, b) => (a.order || 0) - (b.order || 0)) || [];
 
-    // Use folder color or default violet
-    const accentColor = folder.color || "#8b5cf6";
-    const accentAlpha = accentColor + "20";
-
     return (
       <div key={folder._id}>
         <div
-          className="group flex items-center gap-2 rounded-lg cursor-pointer relative transition-all duration-150"
+          className="group flex items-center gap-1.5 rounded-md cursor-pointer relative transition-all duration-100"
           style={{
-            paddingLeft: `${10 + level * 14}px`,
-            paddingRight: "8px",
-            paddingTop: "6px",
-            paddingBottom: "6px",
+            paddingLeft: `${8 + level * 12}px`,
+            paddingRight: "6px",
+            paddingTop: "5px",
+            paddingBottom: "5px",
             background: isActive
-              ? `linear-gradient(90deg, ${accentColor}18 0%, transparent 100%)`
+              ? "var(--bg-elevated)"
               : isHovered
-              ? "rgba(255,255,255,0.035)"
+              ? "rgba(255,255,255,0.04)"
               : "transparent",
           }}
           onMouseEnter={() => setHoveredFolder(folder._id)}
           onMouseLeave={() => setHoveredFolder(null)}
         >
-          {/* Active indicator bar */}
+          {/* Active indicator */}
           {isActive && (
             <div
               className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full"
-              style={{
-                background: accentColor,
-                boxShadow: `0 0 8px ${accentColor}80`,
-              }}
+              style={{ background: "var(--blue)" }}
             />
           )}
 
@@ -171,20 +174,23 @@ export default function Sidebar({ isOpen, onClose }) {
           >
             {hasChildren && (
               isExpanded
-                ? <ChevronDown className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
-                : <ChevronRight className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
+                ? <ChevronDown className="h-3 w-3" style={{ color: "var(--text-muted)" }} />
+                : <ChevronRight className="h-3 w-3" style={{ color: "var(--text-muted)" }} />
             )}
           </button>
 
           {/* Folder icon */}
-          <span className="flex-shrink-0 text-sm">{folder.icon || "📁"}</span>
+          <span className="flex-shrink-0 text-sm leading-none">{folder.icon || "📁"}</span>
 
           {/* Folder link */}
           <Link
             to={`/app/folder/${folder._id}`}
             onClick={onClose}
-            className="flex-1 truncate text-sm font-medium transition-colors"
-            style={{ color: isActive ? accentColor : "var(--text-secondary)" }}
+            className="flex-1 truncate text-sm transition-colors"
+            style={{
+              color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
+              fontWeight: isActive ? "500" : "400",
+            }}
           >
             {folder.name}
           </Link>
@@ -192,10 +198,10 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* Note count */}
           {noteCount > 0 && (
             <span
-              className="flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full font-semibold"
+              className="flex-shrink-0 text-xs px-1 py-0.5 rounded font-medium"
               style={{
-                background: isActive ? `${accentColor}20` : "var(--bg-elevated)",
-                color: isActive ? accentColor : "var(--text-muted)",
+                background: "transparent",
+                color: "var(--text-muted)",
                 fontSize: "0.65rem",
               }}
             >
@@ -215,7 +221,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 e.stopPropagation();
                 handleCreateFolder(folder._id);
               }}
-              className="p-1 rounded hover:bg-white/10 transition-colors"
+              className="p-1 rounded hover:bg-white/8 transition-colors"
               title="Add subfolder"
             >
               <Plus className="h-3 w-3" style={{ color: "var(--text-muted)" }} />
@@ -225,10 +231,13 @@ export default function Sidebar({ isOpen, onClose }) {
                 e.preventDefault();
                 handleDeleteFolder(folder._id, folder.name, e);
               }}
-              className="p-1 rounded hover:bg-rose-500/15 transition-colors"
+              className="p-1 rounded transition-colors"
+              style={{ color: "var(--text-muted)" }}
+              onMouseEnter={e => e.currentTarget.style.color = "var(--danger)"}
+              onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
               title="Delete folder"
             >
-              <Trash2 className="h-3 w-3" style={{ color: "var(--text-muted)" }} />
+              <Trash2 className="h-3 w-3" />
             </button>
           </div>
         </div>
@@ -249,59 +258,55 @@ export default function Sidebar({ isOpen, onClose }) {
       {isOpen && (
         <div
           className="fixed inset-0 z-30 lg:hidden"
-          style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+          style={{ background: "rgba(0,0,0,0.5)" }}
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-14 bottom-0 w-64 overflow-y-auto z-40 lg:translate-x-0 custom-scrollbar transition-transform duration-300 ${
+        className={`fixed left-0 top-12 bottom-0 overflow-y-auto z-40 custom-scrollbar transition-transform duration-250 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
+          width: `${SIDEBAR_WIDTH}px`,
           background: "var(--bg-surface)",
           borderRight: "1px solid var(--border-subtle)",
-          /* Purple glow spine on the left edge */
-          boxShadow: "inset -1px 0 0 var(--border-subtle), 4px 0 24px rgba(0,0,0,0.2)",
         }}
       >
-        {/* Left spine glow */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
-          style={{
-            background: "linear-gradient(180deg, transparent 0%, rgba(139,92,246,0.6) 30%, rgba(6,182,212,0.4) 70%, transparent 100%)",
-          }}
-        />
-
-        <div className="p-4 h-full flex flex-col">
+        <div className="p-3 h-full flex flex-col">
           {/* Header */}
           <div
-            className="flex items-center justify-between mb-4 pb-4"
+            className="flex items-center justify-between mb-3 pb-3"
             style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
             <div className="flex items-center gap-2">
-              <Folder className="h-4 w-4" style={{ color: "var(--violet)" }} />
-              <h2 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
-                My Vault
-              </h2>
-              {/* Animated status dot */}
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                Folders
+              </span>
+              {/* Live indicator */}
               <div
                 className="w-1.5 h-1.5 rounded-full"
                 style={{
-                  background: "var(--cyan)",
-                  boxShadow: "0 0 6px rgba(6,182,212,0.8)",
+                  background: "var(--success)",
                   animation: "pulse-glow 2s ease-in-out infinite",
                 }}
               />
             </div>
             <button
               onClick={() => handleCreateFolder()}
-              className="p-1.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+              className="p-1.5 rounded-md transition-colors"
               style={{
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border-subtle)",
-                color: "var(--text-secondary)",
+                color: "var(--text-muted)",
+                background: "transparent",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "var(--bg-elevated)";
+                e.currentTarget.style.color = "var(--text-primary)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "var(--text-muted)";
               }}
               title="Create new folder"
             >
@@ -313,24 +318,24 @@ export default function Sidebar({ isOpen, onClose }) {
           <div className="flex-1 space-y-0.5">
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-5 w-5 animate-spin" style={{ color: "var(--violet)" }} />
+                <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--text-muted)" }} />
               </div>
             ) : folders.length === 0 ? (
               <div className="text-center py-10 px-3">
                 <div
-                  className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}
+                  className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
+                  style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}
                 >
-                  <Folder className="h-5 w-5" style={{ color: "var(--violet)" }} />
+                  <Folder className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
                 </div>
                 <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>No folders yet</p>
                 <button
                   onClick={() => handleCreateFolder()}
                   className="btn-primary text-xs"
-                  style={{ padding: "0.4rem 0.875rem" }}
+                  style={{ padding: "0.35rem 0.75rem" }}
                 >
-                  <FolderPlus className="h-3.5 w-3.5 mr-1" />
-                  Create Folder
+                  <FolderPlus className="h-3 w-3 mr-1" />
+                  New Folder
                 </button>
               </div>
             ) : (
@@ -341,10 +346,10 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* Footer */}
           {!loading && folders.length > 0 && (
             <div
-              className="mt-4 pt-4"
+              className="mt-3 pt-3"
               style={{ borderTop: "1px solid var(--border-subtle)" }}
             >
-              <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-faint)" }}>
+              <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
                 <Folder className="h-3 w-3" />
                 <span>
                   {folders.reduce((acc, f) => {

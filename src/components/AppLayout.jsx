@@ -5,11 +5,26 @@ import Sidebar from "./Sidebar";
 import { ChevronUp } from "lucide-react";
 
 export default function AppLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 1024);
+  // Sidebar: open by default on desktop, closed on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [scrolled, setScrolled] = useState(false);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
   const closeSidebar = () => setSidebarOpen(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      // Auto-open sidebar when transitioning to desktop
+      if (desktop && !sidebarOpen) {
+        // Don't auto-open if user explicitly closed it
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [sidebarOpen]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 100);
@@ -17,50 +32,24 @@ export default function AppLayout() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock scroll on mobile when sidebar is open
   useEffect(() => {
-    if (sidebarOpen && window.innerWidth < 1024) {
+    if (sidebarOpen && !isDesktop) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
     return () => { document.body.style.overflow = "unset"; };
-  }, [sidebarOpen]);
+  }, [sidebarOpen, isDesktop]);
+
+  // On desktop: sidebar pushes content. On mobile: sidebar overlays.
+  const mainMargin = isDesktop && sidebarOpen ? "240px" : "0";
 
   return (
     <div
       className="min-h-screen"
       style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}
     >
-      {/* Ambient background blobs — fixed, decorative */}
-      <div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
-        style={{ zIndex: 0 }}
-        aria-hidden="true"
-      >
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "600px",
-            height: "600px",
-            top: "-200px",
-            left: "-200px",
-            background: "radial-gradient(circle, rgba(109,40,217,0.07) 0%, transparent 70%)",
-            animation: "float-slow 18s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "500px",
-            height: "500px",
-            bottom: "-150px",
-            right: "-150px",
-            background: "radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)",
-            animation: "float-mid 22s ease-in-out infinite",
-          }}
-        />
-      </div>
-
       {/* Navbar */}
       <div data-navbar style={{ position: "relative", zIndex: 50 }}>
         <Navbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
@@ -73,8 +62,13 @@ export default function AppLayout() {
 
       {/* Main content */}
       <main
-        className="lg:ml-64 min-h-screen pt-4 pb-12"
-        style={{ position: "relative", zIndex: 1 }}
+        className="min-h-screen pt-4 pb-12"
+        style={{
+          marginLeft: mainMargin,
+          transition: "margin-left 0.3s ease",
+          position: "relative",
+          zIndex: 1,
+        }}
       >
         <Outlet />
       </main>
@@ -83,15 +77,15 @@ export default function AppLayout() {
       {scrolled && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 p-2.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+          className="fixed bottom-6 right-6 z-50 p-2 rounded-md transition-all duration-200 hover:-translate-y-0.5"
           style={{
-            background: "linear-gradient(135deg, var(--violet-dark), var(--violet))",
-            boxShadow: "0 4px 16px rgba(139,92,246,0.35)",
-            border: "1px solid rgba(139,92,246,0.3)",
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-default)",
+            color: "var(--text-secondary)",
           }}
           aria-label="Scroll to top"
         >
-          <ChevronUp className="w-4 h-4 text-white" />
+          <ChevronUp className="w-4 h-4" />
         </button>
       )}
     </div>

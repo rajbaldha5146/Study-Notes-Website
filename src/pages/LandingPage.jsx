@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   FileText, ArrowRight, Folder, Upload, Share2, Search,
-  Sparkles, Lock, Code, GripVertical, BookOpen, Zap, CheckCircle2,
+  Sparkles, Lock, Code, GripVertical, Zap, CheckCircle2,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -25,84 +25,47 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
-      {/* Background blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true" style={{ zIndex: 0 }}>
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "800px", height: "800px",
-            top: "-300px", left: "-300px",
-            background: "radial-gradient(circle, rgba(109,40,217,0.1) 0%, transparent 65%)",
-            animation: "float-slow 20s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "600px", height: "600px",
-            top: "20%", right: "-200px",
-            background: "radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 65%)",
-            animation: "float-mid 25s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "500px", height: "500px",
-            bottom: "10%", left: "20%",
-            background: "radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 65%)",
-            animation: "float-slow 30s ease-in-out infinite reverse",
-          }}
-        />
-      </div>
+      {/* Clean subtle background */}
 
       {/* Navigation */}
       <nav
         className="fixed top-0 w-full z-50"
         style={{
-          background: "rgba(7,12,24,0.85)",
-          backdropFilter: "blur(20px)",
+          background: "var(--bg-surface)",
           borderBottom: "1px solid var(--border-subtle)",
         }}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #6d28d9, #8b5cf6, #06b6d4)",
-                  boxShadow: "0 0 12px rgba(139,92,246,0.4)",
-                }}
-              >
-                <BookOpen className="h-4 w-4 text-white" />
-              </div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-between items-center h-12">
+            <div className="flex items-center gap-2">
+              <img
+                src="/logo.png"
+                alt="NoteMaster"
+                className="w-7 h-7 rounded-md object-cover"
+              />
               <span
-                className="font-bold text-lg"
-                style={{
-                  background: "linear-gradient(135deg, #f1f5f9, #a78bfa)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+                className="font-semibold text-sm"
+                style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}
               >
                 NoteMaster
               </span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="text-sm font-medium transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
+                className="text-sm font-medium transition-colors px-3 py-1.5 rounded-md"
                 style={{ color: "var(--text-secondary)" }}
+                onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
               >
                 Sign in
               </Link>
               <Link
                 to="/register"
                 className="btn-primary text-sm"
-                style={{ padding: "0.45rem 1.125rem" }}
+                style={{ padding: "0.4rem 0.875rem" }}
               >
-                Get started free
+                Get started
               </Link>
             </div>
           </div>
@@ -110,96 +73,73 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 px-4 sm:px-6" style={{ zIndex: 1 }}>
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Pill badge */}
+      <section className="relative pt-28 pb-20 px-4 sm:px-6" style={{ zIndex: 1 }}>
+        <div className="max-w-3xl mx-auto text-center">
+          {/* Badge */}
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium mb-8"
             style={{
-              background: "rgba(139,92,246,0.1)",
-              border: "1px solid rgba(139,92,246,0.25)",
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border-default)",
+              color: "var(--text-secondary)",
             }}
           >
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ background: "var(--cyan)", boxShadow: "0 0 6px rgba(6,182,212,0.8)", animation: "pulse-glow 2s ease-in-out infinite" }}
-            />
-            <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--violet-light)" }} />
-            <span style={{ color: "var(--violet-light)" }}>Markdown notes with AI-powered generation</span>
+            <Sparkles className="h-3 w-3" style={{ color: "var(--blue)" }} />
+            <span>Markdown notes with AI-powered generation</span>
           </div>
 
           {/* Headline */}
           <h1
-            className="font-extrabold leading-tight mb-6"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.04em" }}
+            className="font-bold leading-tight mb-5"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)", letterSpacing: "-0.03em", color: "var(--text-primary)" }}
           >
             Your notes,{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, var(--violet-light), var(--cyan-light))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              organized
-            </span>
-            <br />
-            and{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, var(--cyan-light), var(--violet-light))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              searchable
-            </span>
+            <span style={{ color: "var(--blue-light)" }}>organized</span>
+            {" "}and{" "}
+            <span style={{ color: "var(--blue-light)" }}>searchable</span>
           </h1>
 
           <p
-            className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto"
+            className="text-base sm:text-lg mb-10 max-w-2xl mx-auto"
             style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
           >
             A clean, fast note-taking app built for developers and writers.
-            Markdown support, AI generation, and smart organization. No bloat, just notes.
+            Markdown support, AI generation, and smart organization.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-14">
             <Link
               to="/register"
-              className="btn-primary inline-flex items-center justify-center gap-2 text-lg"
-              style={{ padding: "0.875rem 2rem", borderRadius: "0.75rem" }}
+              className="btn-primary inline-flex items-center justify-center gap-2"
+              style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
             >
               Start for free
-              <ArrowRight className="h-5 w-5" />
+              <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/login"
-              className="btn-secondary inline-flex items-center justify-center gap-2 text-lg"
-              style={{ padding: "0.875rem 2rem", borderRadius: "0.75rem" }}
+              className="btn-secondary inline-flex items-center justify-center gap-2"
+              style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
             >
               Sign in
             </Link>
           </div>
 
           {/* Problem/Solution */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto">
             {problems.map((item, i) => (
               <div
                 key={i}
-                className="text-left p-4 rounded-xl"
+                className="text-left p-4 rounded-lg"
                 style={{
-                  background: "rgba(15,23,42,0.6)",
+                  background: "var(--bg-elevated)",
                   border: "1px solid var(--border-subtle)",
-                  backdropFilter: "blur(8px)",
                 }}
               >
-                <p className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>{item.problem}</p>
-                <p className="text-sm font-semibold flex items-center gap-2" style={{ color: "#6ee7b7" }}>
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>{item.problem}</p>
+                <p className="text-sm font-semibold flex items-center gap-2" style={{ color: "var(--success)" }}>
+                  <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
                   {item.solution}
                 </p>
               </div>
@@ -282,22 +222,21 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { n: "1", title: "Create folders", desc: "Organize your notes into folders and subfolders", color: "var(--violet)" },
-              { n: "2", title: "Write or generate", desc: "Write in Markdown or use AI to generate content", color: "var(--cyan)" },
-              { n: "3", title: "Share & present", desc: "Share notes with a link or run slideshow mode", color: "#10b981" },
+              { n: "01", title: "Create folders", desc: "Organize your notes into folders and subfolders" },
+              { n: "02", title: "Write or generate", desc: "Write in Markdown or use AI to generate content" },
+              { n: "03", title: "Share & present", desc: "Share notes with a link or run slideshow mode" },
             ].map((step) => (
               <div key={step.n} className="text-center">
                 <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
                   style={{
-                    background: `${step.color}12`,
-                    border: `1px solid ${step.color}30`,
-                    boxShadow: `0 0 24px ${step.color}20`,
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border-default)",
                   }}
                 >
-                  <span className="text-2xl font-extrabold" style={{ color: step.color }}>{step.n}</span>
+                  <span className="text-sm font-bold font-mono" style={{ color: "var(--blue)" }}>{step.n}</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: "var(--text-primary)" }}>{step.title}</h3>
+                <h3 className="text-base font-semibold mb-2" style={{ color: "var(--text-primary)" }}>{step.title}</h3>
                 <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.65 }}>{step.desc}</p>
               </div>
             ))}
@@ -307,45 +246,42 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section
-        className="relative py-20 px-4 sm:px-6"
+        className="relative py-16 px-4 sm:px-6"
         style={{
           borderTop: "1px solid var(--border-subtle)",
           zIndex: 1,
-          background: "linear-gradient(135deg, rgba(109,40,217,0.06) 0%, rgba(6,182,212,0.04) 100%)",
         }}
       >
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-extrabold mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.03em" }}>
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-bold mb-3" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
             Ready to organize your notes?
           </h2>
-          <p className="text-lg mb-8" style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-            Join thousands of users who trust NoteMaster.<br />
+          <p className="text-sm mb-8" style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
             Free to start, no credit card required.
           </p>
           <Link
             to="/register"
-            className="btn-primary inline-flex items-center gap-2 text-lg"
-            style={{ padding: "0.875rem 2.25rem", borderRadius: "0.875rem" }}
+            className="btn-primary inline-flex items-center gap-2"
+            style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
           >
             Create free account
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer
-        className="relative py-8 px-4 sm:px-6"
+        className="relative py-6 px-4 sm:px-6"
         style={{ borderTop: "1px solid var(--border-subtle)", zIndex: 1 }}
       >
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div
-              className="w-6 h-6 rounded flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #6d28d9, #06b6d4)" }}
-            >
-              <BookOpen className="h-3 w-3 text-white" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="NoteMaster"
+              className="w-6 h-6 rounded-md object-cover"
+            />
             <span className="text-sm" style={{ color: "var(--text-muted)" }}>© 2025 NoteMaster</span>
           </div>
           <div className="flex items-center gap-6 text-sm" style={{ color: "var(--text-muted)" }}>

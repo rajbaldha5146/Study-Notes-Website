@@ -20,7 +20,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeRaw from "rehype-raw";
 import { getNote, getFolder } from "../services/api";
-import "highlight.js/styles/github-dark.css";
+
 
 export default function NoteViewer() {
   const { id } = useParams();
@@ -44,23 +44,7 @@ export default function NoteViewer() {
     loadData();
   }, [id, folderId]);
 
-  // Hide sidebar
-  useEffect(() => {
-    const sidebar = document.querySelector("[data-sidebar]");
-    const mainContent = document.querySelector("main");
-
-    if (sidebar && mainContent) {
-      sidebar.style.transform = "translateX(-100%)";
-      mainContent.style.marginLeft = "0";
-    }
-
-    return () => {
-      if (sidebar && mainContent) {
-        sidebar.style.transform = "";
-        mainContent.style.marginLeft = "";
-      }
-    };
-  }, []);
+  // NoteViewer does not manipulate sidebar — sidebar toggle is handled globally
 
   // Reading progress
   useEffect(() => {
@@ -179,12 +163,12 @@ export default function NoteViewer() {
   }
 
   return (
-    <div className="min-h-screen pb-12" style={{ background: "var(--bg-base)" }}>
-      {/* Progress bar */}
+    <div className="min-h-screen pb-12">
+      {/* Reading progress bar */}
       <div
         ref={contentRef}
-        className="fixed top-0 left-0 h-0.5 z-50 transition-all"
-        style={{ width: "var(--progress, 0%)", background: "linear-gradient(90deg, var(--violet), var(--cyan))" }}
+        className="fixed top-12 left-0 h-px z-50 transition-all"
+        style={{ width: "var(--progress, 0%)", background: "var(--blue)" }}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8">
@@ -201,7 +185,10 @@ export default function NoteViewer() {
               </button>
 
               {folderId && folderNotes.length > 1 && (
-                <div className="flex items-center gap-2 pl-3 border-l border-neutral-800">
+                <div
+                  className="flex items-center gap-2 pl-3"
+                  style={{ borderLeft: "1px solid var(--border-subtle)" }}
+                >
                   <button
                     onClick={() => {
                       if (currentNoteIndex > 0) {
@@ -212,11 +199,14 @@ export default function NoteViewer() {
                       }
                     }}
                     disabled={currentNoteIndex <= 0}
-                    className="p-1.5 rounded-lg hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => !e.currentTarget.disabled && (e.currentTarget.style.background = "var(--bg-elevated)")}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <ChevronLeft className="h-4 w-4 text-neutral-400" />
+                    <ChevronLeft className="h-4 w-4" />
                   </button>
-                  <span className="text-sm text-neutral-500">
+                  <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                     {currentNoteIndex + 1} / {folderNotes.length}
                   </span>
                   <button
@@ -229,9 +219,12 @@ export default function NoteViewer() {
                       }
                     }}
                     disabled={currentNoteIndex >= folderNotes.length - 1}
-                    className="p-1.5 rounded-lg hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    style={{ color: "var(--text-muted)" }}
+                    onMouseEnter={e => !e.currentTarget.disabled && (e.currentTarget.style.background = "var(--bg-elevated)")}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <ChevronRight className="h-4 w-4 text-neutral-400" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
               )}
@@ -260,35 +253,31 @@ export default function NoteViewer() {
           </h1>
 
           {/* Meta */}
-          <div className="flex flex-wrap items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm pb-6" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
             {note.episode && (
               <span className="badge badge-primary">Episode {note.episode}</span>
             )}
-            <span className="flex items-center gap-1.5 text-neutral-500">
-              <Calendar className="h-4 w-4" />
+            <span className="flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
+              <Calendar className="h-3.5 w-3.5" />
               {new Date(note.createdAt).toLocaleDateString()}
             </span>
             {note.folder && (
               <Link
                 to={`/app/folder/${note.folder._id}`}
-                className="flex items-center gap-1.5 text-neutral-500 hover:text-indigo-400 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 transition-colors"
+                style={{ color: "var(--text-muted)" }}
+                onMouseEnter={e => e.currentTarget.style.color = "var(--blue-light)"}
+                onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
               >
-                <Folder className="h-4 w-4" />
-                <span className="hover:underline">{note.folder.name || "Unknown"}</span>
+                <Folder className="h-3.5 w-3.5" />
+                <span>{note.folder.name || "Unknown"}</span>
               </Link>
             )}
           </div>
         </div>
 
-        {/* Content */}
-        <article
-          className="rounded-2xl p-6 sm:p-8 note-viewer"
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border-subtle)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
-          }}
-        >
+        {/* Content — no card box, blends with page background like HackMD */}
+        <div className="note-viewer mt-6">
           <div className="prose max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -323,13 +312,13 @@ export default function NoteViewer() {
               {note.content}
             </ReactMarkdown>
           </div>
-        </article>
+        </div>
 
         {/* Bottom Navigation */}
         {folderId && folderNotes.length > 1 && (
           <div
-            className="mt-8 rounded-2xl p-6"
-            style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+            className="mt-10 pt-6"
+            style={{ borderTop: "1px solid var(--border-subtle)" }}
           >
             <div className="flex items-center justify-between gap-4">
               {/* Previous */}
@@ -342,24 +331,27 @@ export default function NoteViewer() {
                       );
                       window.scrollTo(0, 0);
                     }}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-800 text-left"
+                    className="flex items-center gap-3 p-3 rounded-lg text-left transition-colors"
+                    style={{ color: "var(--text-secondary)" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
-                    <ChevronLeft className="h-5 w-5 text-neutral-500" />
+                    <ChevronLeft className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
                     <div>
-                      <div className="text-xs text-neutral-500">Previous</div>
-                      <div className="text-sm font-medium text-neutral-300 line-clamp-1">
+                      <div className="text-xs" style={{ color: "var(--text-muted)" }}>Previous</div>
+                      <div className="text-sm font-medium line-clamp-1" style={{ color: "var(--text-primary)" }}>
                         {folderNotes[currentNoteIndex - 1].title}
                       </div>
                     </div>
                   </button>
                 ) : (
-                  <div className="p-3 text-neutral-600 text-sm">No previous</div>
+                  <div className="p-3 text-sm" style={{ color: "var(--text-faint)" }}>No previous</div>
                 )}
               </div>
 
               {/* Progress */}
               <div className="text-center px-4">
-                <div className="text-sm font-medium text-neutral-400">
+                <div className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
                   {currentNoteIndex + 1} of {folderNotes.length}
                 </div>
                 <div className="flex gap-1 mt-2 justify-center">
@@ -369,13 +361,15 @@ export default function NoteViewer() {
                       onClick={() =>
                         navigate(`/app/note/${n._id}?folder=${folderId}`)
                       }
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        i === currentNoteIndex
-                          ? "bg-violet-500 scale-125"
+                      className="w-1.5 h-1.5 rounded-full transition-all"
+                      style={{
+                        background: i === currentNoteIndex
+                          ? "var(--blue)"
                           : i < currentNoteIndex
-                          ? "bg-emerald-500"
-                          : "bg-slate-700"
-                      }`}
+                          ? "var(--success)"
+                          : "var(--border-default)",
+                        transform: i === currentNoteIndex ? "scale(1.3)" : "scale(1)",
+                      }}
                       title={n.title}
                     />
                   ))}
@@ -392,18 +386,21 @@ export default function NoteViewer() {
                       );
                       window.scrollTo(0, 0);
                     }}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-800 text-right"
+                    className="flex items-center gap-3 p-3 rounded-lg text-right transition-colors"
+                    style={{ color: "var(--text-secondary)" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <div>
-                      <div className="text-xs text-neutral-500">Next</div>
-                      <div className="text-sm font-medium text-neutral-300 line-clamp-1">
+                      <div className="text-xs" style={{ color: "var(--text-muted)" }}>Next</div>
+                      <div className="text-sm font-medium line-clamp-1" style={{ color: "var(--text-primary)" }}>
                         {folderNotes[currentNoteIndex + 1].title}
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-neutral-500" />
+                    <ChevronRight className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
                   </button>
                 ) : (
-                  <div className="p-3 text-neutral-600 text-sm">No next</div>
+                  <div className="p-3 text-sm" style={{ color: "var(--text-faint)" }}>No next</div>
                 )}
               </div>
             </div>

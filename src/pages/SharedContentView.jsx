@@ -17,7 +17,7 @@ import rehypeRaw from "rehype-raw";
 import BookLoader from "../components/BookLoader";
 import SaveToAccountModal from "../components/SaveToAccountModal";
 import { getSharedContent } from "../services/api";
-import "highlight.js/styles/github-dark.css";
+
 
 export default function SharedContentView() {
   const { shareId } = useParams();
@@ -63,7 +63,7 @@ export default function SharedContentView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
         <BookLoader message="Loading shared content..." />
       </div>
     );
@@ -71,17 +71,14 @@ export default function SharedContentView() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "var(--bg-base)" }}>
         <div className="card p-8 max-w-md text-center">
-          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-neutral-200 mb-2">
+          <AlertCircle className="h-10 w-10 mx-auto mb-4" style={{ color: "var(--danger)" }} />
+          <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
             Content Unavailable
           </h2>
-          <p className="text-neutral-400 mb-6">{error}</p>
-          <Link
-            to="/app"
-            className="btn-primary inline-flex items-center gap-2"
-          >
+          <p className="mb-6" style={{ color: "var(--text-secondary)" }}>{error}</p>
+          <Link to="/app" className="btn-primary inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Go to My Notes
           </Link>
@@ -92,19 +89,16 @@ export default function SharedContentView() {
 
   if (!sharedData) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "var(--bg-base)" }}>
         <div className="card p-8 max-w-md text-center">
-          <FileText className="h-12 w-12 text-neutral-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-neutral-200 mb-2">
+          <FileText className="h-10 w-10 mx-auto mb-4" style={{ color: "var(--text-muted)" }} />
+          <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
             Content Not Found
           </h2>
-          <p className="text-neutral-400 mb-6">
+          <p className="mb-6" style={{ color: "var(--text-secondary)" }}>
             The shared content you're looking for doesn't exist.
           </p>
-          <Link
-            to="/app"
-            className="btn-primary inline-flex items-center gap-2"
-          >
+          <Link to="/app" className="btn-primary inline-flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             Go to My Notes
           </Link>
@@ -121,7 +115,26 @@ export default function SharedContentView() {
     : content?.title;
 
   return (
-    <div className="min-h-screen bg-neutral-950 pb-12">
+    <div className="min-h-screen pb-12" style={{ background: "var(--bg-base)" }}>
+      {/* Mini nav bar */}
+      <nav
+        className="sticky top-0 z-50"
+        style={{
+          background: "var(--bg-surface)",
+          borderBottom: "1px solid var(--border-subtle)",
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="NoteMaster" className="w-6 h-6 rounded-md object-cover" />
+            <span className="text-sm font-semibold" style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>NoteMaster</span>
+          </div>
+          <Link to="/app" className="btn-primary text-xs" style={{ padding: "0.35rem 0.75rem" }}>
+            Open App
+          </Link>
+        </div>
+      </nav>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8">
         {/* Header */}
         <div className="mb-8">
@@ -146,8 +159,8 @@ export default function SharedContentView() {
           </div>
 
           {/* Owner Attribution */}
-          <div className="flex items-center gap-2 text-sm text-neutral-400 mb-4">
-            <User className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-sm mb-4" style={{ color: "var(--text-muted)" }}>
+            <User className="h-3.5 w-3.5" />
             <span>Shared by {owner?.name || "Unknown"}</span>
           </div>
 
@@ -194,8 +207,8 @@ function SharedNoteDisplay({ content }) {
         <span className="badge badge-primary">Shared Note</span>
       </div>
 
-      {/* Note Content - Read Only */}
-      <article className="card p-6 sm:p-8">
+      {/* Note Content - Read Only — no card, blends with page */}
+      <div className="note-viewer">
         <div className="prose max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -224,7 +237,7 @@ function SharedNoteDisplay({ content }) {
             {noteContent || ""}
           </ReactMarkdown>
         </div>
-      </article>
+      </div>
     </>
   );
 }

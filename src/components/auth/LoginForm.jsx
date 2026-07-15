@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, BookOpen, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { consumePendingShareRedirect } from "../../utils/shareRedirect";
 
@@ -30,29 +30,25 @@ const LoginForm = () => {
     <div className="w-full max-w-sm mx-auto" style={{ animation: "fade-up 0.4s ease both" }}>
       {/* Logo */}
       <div className="text-center mb-8">
-        <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 relative"
-          style={{
-            background: "linear-gradient(135deg, #6d28d9, #8b5cf6, #06b6d4)",
-            boxShadow: "0 0 30px rgba(139,92,246,0.4), 0 0 60px rgba(6,182,212,0.15)",
-          }}
-        >
-          <BookOpen className="h-7 w-7 text-white" />
+        <div className="flex justify-center mb-4">
+          <img
+            src="/logo.png"
+            alt="NoteMaster"
+            className="w-14 h-14 rounded-2xl object-cover"
+          />
         </div>
         <h1 className="text-2xl font-extrabold mb-1" style={{ letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
           Welcome back
         </h1>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>Sign in to your vault</p>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>Sign in to your account</p>
       </div>
 
       {/* Card */}
       <div
-        className="p-6 rounded-2xl"
+        className="p-6 rounded-xl"
         style={{
-          background: "rgba(15, 23, 42, 0.7)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid var(--border-subtle)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.06)",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border-default)",
         }}
       >
         <form onSubmit={handleSubmit} className="space-y-4">

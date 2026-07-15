@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Plus, Home, LogOut, Menu, X, BookOpen } from "lucide-react";
+import { Plus, Home, LogOut, PanelLeft } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 
@@ -64,62 +64,43 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
     <>
       <nav
         style={{
-          background: scrolled
-            ? "rgba(7, 12, 24, 0.95)"
-            : "rgba(7, 12, 24, 0.98)",
-          backdropFilter: scrolled ? "blur(20px)" : "none",
-          borderBottom: "1px solid transparent",
-          backgroundImage: scrolled
-            ? `linear-gradient(rgba(7,12,24,0.95), rgba(7,12,24,0.95)), linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.4) 30%, rgba(6,182,212,0.4) 70%, transparent 100%)`
-            : "none",
-          backgroundOrigin: "border-box",
-          backgroundClip: "padding-box, border-box",
+          background: "var(--bg-surface)",
+          borderBottom: "1px solid var(--border-subtle)",
+          transition: "border-color 0.2s ease",
         }}
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50"
       >
-        {/* Aurora bottom border line */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-px"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.5) 25%, rgba(6,182,212,0.5) 75%, transparent 100%)",
-            backgroundSize: "200% 100%",
-            animation: "aurora-shift 4s ease infinite",
-          }}
-        />
-
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
+        <div className="px-3 sm:px-4">
+          <div className="flex justify-between items-center h-12">
             {/* Left */}
-            <div className="flex items-center gap-4">
-              {/* Mobile toggle */}
+            <div className="flex items-center gap-1">
+              {/* Sidebar toggle — always visible */}
               <button
+                id="sidebar-toggle-btn"
                 onClick={onToggleSidebar}
-                className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition-colors"
+                className="p-2 rounded-md transition-colors"
+                style={{
+                  color: sidebarOpen ? "var(--text-primary)" : "var(--text-muted)",
+                  background: sidebarOpen ? "var(--bg-elevated)" : "transparent",
+                }}
                 aria-label="Toggle sidebar"
                 aria-expanded={sidebarOpen}
+                title="Toggle sidebar"
               >
-                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                <PanelLeft className="h-4 w-4" />
               </button>
 
               {/* Logo */}
-              <Link to="/app" className="flex items-center gap-2.5 group">
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center relative overflow-hidden"
-                  style={{
-                    background: "linear-gradient(135deg, #6d28d9, #8b5cf6, #06b6d4)",
-                    boxShadow: "0 0 12px rgba(139,92,246,0.4)",
-                  }}
-                >
-                  <BookOpen className="h-4 w-4 text-white relative z-10" />
-                </div>
+              <Link to="/app" className="flex items-center gap-2 ml-1 group">
+                <img
+                  src="/logo.png"
+                  alt="NoteMaster"
+                  className="w-7 h-7 rounded-md object-cover"
+                  style={{ display: "block" }}
+                />
                 <span
-                  className="text-base font-bold hidden sm:block"
-                  style={{
-                    background: "linear-gradient(135deg, #f1f5f9, #a78bfa)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
+                  className="text-sm font-semibold hidden sm:block"
+                  style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}
                 >
                   NoteMaster
                 </span>
@@ -127,57 +108,64 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
             </div>
 
             {/* Right */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {/* Home Link */}
               <Link
                 to="/app"
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-500 transition-all duration-200 ${
-                  isActive("/app")
-                    ? "text-violet-300 bg-violet-500/10 border border-violet-500/20"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
-                }`}
+                id="nav-home-link"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                style={{
+                  color: isActive("/app") ? "var(--text-primary)" : "var(--text-muted)",
+                  background: isActive("/app") ? "var(--bg-elevated)" : "transparent",
+                }}
               >
-                <Home className="h-4 w-4" />
-                <span className="hidden md:inline font-medium">Home</span>
+                <Home className="h-3.5 w-3.5" />
+                <span className="hidden md:inline">Home</span>
               </Link>
 
               {/* New Note Button */}
               <Link
                 to="/app/create"
-                className="btn-primary flex items-center gap-2 text-sm"
-                style={{ padding: "0.45rem 0.875rem" }}
+                id="nav-new-note-btn"
+                className="btn-primary flex items-center gap-1.5 text-xs"
+                style={{ padding: "0.4rem 0.75rem" }}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">New Note</span>
               </Link>
 
               {/* User Menu */}
-              <div className="relative ml-1">
+              <div className="relative ml-0.5">
                 <button
                   ref={buttonRef}
+                  id="user-menu-btn"
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-200 ${
-                    showUserMenu ? "bg-slate-800/70" : "hover:bg-slate-800/50"
-                  }`}
+                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-colors"
+                  style={{
+                    background: showUserMenu ? "var(--bg-elevated)" : "transparent",
+                    color: "var(--text-secondary)",
+                  }}
                   aria-label="User menu"
                   aria-expanded={showUserMenu}
                   aria-haspopup="true"
                 >
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
                     style={{
-                      background: "linear-gradient(135deg, #6d28d9, #06b6d4)",
-                      boxShadow: showUserMenu ? "0 0 0 2px rgba(139,92,246,0.5)" : "none",
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border-default)",
+                      color: "var(--text-secondary)",
                     }}
                   >
                     {getUserInitials()}
                   </div>
-                  <span className="hidden md:block text-sm text-slate-300 max-w-[100px] truncate font-medium">
+                  <span className="hidden md:block text-xs max-w-[90px] truncate font-medium" style={{ color: "var(--text-secondary)" }}>
                     {user?.name}
                   </span>
                   <svg
-                    className={`hidden sm:block w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`}
+                    className={`hidden sm:block w-3 h-3 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""}`}
                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    style={{ color: "var(--text-muted)" }}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -187,48 +175,61 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
                 {showUserMenu && (
                   <>
                     <div
-                      className="fixed inset-0 z-40 sm:hidden"
+                      className="fixed inset-0 z-40"
                       onClick={() => setShowUserMenu(false)}
                     />
                     <div
                       ref={menuRef}
-                      className="absolute right-0 mt-2 w-64 z-50 overflow-hidden"
+                      id="user-dropdown-menu"
+                      className="absolute right-0 mt-1.5 w-56 z-50 overflow-hidden"
                       style={{
-                        background: "rgba(11, 17, 32, 0.95)",
-                        backdropFilter: "blur(20px)",
-                        border: "1px solid rgba(26, 37, 64, 0.8)",
-                        borderRadius: "0.875rem",
-                        boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.08)",
+                        background: "var(--bg-surface)",
+                        border: "1px solid var(--border-default)",
+                        borderRadius: "0.5rem",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                       }}
                       role="menu"
                     >
                       {/* User Info */}
                       <div
-                        className="px-4 py-4"
-                        style={{ borderBottom: "1px solid rgba(26, 37, 64, 0.8)" }}
+                        className="px-3 py-3"
+                        style={{ borderBottom: "1px solid var(--border-subtle)" }}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2.5">
                           <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                            style={{ background: "linear-gradient(135deg, #6d28d9, #06b6d4)" }}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                            style={{
+                              background: "var(--bg-elevated)",
+                              border: "1px solid var(--border-default)",
+                              color: "var(--text-secondary)",
+                            }}
                           >
                             {getUserInitials()}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-slate-100 truncate">{user?.name}</p>
-                            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>{user?.name}</p>
+                            <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{user?.email}</p>
                           </div>
                         </div>
                       </div>
 
                       {/* Menu Items */}
-                      <div className="py-1.5 px-1.5">
+                      <div className="p-1">
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-slate-400 hover:text-rose-400 hover:bg-rose-500/8 rounded-lg transition-all duration-150"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-md transition-colors"
+                          style={{ color: "var(--text-secondary)" }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = "rgba(248, 81, 73, 0.08)";
+                            e.currentTarget.style.color = "#f85149";
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.color = "var(--text-secondary)";
+                          }}
                           role="menuitem"
                         >
-                          <LogOut className="h-4 w-4" />
+                          <LogOut className="h-3.5 w-3.5" />
                           <span>Sign out</span>
                         </button>
                       </div>
@@ -242,7 +243,7 @@ export default function Navbar({ onToggleSidebar, sidebarOpen }) {
       </nav>
 
       {/* Spacer */}
-      <div className="h-14" />
+      <div className="h-12" />
     </>
   );
 }
