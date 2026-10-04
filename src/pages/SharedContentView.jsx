@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -217,12 +217,46 @@ function SharedNoteDisplay({ content }) {
               pre({ children, ...props }) {
                 const child = Array.isArray(children) ? children[0] : children;
                 const className = child?.props?.className || "";
-                const match = /language-(\w+)/.exec(className);
-                const lang = match ? match[1] : "";
+                const match = /language-([^\s]+)/.exec(className);
+                let lang = match ? match[1] : "";
+                if (lang === "csharp" || lang === "cs" || lang === "c-sharp") {
+                  lang = "c#";
+                }
+
+                const extractText = (node) => {
+                  if (typeof node === "string") return node;
+                  if (Array.isArray(node)) return node.map(extractText).join("");
+                  if (node?.props?.children) return extractText(node.props.children);
+                  return "";
+                };
+
+                const [copied, setCopied] = React.useState(false);
+                const handleCopy = () => {
+                  const text = extractText(child?.props?.children || "");
+                  navigator.clipboard.writeText(text).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  });
+                };
+
                 return (
-                  <pre data-language={lang} {...props}>
-                    {children}
-                  </pre>
+                  <div className="code-block-wrapper">
+                    <pre data-language={lang} {...props}>
+                      {children}
+                    </pre>
+                    <button
+                      onClick={handleCopy}
+                      className="code-copy-btn"
+                      title={copied ? "Copied!" : "Copy code"}
+                      aria-label="Copy code to clipboard"
+                    >
+                      {copied ? (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                      )}
+                    </button>
+                  </div>
                 );
               },
               code({ inline, className, children, ...props }) {

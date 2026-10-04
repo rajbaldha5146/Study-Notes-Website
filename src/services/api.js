@@ -68,6 +68,46 @@ export const deleteNote = async (id) => {
   return response.data;
 };
 
+export const toggleNoteFavorite = async (id) => {
+  const response = await api.patch(`/notes/${id}/favorite`);
+  return response.data;
+};
+
+export const getFavoriteNotes = async () => {
+  const response = await api.get("/notes/favorites");
+  return response.data.notes || [];
+};
+
+export const getTrashNotes = async () => {
+  const response = await api.get("/notes/trash");
+  return response.data.notes || [];
+};
+
+export const restoreNote = async (id) => {
+  const response = await api.patch(`/notes/${id}/restore`);
+  return response.data;
+};
+
+export const restoreBulkNotes = async (ids) => {
+  const response = await api.post("/notes/trash/restore-bulk", { ids });
+  return response.data;
+};
+
+export const deleteBulkNotes = async (ids) => {
+  const response = await api.post("/notes/trash/delete-bulk", { ids });
+  return response.data;
+};
+
+export const emptyTrash = async () => {
+  const response = await api.delete("/notes/trash/empty");
+  return response.data;
+};
+
+export const permanentDeleteNote = async (id) => {
+  const response = await api.delete(`/notes/${id}/permanent`);
+  return response.data;
+};
+
 // Folders API
 export const getFolders = async () => {
   const response = await api.get("/folders");
@@ -101,6 +141,21 @@ export const deleteFolder = async (id) => {
 
 export const reorderFolders = async (folderOrders) => {
   const response = await api.patch("/folders/reorder", { folderOrders });
+  return response.data;
+};
+
+export const searchFolderNotes = async (folderId, searchTerm) => {
+  const response = await api.get(`/folders/${folderId}/search`, { params: { q: searchTerm } });
+  return response.data;
+};
+
+export const searchNotes = async (searchTerm) => {
+  const response = await api.get('/notes', { params: { search: searchTerm, limit: 50 } });
+  return response.data;
+};
+
+export const globalSearchNotes = async (searchTerm) => {
+  const response = await api.get('/notes/search/global', { params: { q: searchTerm } });
   return response.data;
 };
 

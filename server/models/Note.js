@@ -27,6 +27,18 @@ const noteSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  isFavorite: {
+    type: Boolean,
+    default: false
+  },
+  isTrash: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -44,6 +56,8 @@ noteSchema.pre('save', function(next) {
 
 // Indexes for better query performance
 noteSchema.index({ user: 1, folder: 1 });
+noteSchema.index({ user: 1, isFavorite: 1 });
+noteSchema.index({ user: 1, isTrash: 1 });
 noteSchema.index({ user: 1, createdAt: -1 });
 noteSchema.index({ title: 'text', content: 'text' });
 

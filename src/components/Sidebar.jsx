@@ -8,9 +8,11 @@ import {
   Plus,
   Trash2,
   Loader2,
+  Search,
 } from "lucide-react";
 import { getFolderTree, deleteFolder } from "../services/api";
 import CreateFolderModal from "./CreateFolderModal";
+import ConfirmModal from "./ConfirmModal";
 import { useFolders } from "../contexts/FolderContext";
 import toast from "react-hot-toast";
 
@@ -21,6 +23,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const [selectedParent, setSelectedParent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hoveredFolder, setHoveredFolder] = useState(null);
+  const [filterQuery, setFilterQuery] = useState("");
   const location = useLocation();
   const { refreshTrigger, refreshFolders: triggerGlobalRefresh } = useFolders();
 
@@ -108,19 +111,33 @@ export default function Sidebar({ isOpen, onClose }) {
     }
   }, [triggerGlobalRefresh, fetchFolders]);
 
-  const handleDeleteFolder = useCallback(async (folderId, folderName, e) => {
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Delete",
+    onConfirm: () => {},
+  });
+
+  const handleDeleteFolder = useCallback((folderId, folderName, e) => {
     e?.stopPropagation();
-    if (window.confirm(`Delete "${folderName}"? This will also delete all notes and subfolders.`)) {
-      try {
-        await deleteFolder(folderId);
-        toast.success("Folder deleted");
-        await fetchFolders();
-        triggerGlobalRefresh();
-      } catch (error) {
-        console.error("Failed to delete folder:", error);
-        toast.error(error.response?.data?.message || "Failed to delete");
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Folder?",
+      message: `Are you sure you want to delete "${folderName}"? All notes inside will be moved to the Trash Bin.`,
+      confirmText: "Delete Folder",
+      onConfirm: async () => {
+        try {
+          await deleteFolder(folderId);
+          toast.success("Folder deleted (notes moved to trash)");
+          await fetchFolders();
+          triggerGlobalRefresh();
+        } catch (error) {
+          console.error("Failed to delete folder:", error);
+          toast.error(error.response?.data?.message || "Failed to delete");
+        }
+      },
+    });
   }, [triggerGlobalRefresh, fetchFolders]);
 
   const countNotes = useCallback((folder) => {
@@ -131,8 +148,32 @@ export default function Sidebar({ isOpen, onClose }) {
     return count;
   }, []);
 
+  const getFilteredFolders = useCallback((nodes, query) => {
+    if (!query) return nodes;
+    const lowerQuery = query.toLowerCase();
+
+    const filterNodes = (items) => {
+      return items.map(item => {
+        const matches = item.name.toLowerCase().includes(lowerQuery);
+        let filteredChildren = [];
+        if (item.children) {
+          filteredChildren = filterNodes(item.children);
+        }
+        
+        if (matches || filteredChildren.length > 0) {
+          return { ...item, children: filteredChildren };
+        }
+        return null;
+      }).filter(Boolean);
+    };
+
+    return filterNodes(nodes);
+  }, []);
+
+  const filteredFolders = getFilteredFolders(folders, filterQuery);
+
   const renderFolder = (folder, level = 0) => {
-    const isExpanded = expandedFolders.has(folder._id);
+    const isExpanded = expandedFolders.has(folder._id) || !!filterQuery;
     const hasChildren = folder.children?.length > 0;
     const isActive = location.pathname === `/app/folder/${folder._id}`;
     const isHovered = hoveredFolder === folder._id;
@@ -198,10 +239,11 @@ export default function Sidebar({ isOpen, onClose }) {
           {/* Note count */}
           {noteCount > 0 && (
             <span
-              className="flex-shrink-0 text-xs px-1 py-0.5 rounded font-medium"
+              className="flex-shrink-0 px-1.5 py-0.5 rounded-full font-medium ml-1"
               style={{
-                background: "transparent",
-                color: "var(--text-muted)",
+                background: "var(--bg-elevated)",
+                color: "var(--text-secondary)",
+                border: "1px solid var(--border-subtle)",
                 fontSize: "0.65rem",
               }}
             >
@@ -282,7 +324,7 @@ export default function Sidebar({ isOpen, onClose }) {
           >
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-                Folders
+                All Folders
               </span>
               {/* Live indicator */}
               <div
@@ -314,13 +356,32 @@ export default function Sidebar({ isOpen, onClose }) {
             </button>
           </div>
 
+          {/* Folders Search */}
+          <div className="mb-3">
+            <div className="relative">
+              <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
+              <input
+                type="text"
+                placeholder="Search folders..."
+                value={filterQuery}
+                onChange={(e) => setFilterQuery(e.target.value)}
+                className="w-full text-xs rounded-md pl-7 pr-2 py-1.5 focus:outline-none transition-colors"
+                style={{
+                  background: "var(--bg-elevated)",
+                  color: "var(--text-primary)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              />
+            </div>
+          </div>
+
           {/* Folders list */}
           <div className="flex-1 space-y-0.5">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--text-muted)" }} />
               </div>
-            ) : folders.length === 0 ? (
+            ) : filteredFolders.length === 0 ? (
               <div className="text-center py-10 px-3">
                 <div
                   className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
@@ -339,33 +400,49 @@ export default function Sidebar({ isOpen, onClose }) {
                 </button>
               </div>
             ) : (
-              folders.map((folder) => renderFolder(folder))
+              filteredFolders.map((folder) => renderFolder(folder))
             )}
           </div>
 
           {/* Footer */}
-          {!loading && folders.length > 0 && (
-            <div
-              className="mt-3 pt-3"
-              style={{ borderTop: "1px solid var(--border-subtle)" }}
-            >
-              <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
-                <Folder className="h-3 w-3" />
-                <span>
-                  {folders.reduce((acc, f) => {
-                    const countFolders = (folder) => {
-                      let count = 1;
-                      if (folder.children) {
-                        folder.children.forEach((child) => { count += countFolders(child); });
-                      }
-                      return count;
-                    };
-                    return acc + countFolders(f);
-                  }, 0)}{" "}folders
-                </span>
-              </div>
+          <div
+            className="mt-3 pt-3 flex items-center justify-between"
+            style={{ borderTop: "1px solid var(--border-subtle)" }}
+          >
+            <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
+              <Folder className="h-3 w-3" />
+              <span>
+                {folders.reduce((acc, f) => {
+                  const countFolders = (folder) => {
+                    let count = 1;
+                    if (folder.children) {
+                      folder.children.forEach((child) => { count += countFolders(child); });
+                    }
+                    return count;
+                  };
+                  return acc + countFolders(f);
+                }, 0)}{" "}folders
+              </span>
             </div>
-          )}
+
+            <Link
+              to="/app/trash"
+              onClick={onClose}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors"
+              style={{ color: "var(--text-muted)" }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = "var(--danger)";
+                e.currentTarget.style.background = "rgba(248, 81, 73, 0.1)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = "var(--text-muted)";
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Trash</span>
+            </Link>
+          </div>
         </div>
       </aside>
 
@@ -377,6 +454,16 @@ export default function Sidebar({ isOpen, onClose }) {
           onFolderCreated={handleFolderCreated}
         />
       )}
+
+      {/* Delete Folder Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        onConfirm={confirmModal.onConfirm}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </>
   );
 }

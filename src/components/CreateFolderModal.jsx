@@ -61,16 +61,34 @@ export default function CreateFolderModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl w-full max-w-md">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+      style={{
+        background: "rgba(0, 0, 0, 0.75)",
+        backdropFilter: "blur(8px)",
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transition-all"
+        style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--border-default)",
+          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.6)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
-          <h3 className="text-lg font-semibold text-neutral-100">
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: "1px solid var(--border-subtle)" }}
+        >
+          <h3 className="text-lg font-bold text-neutral-100">
             Create Folder
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>

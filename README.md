@@ -1,54 +1,75 @@
-# 📝 NoteMaster
+# 📝 NoteMaster — Modern Distraction-Free Study & Knowledge Base Platform
 
-A beautiful, modern note-taking application built with React and Node.js. Create, organize, and manage your notes with a clean, dark slate theme and powerful markdown support.
+NoteMaster is a powerful, full-stack, distraction-free note-taking and study knowledge base built with React 19, Node.js, Express, and MongoDB. Designed for extended night reading and seamless organization, NoteMaster provides rich Markdown support, folder hierarchies, accurate code syntax highlighting, soft-delete trash recovery, and a dedicated ⭐ Favorites Vault.
 
-![NoteMaster Preview](https://via.placeholder.com/800x400/0f172a/3b82f6?text=NoteMaster+Preview)
+---
 
-## ✨ Features
+## ✨ Features & Highlights
 
-- 🎨 **Beautiful Dark Theme** - Clean slate design with blue accents
-- 📝 **Markdown Support** - Full markdown editing with live preview
-- � S**Folder Organization** - Organize notes in folders and subfolders
-- � **sSearch & Filter** - Find notes quickly with powerful search
-- �  **Responsive Design** - Works perfectly on all devices
-- 🚀 **Fast & Modern** - Built with React 18 and Vite
-- 🔐 **Secure Authentication** - JWT-based user authentication
-- 📤 **File Upload** - Upload existing markdown files
-- 🎯 **AI Integration** - AI-powered topic generation
+### 🎨 1. Obsidian Midnight Design System (Night Reading Friendly)
+- **Eye-Soothing Night Palette**: Soft `#0d1117` base, `#161b22` surface cards, `#e6edf3` soft text, and `#79c0ff` sapphire accents. Zero harsh pure white glare for long study sessions.
+- **Modern Typography**: Inter & JetBrains Mono fonts for code blocks.
+- **Custom Modals**: Fully integrated custom non-browser popups (`<ConfirmModal />`) for folder/note deletions.
+
+### 📝 2. High-Performance Note & Code Reading
+- **Accurate Code Syntax Highlighting**: Powered by `rehype-highlight` & `highlight.js` (GitHub Dark Dimmed style) supporting **C# (`c#`/`csharp`/`cs`)**, JavaScript, TypeScript, Python, C++, HTML, CSS, SQL, Shell, JSON, and more.
+- **Code Block Copying**: One-click copy button with instant checkmark feedback.
+- **Reading Progress & Stats**: Fixed top reading progress bar, estimated reading time, and live word count.
+- **Table of Contents (TOC)**: Auto-extracted heading outline with ScrollSpy section highlighting (hidden by default to keep reading centered).
+- **Clean Note Card Previews**: Home and Folder views render clean plaintext previews (stripped of raw `#`, `**`, `[link]` markdown tags).
+
+### 🗑️ 3. Soft-Delete Trash Bin System
+- **Safe Deletion**: Deleting notes moves them to the Trash instead of permanent deletion.
+- **Bulk Multi-Select Restore**: Select multiple files or folders from the Trash to restore them simultaneously.
+- **Folder Preservation**: Restoring notes restores them back into their original parent folder without breaking breadcrumbs or displaying `Uncategorized`.
+- **Permanent Purge**: Options to permanently purge single or selected notes from Trash.
+
+### ⭐ 4. Favorites Vault
+- **Favorites Folder**: Dedicated Favorites card on the Home dashboard for quick access to starred study notes.
+- **Favorite API**: Instant toggle (`PATCH /api/notes/:id/favorite`) with real-time UI synchronization.
+
+### 📁 5. Folder Hierarchy & Organization
+- **Nested Structure**: Organize notes across custom folders with customizable icons and colors.
+- **Context Menus & Actions**: Quick access to rename, recolor, export, or delete folders.
+- **ZIP Export**: Download entire folders as `.zip` archives.
+- **Bulk Upload**: Upload multiple `.md` files at once.
+- **Shareable Links**: Share notes or folders with public view links.
+
+---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** - Modern React with hooks
-- **Vite** - Lightning-fast build tool
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Router** - Client-side routing
-- **React Markdown** - Markdown rendering
-- **Lucide React** - Beautiful icons
-- **React Hot Toast** - Elegant notifications
+- **React 19** - Modern UI components & hooks
+- **Vite 7** - Ultra-fast development server & bundler
+- **Tailwind CSS 3** - Utility-first styling with custom CSS variables
+- **React Router 6** - Client-side SPA routing
+- **React Markdown** - GFM, Rehype Highlight & Rehype Raw rendering
+- **Lucide React** - Modern vector iconography
+- **React Hot Toast** - Toast notification feedback
 
 ### Backend
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **JWT** - Authentication tokens
-- **bcryptjs** - Password hashing
-- **CORS** - Cross-origin resource sharing
+- **Node.js** - Async JavaScript runtime
+- **Express.js** - RESTful API routes & middleware
+- **MongoDB & Mongoose 8** - Document database & ODM schema modeling
+- **JWT & bcryptjs** - Authentication & password hashing
+- **JSZip & File-Saver** - Dynamic zip exports
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- MongoDB
+- Node.js 18+
+- MongoDB instance (local or MongoDB Atlas)
 - npm or yarn
 
-### Installation
+### Installation Steps
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/notemaster.git
-   cd notemaster
+   git clone https://github.com/rajbaldha5146/Study-Notes-Website.git
+   cd Study-Notes-Website
    ```
 
 2. **Install frontend dependencies**
@@ -63,13 +84,13 @@ A beautiful, modern note-taking application built with React and Node.js. Create
    cd ..
    ```
 
-4. **Environment Setup**
-   
-   Create `.env` in root directory:
+4. **Configure Environment Variables**
+
+   Create `.env` in the root directory:
    ```env
    VITE_API_URL=http://localhost:5000/api
    ```
-   
+
    Create `server/.env`:
    ```env
    PORT=5000
@@ -78,118 +99,61 @@ A beautiful, modern note-taking application built with React and Node.js. Create
    NODE_ENV=development
    ```
 
-5. **Start the application**
-   
-   Terminal 1 (Backend):
+5. **Start Development Servers**
+
+   Backend Server:
    ```bash
    cd server
    npm run dev
    ```
-   
-   Terminal 2 (Frontend):
+
+   Frontend Client:
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
-   ```
-   http://localhost:5173
-   ```
-
-## 📁 Project Structure
-
-```
-notemaster/
-├── src/                    # Frontend source
-│   ├── components/         # React components
-│   │   ├── auth/          # Authentication components
-│   │   └── ai/            # AI-related components
-│   ├── contexts/          # React contexts
-│   ├── pages/             # Page components
-│   ├── services/          # API services
-│   ├── styles/            # CSS files
-│   └── utils/             # Utility functions
-├── server/                # Backend source
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── middleware/        # Express middleware
-│   ├── services/          # Business logic
-│   └── utils/             # Server utilities
-└── public/                # Static assets
-```
-
-## 🎨 Theme & Design
-
-NoteMaster features a carefully crafted dark theme:
-
-- **Primary Colors**: Slate (950, 900, 800, 700)
-- **Accent Color**: Blue (500, 600, 400)
-- **Typography**: Clean, readable fonts with proper hierarchy
-- **Components**: Rounded corners, subtle shadows, smooth transitions
-- **Responsive**: Mobile-first design approach
-
-## 📝 Usage
-
-### Creating Notes
-1. Click "New Note" button
-2. Choose a folder or create a new one
-3. Write in markdown or upload .md files
-4. Save and organize
-
-### Organizing with Folders
-1. Use the sidebar to create folders
-2. Drag and drop notes between folders
-3. Create nested folder structures
-4. Add icons and descriptions
-
-### Markdown Features
-- Headers, lists, links, images
-- Code blocks with syntax highlighting
-- Tables with enhanced styling
-- Blockquotes and emphasis
-- Task lists and more
-
-## 🚀 Deployment
-
-### Frontend (Vercel)
-```bash
-npm run build
-# Deploy dist/ folder to Vercel
-```
-
-### Backend (Railway/Render)
-```bash
-cd server
-npm start
-# Deploy to your preferred platform
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [React](https://reactjs.org/) - The web framework used
-- [Tailwind CSS](https://tailwindcss.com/) - For the beautiful styling
-- [Lucide](https://lucide.dev/) - For the amazing icons
-- [MongoDB](https://www.mongodb.com/) - For the database
-
-## 📞 Support
-
-If you have any questions or need help, please open an issue or contact:
-
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
+6. **Access App**: Open `http://localhost:5173` in your browser.
 
 ---
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+## 📂 Project Structure
+
+```
+NoteMaster/
+├── src/                        # React Frontend Source
+│   ├── components/             # Reusable UI Components & Modals
+│   ├── contexts/               # Global Context Providers
+│   ├── pages/                  # Home, NoteViewer, TrashView, FolderView, Editors
+│   ├── services/               # Axios API Service Handlers
+│   ├── styles/                 # Theme & Markdown CSS (Obsidian Midnight)
+│   └── utils/                  # Markdown Cleaners, Reading Time & Search Helpers
+├── server/                     # Express Backend Source
+│   ├── models/                 # Mongoose Note & Folder Schemas
+│   ├── routes/                 # REST Endpoints (Notes, Folders, Auth, Search, Trash)
+│   ├── middleware/             # Auth & Error Handling
+│   └── server.js               # Express Application Entry
+└── README.md
+```
+
+---
+
+## ⚡ Key API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/notes` | Get all active notes |
+| `GET` | `/api/notes/:id` | Get note by ID |
+| `POST` | `/api/notes` | Create a new note |
+| `PATCH` | `/api/notes/:id/favorite` | Toggle note favorite state |
+| `GET` | `/api/notes/favorites` | Get all favorite notes |
+| `GET` | `/api/notes/trash` | Get all soft-deleted notes in trash |
+| `POST` | `/api/notes/trash/restore-many` | Bulk restore notes from trash |
+| `POST` | `/api/notes/trash/delete-many` | Permanently purge notes from trash |
+| `GET` | `/api/folders` | Get folder structure |
+| `DELETE` | `/api/folders/:id` | Soft-delete folder & contained notes |
+
+---
+
+## 📄 License
+
+This project is open-source under the [MIT License](LICENSE).

@@ -77,15 +77,16 @@ export default function AppLayout() {
       {scrolled && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 p-2 rounded-md transition-all duration-200 hover:-translate-y-0.5"
+          className="fixed bottom-6 right-6 z-50 p-2.5 rounded-xl transition-all duration-200 shadow-xl hover:-translate-y-1 active:translate-y-0"
           style={{
             background: "var(--bg-elevated)",
             border: "1px solid var(--border-default)",
-            color: "var(--text-secondary)",
+            color: "var(--blue-light)",
           }}
           aria-label="Scroll to top"
+          title="Scroll to top"
         >
-          <ChevronUp className="w-4 h-4" />
+          <ChevronUp className="w-5 h-5" />
         </button>
       )}
     </div>

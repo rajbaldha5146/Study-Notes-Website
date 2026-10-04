@@ -1,11 +1,11 @@
 /* =========================================================
-   MARKDOWN — HackMD-style clean dark rendering
-   No card border — content blends with page background
+   MARKDOWN — OBSIDIAN MIDNIGHT NIGHT READING DESIGN SYSTEM
+   Optimized for long night reading sessions without eye strain
    ========================================================= */
 
 /* Selection */
 .prose ::selection {
-  background: rgba(74, 158, 255, 0.25);
+  background: rgba(88, 166, 255, 0.25);
   color: #ffffff;
 }
 
@@ -18,35 +18,40 @@
 .prose h6 {
   position: relative;
   scroll-margin-top: 80px;
-  color: #e2e8f0;
+  color: var(--text-primary, #e6edf3);
   font-weight: 700;
   line-height: 1.35;
+  letter-spacing: -0.015em;
 }
 
 .prose h1 {
-  font-size: 1.625rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
   padding-bottom: 0.625rem;
-  border-bottom: 1px solid #2a2f3a;
+  border-bottom: 1px solid var(--border-subtle, #21262d);
 }
 
 .prose h2 {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   margin-top: 2rem;
-  margin-bottom: 0.625rem;
-  padding-bottom: 0;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .prose h3 {
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  color: var(--text-primary, #e6edf3);
 }
 
 .prose h4 {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   margin-top: 1.25rem;
   margin-bottom: 0.375rem;
+  color: var(--text-secondary, #8b949e);
 }
 
 /* Anchor links on headings */
@@ -54,7 +59,7 @@
   position: absolute;
   left: -1.25rem;
   opacity: 0;
-  color: #555f6e;
+  color: var(--text-muted, #6e7681);
   text-decoration: none;
   font-weight: 400;
   font-size: 1em;
@@ -70,322 +75,291 @@
 
 /* Paragraphs */
 .prose p {
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  color: #cdd5df;
+  line-height: 1.75;
+  margin-bottom: 1.125rem;
+  color: #c9d1d9;
+  font-size: 0.95rem;
 }
 
 /* Links */
 .prose a {
-  color: #74b9ff;
+  color: var(--blue-light, #79c0ff);
   text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-color: rgba(116, 185, 255, 0.4);
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(121, 192, 255, 0.35);
   transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
 .prose a:hover {
-  color: #a5ceff;
-  text-decoration-color: rgba(165, 206, 255, 0.7);
+  color: #a5d6ff;
+  text-decoration-color: rgba(165, 214, 255, 0.75);
 }
 
 /* Strong & Emphasis */
 .prose strong {
-  color: #e2e8f0;
+  color: var(--text-primary, #e6edf3);
   font-weight: 700;
 }
 
 .prose em {
   font-style: italic;
-  color: #cdd5df;
+  color: #c9d1d9;
 }
 
 /* Lists */
 .prose ul,
 .prose ol {
+  margin-bottom: 1.125rem;
   padding-left: 1.5rem;
-  margin-bottom: 1rem;
 }
 
-.prose li {
-  line-height: 1.75;
-  margin-bottom: 0.25rem;
-  color: #cdd5df;
-}
-
-.prose ul > li {
+.prose ul {
   list-style-type: disc;
 }
 
-.prose ol > li {
+.prose ol {
   list-style-type: decimal;
 }
 
-.prose ul > li::marker,
-.prose ol > li::marker {
-  color: #555f6e;
+.prose li {
+  line-height: 1.7;
+  margin-bottom: 0.375rem;
+  color: #c9d1d9;
 }
 
-/* Nested lists */
-.prose li > ul,
-.prose li > ol {
-  margin-top: 0.25rem;
+.prose li::marker {
+  color: var(--text-muted, #6e7681);
+}
+
+.prose li p {
   margin-bottom: 0.25rem;
 }
 
-/* Blockquotes */
+/* Nested lists */
+.prose ul ul,
+.prose ul ol,
+.prose ol ul,
+.prose ol ol {
+  margin-top: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+/* Blockquotes / Callouts */
 .prose blockquote {
-  margin: 1.25rem 0;
-  padding: 0.5rem 1rem;
-  padding-left: 1rem;
-  border-left: 3px solid #454d5e;
+  border-left: 3px solid var(--blue, #58a6ff);
+  background: rgba(56, 139, 253, 0.06);
+  padding: 0.75rem 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 0 8px 8px 0;
   color: #8b949e;
-  font-style: italic;
 }
 
 .prose blockquote p {
-  margin: 0;
-  color: #8b949e;
+  margin-bottom: 0;
+  color: #c9d1d9;
 }
 
 /* Inline code */
 .prose :not(pre) > code {
-  background: #252932;
+  background: #161b22;
   color: #79c0ff;
-  padding: 0.15rem 0.4rem;
-  border-radius: 0.25rem;
+  padding: 0.2em 0.45em;
+  border-radius: 6px;
   font-size: 0.85em;
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  border: 1px solid #353c4a;
-  font-weight: 400;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  border: 1px solid #30363d;
 }
 
-/* Code blocks */
+/* Code blocks wrapper */
+.code-block-wrapper {
+  position: relative;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Code blocks `<pre>` */
 .prose pre {
   position: relative;
-  margin: 1.25rem 0;
-  padding: 0;
-  background: #0d0f14;
-  border: 1px solid #2a2f3a;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-/* Code block header bar */
-.prose pre::before {
-  content: attr(data-language);
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: #161920;
-  border-bottom: 1px solid #2a2f3a;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #555f6e;
-  font-weight: 600;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-}
-
-/* Language-specific header colors */
-.prose pre[data-language="javascript"]::before,
-.prose pre[data-language="js"]::before {
-  color: #d29922;
-}
-
-.prose pre[data-language="typescript"]::before,
-.prose pre[data-language="ts"]::before {
-  color: #4a9eff;
-}
-
-.prose pre[data-language="python"]::before,
-.prose pre[data-language="py"]::before {
-  color: #3fb950;
-}
-
-.prose pre[data-language="html"]::before {
-  color: #f47067;
-}
-
-.prose pre[data-language="css"]::before {
-  color: #79c0ff;
-}
-
-.prose pre[data-language="json"]::before {
-  color: #3fb950;
-}
-
-.prose pre[data-language="bash"]::before,
-.prose pre[data-language="shell"]::before,
-.prose pre[data-language="sh"]::before {
-  color: #8b949e;
-}
-
-.prose pre[data-language="java"]::before {
-  color: #f47067;
-}
-
-.prose pre[data-language="sql"]::before {
-  color: #79c0ff;
-}
-
-/* Default header for unknown languages */
-.prose pre:not([data-language])::before,
-.prose pre[data-language=""]::before {
-  content: "CODE";
-}
-
-/* Code content */
-.prose pre code {
-  display: block;
-  padding: 1rem 1.25rem;
-  background: transparent;
-  color: #cdd9e5;
-  font-size: 0.875rem;
-  line-height: 1.75;
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #161b22 !important;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem 1rem 1.25rem;
   overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
   tab-size: 2;
-  border-left: 2px solid #353c4a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-/* Code scrollbar */
-.prose pre code::-webkit-scrollbar {
-  height: 6px;
+.prose pre code {
+  background: transparent !important;
+  padding: 0;
+  border-radius: 0;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: #c9d1d9;
+  border: none;
 }
 
-.prose pre code::-webkit-scrollbar-track {
-  background: transparent;
+/* Language label tag */
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.4rem;
+  right: 2.5rem;
+  font-size: 0.6875rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  color: #6e7681;
+  letter-spacing: 0.05em;
+  pointer-events: none;
 }
 
-.prose pre code::-webkit-scrollbar-thumb {
-  background: #353c4a;
-  border-radius: 3px;
-}
-
-.prose pre code::-webkit-scrollbar-thumb:hover {
-  background: #454d5e;
+/* Horizontal Rules */
+.prose hr {
+  border: 0;
+  height: 1px;
+  background: #21262d;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 /* Tables */
 .prose table {
   width: 100%;
-  margin: 1.25rem 0;
-  border-collapse: collapse;
-  font-size: 0.875rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #30363d;
 }
 
 .prose th {
-  padding: 0.5rem 0.875rem;
-  background: #1b1f27;
-  color: #8b949e;
-  text-align: left;
+  background: #161b22;
+  color: #e6edf3;
   font-weight: 600;
-  border: 1px solid #2a2f3a;
-  font-size: 0.8125rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #30363d;
 }
 
 .prose td {
-  padding: 0.5rem 0.875rem;
-  color: #cdd5df;
-  border: 1px solid #2a2f3a;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #21262d;
+  color: #c9d1d9;
 }
 
-.prose tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.02);
+.prose tr:last-child td {
+  border-bottom: none;
 }
 
-.prose tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+.prose tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.015);
 }
 
-/* Horizontal rule */
-.prose hr {
-  margin: 1.75rem 0;
-  border: none;
-  border-top: 1px solid #2a2f3a;
+.prose tr:hover td {
+  background: rgba(255, 255, 255, 0.035);
 }
 
 /* Images */
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 0.375rem;
-  margin: 1.25rem 0;
-  border: 1px solid #2a2f3a;
+  border-radius: 12px;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #30363d;
 }
 
 /* Task lists */
 .prose input[type="checkbox"] {
-  width: 0.875rem;
-  height: 0.875rem;
-  margin-right: 0.5rem;
-  accent-color: #4a9eff;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #484f58;
+  border-radius: 4px;
+  background: #161b22;
   vertical-align: middle;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  top: -1px;
 }
 
-/* Highlight/Mark */
-.prose mark {
-  background: rgba(210, 153, 34, 0.25);
-  color: #e2e8f0;
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.2rem;
+.prose input[type="checkbox"]:checked {
+  background: #238636;
+  border-color: #2ea043;
 }
 
-/* Keyboard keys */
-.prose kbd {
-  display: inline-block;
-  padding: 0.1rem 0.4rem;
-  background: #252932;
-  border: 1px solid #353c4a;
-  border-radius: 0.25rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.8em;
-  box-shadow: 0 1px 0 #353c4a;
-  color: #cdd5df;
+.prose input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: bold;
 }
 
-/* Syntax highlighting — GitHub Dark Dimmed */
-.hljs-keyword { color: #ff7b72; font-weight: 500; }
-.hljs-string  { color: #a5d6ff; }
-.hljs-number  { color: #79c0ff; }
-.hljs-comment { color: #8b949e; font-style: italic; }
-.hljs-function { color: #d2a8ff; }
-.hljs-class   { color: #ffa657; font-weight: 600; }
-.hljs-variable { color: #cdd9e5; }
-.hljs-operator { color: #79c0ff; }
-.hljs-punctuation { color: #8b949e; }
-.hljs-property { color: #79c0ff; }
-.hljs-attr    { color: #79c0ff; }
-.hljs-tag     { color: #7ee787; }
-.hljs-built_in { color: #ffa657; }
-.hljs-literal  { color: #79c0ff; }
-.hljs-title   { color: #d2a8ff; font-weight: 600; }
-.hljs-params  { color: #cdd9e5; }
-.hljs-meta    { color: #8b949e; }
-.hljs-regexp  { color: #7ee787; }
-.hljs-symbol  { color: #79c0ff; }
-.hljs-selector-tag   { color: #7ee787; }
-.hljs-selector-class { color: #ffa657; }
-.hljs-selector-id    { color: #79c0ff; }
-.hljs-attribute      { color: #79c0ff; }
-.hljs-name    { color: #7ee787; }
-.hljs-doctag  { color: #8b949e; }
-.hljs-type    { color: #ffa657; }
+/* =========================================================
+   SYNTAX HIGHLIGHTING — Night Reader Soft Dark Palette
+   ========================================================= */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title.class_,
+.hljs-type {
+  color: #ff7b72;
+}
 
-/* Print styles */
-@media print {
-  .prose {
-    color: #000;
-  }
+.hljs-string,
+.hljs-meta .hljs-string,
+.hljs-attribute {
+  color: #a5d6ff;
+}
 
-  .prose pre {
-    background: #f5f5f5;
-    border: 1px solid #ccc;
-  }
+.hljs-comment,
+.hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
 
-  .prose a {
-    color: #000;
-    text-decoration: underline;
-  }
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: #79c0ff;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: #d2a8ff;
+  font-weight: bold;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #7ee787;
+}
+
+.hljs-deletion {
+  color: #ffa198;
+}
+
+.hljs-name,
+.hljs-symbol,
+.hljs-selector-class {
+  color: #ffa657;
+}
+
+.hljs-params {
+  color: #c9d1d9;
 }

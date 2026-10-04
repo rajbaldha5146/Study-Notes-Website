@@ -32,6 +32,10 @@ const folderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  isTrash: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -49,6 +53,7 @@ folderSchema.pre("save", function (next) {
 
 // Indexes for better query performance
 folderSchema.index({ user: 1, parentFolder: 1 });
+folderSchema.index({ user: 1, isTrash: 1 });
 folderSchema.index({ user: 1, createdAt: -1 });
 
 export default mongoose.model("Folder", folderSchema);

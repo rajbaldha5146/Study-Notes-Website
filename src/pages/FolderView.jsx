@@ -23,11 +23,14 @@ import {
   deleteNote,
   deleteFolder,
   createNote,
+  searchFolderNotes,
 } from "../services/api";
 import BookLoader from "../components/BookLoader";
 import ShareButton from "../components/ShareButton";
+import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
+import { stripMarkdown, calculateReadingTime } from "../utils/markdownHelpers";
 
 export default function FolderView() {
   const { id } = useParams();
@@ -65,6 +68,28 @@ export default function FolderView() {
     const t = setTimeout(() => setDebouncedSearchTerm(searchTerm), 300);
     return () => clearTimeout(t);
   }, [searchTerm]);
+
+  const [searchResults, setSearchResults] = useState(null);
+
+  // Backend search when debounced term changes
+  useEffect(() => {
+    if (!debouncedSearchTerm.trim()) {
+      setSearchResults(null);
+      return;
+    }
+    let cancelled = false;
+    const doSearch = async () => {
+      try {
+        const data = await searchFolderNotes(id, debouncedSearchTerm);
+        if (!cancelled) setSearchResults(data.notes);
+      } catch (err) {
+        console.error('Search failed:', err);
+        if (!cancelled) setSearchResults([]);
+      }
+    };
+    doSearch();
+    return () => { cancelled = true; };
+  }, [debouncedSearchTerm, id]);
 
   const handleBulkUpload = async (event) => {
     const files = Array.from(event.target.files || []);
@@ -138,29 +163,52 @@ export default function FolderView() {
     event.target.value = "";
   };
 
-  const handleDeleteNote = useCallback(async (noteId) => {
-    if (!window.confirm("Delete this note?")) return;
-    try {
-      await deleteNote(noteId);
-      toast.success("Note deleted");
-      await fetchFolderData();
-      refreshFolders?.();
-    } catch (error) {
-      toast.error("Failed to delete note");
-    }
-  }, []);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    confirmText: "Delete",
+    onConfirm: () => {},
+  });
 
-  const handleDeleteFolder = useCallback(async () => {
-    if (!window.confirm(`Delete "${folderData?.folder?.name}"?`)) return;
-    try {
-      await deleteFolder(id);
-      toast.success("Folder deleted");
-      refreshFolders?.();
-      navigate("/app");
-    } catch (error) {
-      toast.error("Failed to delete folder");
-    }
-  }, [id, folderData?.folder?.name, navigate]);
+  const handleDeleteNote = useCallback((noteId, noteTitle) => {
+    setConfirmModal({
+      isOpen: true,
+      title: "Move to Trash?",
+      message: `Are you sure you want to move "${noteTitle || "this note"}" to trash? You can restore it anytime from the Trash Bin.`,
+      confirmText: "Move to Trash",
+      onConfirm: async () => {
+        try {
+          await deleteNote(noteId);
+          toast.success("Moved to trash");
+          await fetchFolderData();
+          refreshFolders?.();
+        } catch (error) {
+          toast.error("Failed to delete note");
+        }
+      },
+    });
+  }, [fetchFolderData, refreshFolders]);
+
+  const handleDeleteFolder = useCallback(() => {
+    const folderName = folderData?.folder?.name || "this folder";
+    setConfirmModal({
+      isOpen: true,
+      title: "Delete Folder?",
+      message: `Are you sure you want to delete "${folderName}"? All notes inside will be moved to the Trash Bin.`,
+      confirmText: "Delete Folder",
+      onConfirm: async () => {
+        try {
+          await deleteFolder(id);
+          toast.success("Folder deleted (notes moved to trash)");
+          refreshFolders?.();
+          navigate("/app");
+        } catch (error) {
+          toast.error("Failed to delete folder");
+        }
+      },
+    });
+  }, [id, folderData?.folder?.name, navigate, refreshFolders]);
 
   const handleDownloadZip = useCallback(async () => {
     if (!folderData?.notes || folderData.notes.length === 0) {
@@ -189,19 +237,9 @@ export default function FolderView() {
     }
   }, [folderData]);
 
-  // Filter + sort notes
+  // Filter + sort notes (use backend results when searching)
   const filteredNotes = useMemo(() => {
-    if (!folderData?.notes) return [];
-    let notes = [...folderData.notes];
-
-    if (debouncedSearchTerm) {
-      const q = debouncedSearchTerm.toLowerCase();
-      notes = notes.filter(
-        (n) =>
-          n.title.toLowerCase().includes(q) ||
-          n.content.toLowerCase().includes(q)
-      );
-    }
+    const notes = searchResults !== null ? [...searchResults] : [...(folderData?.notes || [])];
 
     notes.sort((a, b) => {
       let aVal, bVal;
@@ -224,7 +262,7 @@ export default function FolderView() {
     });
 
     return notes;
-  }, [folderData?.notes, debouncedSearchTerm, sortBy, sortOrder]);
+  }, [folderData?.notes, searchResults, sortBy, sortOrder]);
 
   const sortedSubfolders = useMemo(() => {
     if (!folderData?.subfolders) return [];
@@ -471,62 +509,65 @@ export default function FolderView() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredNotes.map((note) => (
-          <div key={note._id} className="group relative rounded-xl overflow-hidden transition-all duration-200" style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--border-default)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3), 0 0 16px rgba(139,92,246,0.08)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--border-subtle)";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            {/* Left accent bar */}
-            <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ background: "linear-gradient(180deg, var(--violet), var(--cyan))" }} />
-            <div className="p-5 pl-6">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="font-bold line-clamp-2 transition-colors" style={{ color: "var(--text-primary)", fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>
-                    {note.title}
-                  </h3>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
-                    <Link
-                      to={`/app/edit/${note._id}`}
-                      className="p-1.5 rounded-lg hover:bg-neutral-800"
-                      title="Edit"
-                    >
-                      <Edit className="h-4 w-4 text-neutral-500 hover:text-indigo-400" />
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteNote(note._id)}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4 text-neutral-500 hover:text-red-400" />
-                    </button>
+              <Link
+                key={note._id}
+                to={`/app/note/${note._id}?folder=${id}`}
+                className="group relative rounded-xl overflow-hidden transition-all duration-200 block"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.3), 0 0 16px rgba(139,92,246,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-subtle)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                {/* Left accent bar */}
+                <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ background: folder?.color || "var(--blue)" }} />
+                <div className="p-5 pl-6 h-full flex flex-col">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <h3 className="font-bold line-clamp-2 transition-colors" style={{ color: "var(--text-primary)", fontSize: "0.9375rem", letterSpacing: "-0.01em" }}>
+                      {note.title}
+                    </h3>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 z-10 relative">
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/app/edit/${note._id}`); }}
+                        className="p-1.5 rounded-lg hover:bg-neutral-800"
+                        title="Edit"
+                      >
+                        <Edit className="h-4 w-4 text-neutral-500 hover:text-indigo-400" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteNote(note._id, note.title); }}
+                        className="p-1.5 rounded-lg hover:bg-red-500/10"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4 text-neutral-500 hover:text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <p className="text-sm line-clamp-3 mb-4" style={{ color: "var(--text-muted)", lineHeight: 1.6 }}>
+                    {stripMarkdown(note.content).substring(0, 140)}...
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs mt-auto pt-2" style={{ color: "var(--text-faint)" }}>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
+                      <span>{new Date(note.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span>{calculateReadingTime(note.content).words} words</span>
+                      <span>•</span>
+                      <span>{calculateReadingTime(note.content).text}</span>
+                    </div>
                   </div>
                 </div>
-
-                {/* Preview */}
-                <p className="text-sm line-clamp-3 mb-4" style={{ color: "var(--text-muted)", lineHeight: 1.6 }}>
-                  {note.content.substring(0, 150)}...
-                </p>
-
-                <div className="flex items-center gap-2 text-xs mb-4" style={{ color: "var(--text-faint)" }}>
-                  <Calendar className="h-3.5 w-3.5" style={{ color: "var(--text-muted)" }} />
-                  <span>{new Date(note.createdAt).toLocaleDateString()}</span>
-                </div>
-
-                <Link
-                  to={`/app/note/${note._id}`}
-                  className="btn-primary block w-full text-center text-sm"
-                  style={{ padding: "0.5rem", borderRadius: "0.5rem" }}
-                >
-                  View Note
-                </Link>
-              </div>
-            </div>
+              </Link>
             ))}
           </div>
         )}
@@ -563,6 +604,16 @@ export default function FolderView() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        onConfirm={confirmModal.onConfirm}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

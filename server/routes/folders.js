@@ -12,7 +12,7 @@ router.use(authenticateToken);
 // Get all folders for the authenticated user
 router.get('/', async (req, res) => {
   try {
-    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder').sort({ order: 1, createdAt: -1 });
+    const folders = await Folder.find({ user: req.user._id, isTrash: { $ne: true } }).populate('parentFolder').sort({ order: 1, createdAt: -1 });
     res.json(folders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 // Get folder tree structure for the authenticated user
 router.get('/tree', async (req, res) => {
   try {
-    const folders = await Folder.find({ user: req.user._id }).populate('parentFolder');
+    const folders = await Folder.find({ user: req.user._id, isTrash: { $ne: true } }).populate('parentFolder');
     
     // Build tree structure
     const folderMap = {};
@@ -48,6 +48,35 @@ router.get('/tree', async (req, res) => {
   }
 });
 
+// Search notes within a specific folder
+router.get('/:id/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const folder = await Folder.findOne({ _id: req.params.id, user: req.user._id });
+    if (!folder) {
+      return res.status(404).json({ message: 'Folder not found' });
+    }
+    
+    let query = { folder: req.params.id, user: req.user._id, isTrash: { $ne: true } };
+    if (q && q.trim()) {
+      query.$and = [
+        { isTrash: { $ne: true } },
+        {
+          $or: [
+            { title: { $regex: q.trim(), $options: 'i' } },
+            { content: { $regex: q.trim(), $options: 'i' } }
+          ]
+        }
+      ];
+    }
+    
+    const notes = await Note.find(query).sort({ createdAt: -1 }).lean();
+    res.json({ notes });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get single folder with notes for the authenticated user
 router.get('/:id', async (req, res) => {
   try {
@@ -56,7 +85,7 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Folder not found' });
     }
     
-    const notes = await Note.find({ folder: req.params.id, user: req.user._id }).sort({ episode: 1, createdAt: -1 });
+    const notes = await Note.find({ folder: req.params.id, user: req.user._id, isTrash: { $ne: true } }).sort({ episode: 1, createdAt: -1 });
     const subfolders = await Folder.find({ parentFolder: req.params.id, user: req.user._id });
     
     res.json({
@@ -146,17 +175,23 @@ router.delete('/:id', validateObjectId('id'), async (req, res, next) => {
         await deleteFolderRecursive(subfolder._id);
       }
       
-      // Delete all notes in this folder
-      await Note.deleteMany({ folder: id, user: userId });
+      // Soft-delete (move to trash) all notes in this folder
+      await Note.updateMany(
+        { folder: id, user: userId },
+        { $set: { isTrash: true, deletedAt: new Date() } }
+      );
       
-      // Delete the folder itself
-      await Folder.findOneAndDelete({ _id: id, user: userId });
+      // Soft-delete the folder itself
+      await Folder.findOneAndUpdate(
+        { _id: id, user: userId },
+        { $set: { isTrash: true } }
+      );
     };
     
     // Start cascade delete
     await deleteFolderRecursive(folderId);
     
-    res.json({ success: true, message: 'Folder and all contents deleted successfully' });
+    res.json({ success: true, message: 'Folder deleted and notes moved to trash' });
   } catch (error) {
     next(error);
   }

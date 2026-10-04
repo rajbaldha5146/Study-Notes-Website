@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save, Eye, Layout, Columns } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { getNote, updateNote } from "../services/api";
 import toast from "react-hot-toast";
 import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
+import { calculateReadingTime } from "../utils/markdownHelpers";
+import MarkdownToolbar from "../components/MarkdownToolbar";
 import BookLoader from "../components/BookLoader";
 
 export default function EditNote() {
@@ -16,9 +18,10 @@ export default function EditNote() {
     title: "",
     content: "",
   });
-  const [preview, setPreview] = useState(false);
+  const [viewMode, setViewMode] = useState("split"); // 'split' | 'edit' | 'preview'
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     fetchNote();
@@ -81,6 +84,9 @@ export default function EditNote() {
     );
   }
 
+  const readingTimeStats = calculateReadingTime(formData.content);
+  const charCount = formData.content.length;
+
   return (
     <div className="page-container py-6">
       {/* Header */}
@@ -96,17 +102,60 @@ export default function EditNote() {
           <h1 className="text-xl font-semibold text-neutral-100">Edit Note</h1>
         </div>
 
-        <button
-          onClick={() => setPreview(!preview)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
-            preview
-              ? "bg-indigo-600 text-white"
-              : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-          }`}
+        {/* View Mode Switches */}
+        <div
+          className="flex items-center p-1 rounded-lg"
+          style={{
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-subtle)",
+          }}
         >
-          <Eye className="h-4 w-4" />
-          <span>{preview ? "Edit" : "Preview"}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("edit")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "edit" ? "text-white" : ""
+            }`}
+            style={{
+              background: viewMode === "edit" ? "var(--blue)" : "transparent",
+              color: viewMode === "edit" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Edit Only"
+          >
+            <Layout className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Edit</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("split")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "split" ? "text-white" : ""
+            }`}
+            style={{
+              background: viewMode === "split" ? "var(--blue)" : "transparent",
+              color: viewMode === "split" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Split View"
+          >
+            <Columns className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Split</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("preview")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "preview" ? "text-white" : ""
+            }`}
+            style={{
+              background: viewMode === "preview" ? "var(--blue)" : "transparent",
+              color: viewMode === "preview" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Preview Only"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Preview</span>
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,46 +175,81 @@ export default function EditNote() {
           />
         </div>
 
-        {/* Content Editor */}
-        <div className="card overflow-hidden">
-          <div className="px-6 py-4 border-b-2 border-neutral-700">
-            <h3 className="text-sm font-medium text-neutral-200">Content</h3>
-            <p className="text-xs text-neutral-500 mt-1">
-              Write in Markdown format
-            </p>
+        {/* Content Editor with Formatting Toolbar */}
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-subtle)",
+          }}
+        >
+          {/* Header & Stats */}
+          <div
+            className="px-6 py-3 flex items-center justify-between"
+            style={{ borderBottom: "1px solid var(--border-subtle)" }}
+          >
+            <div>
+              <h3
+                className="text-sm font-bold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Editor
+              </h3>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Markdown supported
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <span>{readingTimeStats.words} words</span>
+              <span>•</span>
+              <span>{readingTimeStats.text}</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
+          {/* Markdown Formatting Toolbar */}
+          <MarkdownToolbar
+            textareaRef={textareaRef}
+            content={formData.content}
+            onChange={(newContent) =>
+              setFormData((prev) => ({ ...prev, content: newContent }))
+            }
+          />
+
+          <div
+            className={`grid ${
+              viewMode === "split" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"
+            } min-h-[450px]`}
+          >
             {/* Editor */}
-            <div className={preview ? "hidden lg:block" : ""}>
+            {viewMode !== "preview" && (
               <textarea
+                ref={textareaRef}
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[400px] p-6 bg-neutral-900 text-neutral-100 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm placeholder-neutral-500 leading-relaxed"
-                placeholder={`# Your Note Title
-
-Write your content here...
-
-## Section
-
-- Point 1
-- Point 2
-
-\`\`\`javascript
-console.log('Hello!');
-\`\`\``}
+                className="w-full h-[450px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
+                style={{
+                  background: "var(--bg-elevated)",
+                  color: "var(--text-primary)",
+                  border: "none",
+                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                }}
+                placeholder="Write your content here..."
                 required
               />
-            </div>
+            )}
 
             {/* Preview */}
-            <div
-              className={`border-l-2 border-neutral-700 bg-neutral-900 ${
-                !preview ? "hidden lg:block" : ""
-              }`}
-            >
-              <div className="p-6 prose max-w-none overflow-auto h-[400px] custom-scrollbar">
+            {viewMode !== "edit" && (
+              <div
+                className={`p-6 prose max-w-none overflow-auto h-[450px] custom-scrollbar ${
+                  viewMode === "split" ? "border-l border-neutral-700" : ""
+                }`}
+                style={{ background: "var(--bg-elevated)" }}
+              >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
@@ -173,6 +257,22 @@ console.log('Hello!');
                   {formData.content || "*Preview will appear here...*"}
                 </ReactMarkdown>
               </div>
+            )}
+          </div>
+
+          {/* Status Bar */}
+          <div
+            className="px-6 py-2 flex items-center justify-between text-xs"
+            style={{
+              background: "var(--bg-surface)",
+              borderTop: "1px solid var(--border-subtle)",
+              color: "var(--text-muted)",
+            }}
+          >
+            <span>Markdown Mode</span>
+            <div className="flex items-center gap-4">
+              <span>{charCount} characters</span>
+              <span>{readingTimeStats.words} words</span>
             </div>
           </div>
         </div>

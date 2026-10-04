@@ -1,6 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Eye, FileText, Plus, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  FileText,
+  Plus,
+  Layout,
+  Columns,
+  Maximize2,
+  Sparkles,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -8,7 +18,9 @@ import { createNote, getFolders, createFolder } from "../services/api";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
 import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
-import AITopicGenerator from "../components/ai/AITopicGenerator";
+import { calculateReadingTime } from "../utils/markdownHelpers";
+import { NOTE_TEMPLATES } from "../utils/noteTemplates";
+import MarkdownToolbar from "../components/MarkdownToolbar";
 
 export default function CreateNote() {
   const navigate = useNavigate();
@@ -20,12 +32,12 @@ export default function CreateNote() {
     content: "",
     folder: "",
   });
-  const [preview, setPreview] = useState(false);
+  const [viewMode, setViewMode] = useState("split"); // 'split' | 'edit' | 'preview'
   const [loading, setLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [folders, setFolders] = useState([]);
   const [loadingFolders, setLoadingFolders] = useState(true);
-  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     loadFolders();
@@ -48,7 +60,6 @@ export default function CreateNote() {
         refreshFolders();
       } else {
         setFolders(foldersData);
-        // If folderId is provided in URL, use it; otherwise use first folder
         const defaultFolderId = folderId || foldersData[0]._id;
         setFormData((prev) => ({ ...prev, folder: defaultFolderId }));
       }
@@ -107,13 +118,13 @@ export default function CreateNote() {
     });
   };
 
-  const handleAIContentGenerated = (aiContent) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      title: aiContent.title,
-      content: aiContent.content,
+  const handleApplyTemplate = (template) => {
+    setFormData((prev) => ({
+      ...prev,
+      content: template.content,
+      title: prev.title || template.name,
     }));
-    setShowAIGenerator(false);
+    toast.success(`Applied template: ${template.name}`);
   };
 
   const handleFileUpload = (e) => {
@@ -148,6 +159,9 @@ export default function CreateNote() {
     setFormData((prev) => ({ ...prev, content: "" }));
   };
 
+  const readingTimeStats = calculateReadingTime(formData.content);
+  const charCount = formData.content.length;
+
   return (
     <div className="page-container py-6">
       {/* Header */}
@@ -160,83 +174,128 @@ export default function CreateNote() {
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </button>
-          <h1 className="text-xl font-semibold text-neutral-100">
-            Create Note
-          </h1>
+          <h1 className="text-xl font-semibold text-neutral-100">Create Note</h1>
         </div>
 
-        <button
-          onClick={() => setPreview(!preview)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-            preview
-              ? "text-white"
-              : "hover:opacity-80"
-          }`}
-          style={preview ? {
-            background: "linear-gradient(135deg, var(--violet-dark), var(--violet))",
-            boxShadow: "0 0 12px rgba(139,92,246,0.3)",
-            border: "1px solid rgba(139,92,246,0.3)"
-          } : {
+        {/* View Mode Switches */}
+        <div
+          className="flex items-center p-1 rounded-lg"
+          style={{
             background: "var(--bg-elevated)",
             border: "1px solid var(--border-subtle)",
-            color: "var(--text-secondary)"
           }}
         >
-          <Eye className="h-4 w-4" />
-          <span>{preview ? "Edit" : "Preview"}</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("edit")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "edit" ? "text-white" : ""
+            }`}
+            style={{
+              background:
+                viewMode === "edit" ? "var(--blue)" : "transparent",
+              color: viewMode === "edit" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Edit Only"
+          >
+            <Layout className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Edit</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("split")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "split" ? "text-white" : ""
+            }`}
+            style={{
+              background:
+                viewMode === "split" ? "var(--blue)" : "transparent",
+              color: viewMode === "split" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Split View"
+          >
+            <Columns className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Split</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("preview")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "preview" ? "text-white" : ""
+            }`}
+            style={{
+              background:
+                viewMode === "preview" ? "var(--blue)" : "transparent",
+              color: viewMode === "preview" ? "#fff" : "var(--text-muted)",
+            }}
+            title="Preview Only"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Preview</span>
+          </button>
+        </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <button
-          type="button"
-          onClick={() => {
-            setUploadedFile(null);
-            setFormData({
-              title: "",
-              content: "",
-              folder: folderId || (folders.length > 0 ? folders[0]._id : ""),
-            });
-          }}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New</span>
-        </button>
+      {/* Quick Actions & Templates */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setUploadedFile(null);
+              setFormData({
+                title: "",
+                content: "",
+                folder: folderId || (folders.length > 0 ? folders[0]._id : ""),
+              });
+            }}
+            className="btn-primary flex items-center gap-2 text-xs"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Reset</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setShowAIGenerator(!showAIGenerator)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
-            showAIGenerator
-              ? "bg-emerald-600 text-white"
-              : "bg-purple-600 text-white hover:bg-purple-500"
-          }`}
-        >
-          <Sparkles className="h-4 w-4" />
-          <span>{showAIGenerator ? "Manual" : "AI Generate"}</span>
-        </button>
+          <label className="btn-secondary flex items-center gap-2 text-xs cursor-pointer">
+            <FileText className="h-3.5 w-3.5" />
+            <span>Upload .md</span>
+            <input
+              type="file"
+              className="hidden"
+              accept=".md,.markdown"
+              onChange={handleFileUpload}
+            />
+          </label>
+        </div>
 
-        <label className="btn-secondary flex items-center gap-2 cursor-pointer">
-          <FileText className="h-4 w-4" />
-          <span>Upload</span>
-          <input
-            type="file"
-            className="hidden"
-            accept=".md,.markdown"
-            onChange={handleFileUpload}
-          />
-        </label>
+        {/* Templates Selector */}
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--blue-light)" }} />
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Template:
+          </span>
+          <select
+            onChange={(e) => {
+              const tmpl = NOTE_TEMPLATES.find((t) => t.id === e.target.value);
+              if (tmpl) handleApplyTemplate(tmpl);
+            }}
+            defaultValue="blank"
+            className="px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors"
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            {NOTE_TEMPLATES.map((tmpl) => (
+              <option key={tmpl.id} value={tmpl.id}>
+                {tmpl.icon} {tmpl.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* AI Generator */}
-        <AITopicGenerator
-          onContentGenerated={handleAIContentGenerated}
-          isVisible={showAIGenerator}
-        />
-
         {/* File Status */}
         {uploadedFile && (
           <div className="card p-4 flex items-center justify-between">
@@ -273,8 +332,7 @@ export default function CreateNote() {
                 onChange={handleChange}
                 className="input"
                 placeholder="Enter note title..."
-                required={!showAIGenerator}
-                readOnly={showAIGenerator}
+                required
               />
             </div>
 
@@ -304,34 +362,72 @@ export default function CreateNote() {
           </div>
         </div>
 
-        {/* Content Editor */}
+        {/* Content Editor with Formatting Toolbar */}
         <div
           className="rounded-2xl overflow-hidden"
-          style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-subtle)",
+          }}
         >
+          {/* Header & Markdown Toolbar */}
           <div
-            className="px-6 py-4"
+            className="px-6 py-3 flex items-center justify-between"
             style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
-            <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Content</h3>
-            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Write in Markdown format</p>
+            <div>
+              <h3
+                className="text-sm font-bold"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Editor
+              </h3>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Markdown supported
+              </p>
+            </div>
+            <div
+              className="flex items-center gap-3 text-xs"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <span>{readingTimeStats.words} words</span>
+              <span>•</span>
+              <span>{readingTimeStats.text}</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
-            {/* Editor */}
-            <div className={preview ? "hidden lg:block" : ""}>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                className="w-full h-[400px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
-                style={{
-                  background: "var(--bg-elevated)",
-                  color: "var(--text-primary)",
-                  border: "none",
-                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                }}
-                placeholder={`# Your Note Title
+          {/* Markdown Toolbar */}
+          <MarkdownToolbar
+            textareaRef={textareaRef}
+            content={formData.content}
+            onChange={(newContent) =>
+              setFormData((prev) => ({ ...prev, content: newContent }))
+            }
+          />
+
+          <div
+            className={`grid ${
+              viewMode === "split"
+                ? "grid-cols-1 lg:grid-cols-2"
+                : "grid-cols-1"
+            } min-h-[450px]`}
+          >
+            {/* Textarea Editor */}
+            {viewMode !== "preview" && (
+              <div className="relative flex flex-col">
+                <textarea
+                  ref={textareaRef}
+                  name="content"
+                  value={formData.content}
+                  onChange={handleChange}
+                  className="w-full h-[450px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
+                  style={{
+                    background: "var(--bg-elevated)",
+                    color: "var(--text-primary)",
+                    border: "none",
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                  }}
+                  placeholder={`# Your Note Title
 
 Write your content here...
 
@@ -343,18 +439,19 @@ Write your content here...
 \`\`\`javascript
 console.log('Hello!');
 \`\`\``}
-                required
-              />
-            </div>
+                  required
+                />
+              </div>
+            )}
 
-            {/* Preview */}
-            <div
-              className={`border-l border-neutral-700 ${
-                !preview ? "hidden lg:block" : ""
-              }`}
-              style={{ background: "var(--bg-elevated)" }}
-            >
-              <div className="p-6 prose max-w-none overflow-auto h-[400px] custom-scrollbar">
+            {/* Live Preview Panel */}
+            {viewMode !== "edit" && (
+              <div
+                className={`p-6 prose max-w-none overflow-auto h-[450px] custom-scrollbar ${
+                  viewMode === "split" ? "border-l border-neutral-700" : ""
+                }`}
+                style={{ background: "var(--bg-elevated)" }}
+              >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
@@ -362,6 +459,22 @@ console.log('Hello!');
                   {formData.content || "*Preview will appear here...*"}
                 </ReactMarkdown>
               </div>
+            )}
+          </div>
+
+          {/* Status Bar */}
+          <div
+            className="px-6 py-2 flex items-center justify-between text-xs"
+            style={{
+              background: "var(--bg-surface)",
+              borderTop: "1px solid var(--border-subtle)",
+              color: "var(--text-muted)",
+            }}
+          >
+            <span>Markdown Mode</span>
+            <div className="flex items-center gap-4">
+              <span>{charCount} characters</span>
+              <span>{readingTimeStats.words} words</span>
             </div>
           </div>
         </div>
