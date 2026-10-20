@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    openTabs: [
+      {
+        id: { type: String, required: true },
+        title: { type: String, default: "Untitled" },
+        path: { type: String, required: true },
+        isPinned: { type: Boolean, default: false },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthContext";
+import { getUserTabs, saveUserTabs } from "../services/api";
 
 const TabContext = createContext();
 
@@ -14,8 +16,14 @@ export const useTabs = () => {
 export const TabProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const currentUserId = user?.id || user?._id;
 
-  // Load persisted tabs from localStorage
+  const prevUserIdRef = useRef(null);
+  const isHydratedRef = useRef(false);
+  const saveTimeoutRef = useRef(null);
+
+  // Load persisted tabs from localStorage for instant initial render
   const [tabs, setTabs] = useState(() => {
     try {
       const saved = localStorage.getItem("notemaster_open_tabs");
@@ -27,14 +35,95 @@ export const TabProvider = ({ children }) => {
 
   const [activeTabId, setActiveTabId] = useState(null);
 
-  // Keep localStorage synced
+  // Hydrate tabs from database when authenticated user is detected
+  useEffect(() => {
+    // If user logged out, clear tabs and localStorage
+    if (!currentUserId) {
+      if (prevUserIdRef.current) {
+        setTabs([]);
+        try {
+          localStorage.removeItem("notemaster_open_tabs");
+        } catch {
+          // ignore
+        }
+      }
+      prevUserIdRef.current = null;
+      isHydratedRef.current = false;
+      return;
+    }
+
+    // If user changed or freshly mounted with authenticated user
+    if (prevUserIdRef.current !== currentUserId) {
+      prevUserIdRef.current = currentUserId;
+      isHydratedRef.current = false;
+
+      const hydrateTabs = async () => {
+        try {
+          // Check if tabs were pre-loaded on user object, otherwise query API
+          let dbTabs = Array.isArray(user?.openTabs) && user.openTabs.length > 0 ? user.openTabs : null;
+          if (!dbTabs) {
+            dbTabs = await getUserTabs();
+          }
+
+          if (Array.isArray(dbTabs) && dbTabs.length > 0) {
+            setTabs((currentTabs) => {
+              // Merge dbTabs with any currently open tab in current session
+              const merged = [...dbTabs];
+              for (const cur of currentTabs) {
+                if (!merged.some((m) => m.id === cur.id)) {
+                  merged.push(cur);
+                }
+              }
+              return merged;
+            });
+          } else {
+            // DB has no saved tabs: check if localStorage has existing tabs to seed DB
+            const localSaved = localStorage.getItem("notemaster_open_tabs");
+            const localTabs = localSaved ? JSON.parse(localSaved) : [];
+            if (localTabs.length > 0) {
+              await saveUserTabs(localTabs);
+            }
+          }
+        } catch (err) {
+          console.warn("Failed to hydrate tabs from DB:", err);
+        } finally {
+          isHydratedRef.current = true;
+        }
+      };
+
+      hydrateTabs();
+    }
+  }, [currentUserId, user]);
+
+  // Keep localStorage synced & debounce DB sync (1000ms delay to protect database)
   useEffect(() => {
     try {
       localStorage.setItem("notemaster_open_tabs", JSON.stringify(tabs));
     } catch (err) {
-      console.warn("Failed to persist tabs:", err);
+      console.warn("Failed to persist tabs to localStorage:", err);
     }
-  }, [tabs]);
+
+    // Only sync to DB if user is authenticated and initial hydration completed
+    if (!currentUserId || !isHydratedRef.current) return;
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await saveUserTabs(tabs);
+      } catch (err) {
+        console.warn("Failed to sync tabs to DB:", err);
+      }
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [tabs, currentUserId]);
 
   // Synchronize activeTabId with URL
   useEffect(() => {

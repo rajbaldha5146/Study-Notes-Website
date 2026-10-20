@@ -185,4 +185,15 @@ export const checkResourceShared = async (type, resourceId) => {
   return response.data;
 };
 
+// Tabs Persistence API
+export const getUserTabs = async () => {
+  const response = await api.get("/auth/tabs");
+  return response.data?.tabs || [];
+};
+
+export const saveUserTabs = async (tabs) => {
+  const response = await api.put("/auth/tabs", { tabs });
+  return response.data?.tabs || [];
+};
+
 export default api;

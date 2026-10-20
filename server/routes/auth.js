@@ -133,7 +133,8 @@ router.post('/login', async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          isVerified: user.isVerified
+          isVerified: user.isVerified,
+          openTabs: user.openTabs || []
         }
       }
     });
@@ -256,7 +257,8 @@ router.get('/me', authenticateToken, async (req, res) => {
           name: req.user.name,
           email: req.user.email,
           role: req.user.role,
-          isVerified: req.user.isVerified
+          isVerified: req.user.isVerified,
+          openTabs: req.user.openTabs || []
         }
       }
     });
@@ -265,6 +267,57 @@ router.get('/me', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to get user information'
+    });
+  }
+});
+
+// Get user open tabs
+router.get('/tabs', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('openTabs');
+    res.json({
+      success: true,
+      tabs: user?.openTabs || []
+    });
+  } catch (error) {
+    console.error('Get tabs error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get tabs'
+    });
+  }
+});
+
+// Save / sync user open tabs to DB
+router.put('/tabs', authenticateToken, async (req, res) => {
+  try {
+    const { tabs } = req.body;
+    if (!Array.isArray(tabs)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tabs must be an array'
+      });
+    }
+
+    // Sanitize tabs (max 30 tabs to protect database cluster storage)
+    const sanitizedTabs = tabs.slice(0, 30).map((t) => ({
+      id: String(t.id),
+      title: String(t.title || 'Untitled'),
+      path: String(t.path),
+      isPinned: Boolean(t.isPinned)
+    }));
+
+    await User.findByIdAndUpdate(req.user._id, { openTabs: sanitizedTabs });
+
+    res.json({
+      success: true,
+      tabs: sanitizedTabs
+    });
+  } catch (error) {
+    console.error('Save tabs error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save tabs'
     });
   }
 });
