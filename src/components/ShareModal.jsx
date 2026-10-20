@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Copy, Check, Link, Trash2, Loader2 } from "lucide-react";
 import { createShare, checkResourceShared, revokeShare } from "../services/api";
 import toast from "react-hot-toast";
@@ -9,17 +10,14 @@ export default function ShareModal({ type, resourceId, resourceName, onClose }) 
   const [copied, setCopied] = useState(false);
   const [revoking, setRevoking] = useState(false);
 
-  // Check if resource is already shared or create new share
   useEffect(() => {
     const initializeShare = async () => {
       setLoading(true);
       try {
-        // First check if already shared
         const existingShare = await checkResourceShared(type, resourceId);
         if (existingShare.isShared) {
           setShareData(existingShare.share);
         } else {
-          // Create new share
           const result = await createShare(type, resourceId);
           setShareData(result.share);
         }
@@ -77,22 +75,46 @@ export default function ShareModal({ type, resourceId, resourceName, onClose }) 
     });
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl shadow-2xl w-full max-w-md">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+      style={{ background: "rgba(18, 15, 13, 0.75)" }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-xl overflow-hidden animate-fade-in shadow-2xl"
+        style={{
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border-default)",
+          boxShadow: "var(--shadow-modal)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: "1px solid var(--border-subtle)" }}
+        >
           <div className="flex items-center gap-2">
-            <Link className="h-5 w-5 text-indigo-400" />
-            <h3 className="text-lg font-semibold text-neutral-100">
+            <Link className="h-4 w-4" style={{ color: "var(--accent)" }} />
+            <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
               Share {type === "folder" ? "Folder" : "Note"}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
+            className="p-1.5 rounded-lg transition-colors cursor-pointer"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--text-primary)";
+              e.currentTarget.style.background = "var(--bg-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--text-muted)";
+              e.currentTarget.style.background = "transparent";
+            }}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -100,41 +122,45 @@ export default function ShareModal({ type, resourceId, resourceName, onClose }) 
         <div className="p-6 space-y-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 text-indigo-400 animate-spin mb-3" />
-              <p className="text-neutral-400 text-sm">Generating share link...</p>
+              <Loader2 className="h-7 w-7 animate-spin mb-3" style={{ color: "var(--accent)" }} />
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                Generating share link...
+              </p>
             </div>
           ) : (
             <>
               {/* Resource name */}
               <div>
-                <p className="text-sm text-neutral-400 mb-1">Sharing</p>
-                <p className="text-neutral-100 font-medium truncate">
+                <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>
+                  Sharing
+                </p>
+                <p className="font-medium truncate text-sm" style={{ color: "var(--text-primary)" }}>
                   {resourceName || "Untitled"}
                 </p>
               </div>
 
               {/* Share URL */}
               <div>
-                <label className="block text-sm font-medium text-neutral-300 mb-2">
-                  Share Link
+                <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+                  Share link
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={shareUrl}
                     readOnly
-                    className="input flex-1 text-sm bg-neutral-800 cursor-text select-all"
+                    className="input flex-1 text-xs cursor-text select-all"
                     onClick={(e) => e.target.select()}
                   />
                   <button
                     onClick={handleCopy}
-                    className="btn-primary px-3 py-2 flex items-center gap-1.5"
+                    className="btn-primary px-3 py-2 flex items-center gap-1.5 text-xs font-medium"
                     title="Copy link"
                   >
                     {copied ? (
-                      <Check className="h-4 w-4" />
+                      <Check className="h-3.5 w-3.5" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-3.5 w-3.5" />
                     )}
                     <span className="sr-only sm:not-sr-only">
                       {copied ? "Copied!" : "Copy"}
@@ -145,35 +171,40 @@ export default function ShareModal({ type, resourceId, resourceName, onClose }) 
 
               {/* Share creation date */}
               {shareData?.createdAt && (
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                   Shared on {formatDate(shareData.createdAt)}
                 </p>
               )}
 
               {/* Info text */}
-              <div className="bg-neutral-800/50 rounded-lg p-3 text-sm text-neutral-400">
-                <p>
-                  Anyone with this link can view this {type} after signing in.
-                  They can also save a copy to their own account.
-                </p>
+              <div
+                className="rounded-lg p-3 text-xs leading-relaxed"
+                style={{
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border-subtle)",
+                  color: "var(--text-secondary)",
+                }}
+              >
+                Anyone with this link can view and read this {type} without signing in. If they sign in, they can also save a copy directly to their own account.
               </div>
 
               {/* Revoke option */}
-              <div className="pt-2 border-t border-neutral-800">
+              <div className="pt-2" style={{ borderTop: "1px solid var(--border-subtle)" }}>
                 <button
                   onClick={handleRevoke}
                   disabled={revoking}
-                  className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 text-xs font-medium transition-opacity disabled:opacity-50"
+                  style={{ color: "var(--danger)" }}
                 >
                   {revoking ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   ) : (
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   )}
-                  {revoking ? "Revoking..." : "Revoke share link"}
+                  {revoking ? "Revoking link..." : "Revoke share link"}
                 </button>
-                <p className="text-xs text-neutral-500 mt-1">
-                  This will disable the link. Copies already saved won't be affected.
+                <p className="text-[11px] mt-1" style={{ color: "var(--text-muted)" }}>
+                  This will immediately disable the public link. Copies already saved won't be affected.
                 </p>
               </div>
             </>
@@ -181,12 +212,17 @@ export default function ShareModal({ type, resourceId, resourceName, onClose }) 
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end px-6 py-4 border-t border-neutral-800">
-          <button onClick={onClose} className="btn-ghost px-4 py-2">
+        <div
+          className="flex justify-end px-6 py-3.5"
+          style={{ borderTop: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}
+        >
+          <button onClick={onClose} className="btn-ghost px-4 py-1.5 text-xs font-medium cursor-pointer">
             Close
           </button>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

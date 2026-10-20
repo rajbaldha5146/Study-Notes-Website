@@ -7,12 +7,12 @@ import {
   ChevronDown,
   Plus,
   Trash2,
-  Loader2,
   Search,
 } from "lucide-react";
 import { getFolderTree, deleteFolder } from "../services/api";
 import CreateFolderModal from "./CreateFolderModal";
 import ConfirmModal from "./ConfirmModal";
+import Loader from "./Loader";
 import { useFolders } from "../contexts/FolderContext";
 import toast from "react-hot-toast";
 
@@ -27,7 +27,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const { refreshTrigger, refreshFolders: triggerGlobalRefresh } = useFolders();
 
-  const SIDEBAR_WIDTH = 240;
+  const SIDEBAR_WIDTH = 232;
 
   const fetchFolders = useCallback(async () => {
     try {
@@ -76,7 +76,6 @@ export default function Sidebar({ isOpen, onClose }) {
     }
   }, [location.pathname, folders]);
 
-  // Update CSS variable for main content margin
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--sidebar-width",
@@ -183,30 +182,30 @@ export default function Sidebar({ isOpen, onClose }) {
     return (
       <div key={folder._id}>
         <div
-          className="group flex items-center gap-1.5 rounded-md cursor-pointer relative transition-all duration-100"
+          className="group flex items-center gap-1.5 rounded-lg cursor-pointer relative transition-all duration-150"
           style={{
             paddingLeft: `${8 + level * 12}px`,
             paddingRight: "6px",
-            paddingTop: "5px",
-            paddingBottom: "5px",
+            paddingTop: "6px",
+            paddingBottom: "6px",
             background: isActive
               ? "var(--bg-elevated)"
               : isHovered
-              ? "rgba(255,255,255,0.04)"
+              ? "var(--bg-hover)"
               : "transparent",
           }}
           onMouseEnter={() => setHoveredFolder(folder._id)}
           onMouseLeave={() => setHoveredFolder(null)}
         >
-          {/* Active indicator */}
+          {/* Active Accent Left Border */}
           {isActive && (
             <div
-              className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full"
-              style={{ background: "var(--blue)" }}
+              className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-md"
+              style={{ background: "var(--accent)" }}
             />
           )}
 
-          {/* Expand button */}
+          {/* Expand Chevron */}
           <button
             onClick={(e) => hasChildren && toggleFolder(folder._id, e)}
             className={`flex-shrink-0 p-0.5 rounded transition-colors ${
@@ -220,38 +219,37 @@ export default function Sidebar({ isOpen, onClose }) {
             )}
           </button>
 
-          {/* Folder icon */}
+          {/* Folder Icon Emoji */}
           <span className="flex-shrink-0 text-sm leading-none">{folder.icon || "📁"}</span>
 
-          {/* Folder link */}
+          {/* Folder Link */}
           <Link
             to={`/app/folder/${folder._id}`}
             onClick={onClose}
-            className="flex-1 truncate text-sm transition-colors"
+            className="flex-1 truncate text-xs font-medium transition-colors"
             style={{
               color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-              fontWeight: isActive ? "500" : "400",
+              fontWeight: isActive ? "600" : "400",
             }}
           >
             {folder.name}
           </Link>
 
-          {/* Note count */}
+          {/* Note Count Badge */}
           {noteCount > 0 && (
             <span
-              className="flex-shrink-0 px-1.5 py-0.5 rounded-full font-medium ml-1"
+              className="flex-shrink-0 px-1.5 py-0.5 rounded-md font-mono text-[10px] font-medium"
               style={{
-                background: "var(--bg-elevated)",
-                color: "var(--text-secondary)",
+                background: "var(--bg-card)",
+                color: "var(--text-muted)",
                 border: "1px solid var(--border-subtle)",
-                fontSize: "0.65rem",
               }}
             >
               {noteCount}
             </span>
           )}
 
-          {/* Actions */}
+          {/* Quick Actions (Add Subfolder / Delete) */}
           <div
             className={`flex-shrink-0 flex items-center gap-0.5 transition-opacity ${
               isHovered || isActive ? "opacity-100" : "opacity-0"
@@ -263,7 +261,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 e.stopPropagation();
                 handleCreateFolder(folder._id);
               }}
-              className="p-1 rounded hover:bg-white/8 transition-colors"
+              className="p-1 rounded hover:bg-white/10 transition-colors"
               title="Add subfolder"
             >
               <Plus className="h-3 w-3" style={{ color: "var(--text-muted)" }} />
@@ -273,7 +271,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 e.preventDefault();
                 handleDeleteFolder(folder._id, folder.name, e);
               }}
-              className="p-1 rounded transition-colors"
+              className="p-1 rounded hover:bg-red-500/10 transition-colors"
               style={{ color: "var(--text-muted)" }}
               onMouseEnter={e => e.currentTarget.style.color = "var(--danger)"}
               onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
@@ -284,7 +282,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Children */}
+        {/* Children Subfolders */}
         {hasChildren && isExpanded && (
           <div className="mt-0.5">
             {sortedChildren.map((child) => renderFolder(child, level + 1))}
@@ -296,18 +294,18 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Mobile Backdrop Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 lg:hidden"
-          style={{ background: "rgba(0,0,0,0.5)" }}
+          className="fixed inset-0 z-30 lg:hidden backdrop-blur-sm"
+          style={{ background: "rgba(0, 0, 0, 0.6)" }}
           onClick={onClose}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Main Sidebar */}
       <aside
-        className={`fixed left-0 top-12 bottom-0 overflow-y-auto z-40 custom-scrollbar transition-transform duration-250 ${
+        className={`fixed left-0 top-14 bottom-0 overflow-y-auto z-40 custom-scrollbar transition-transform duration-200 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
@@ -316,101 +314,93 @@ export default function Sidebar({ isOpen, onClose }) {
           borderRight: "1px solid var(--border-subtle)",
         }}
       >
-        <div className="p-3 h-full flex flex-col">
-          {/* Header */}
-          <div
-            className="flex items-center justify-between mb-3 pb-3"
-            style={{ borderBottom: "1px solid var(--border-subtle)" }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-                All Folders
-              </span>
-              {/* Live indicator */}
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{
-                  background: "var(--success)",
-                  animation: "pulse-glow 2s ease-in-out infinite",
-                }}
-              />
-            </div>
-            <button
-              onClick={() => handleCreateFolder()}
-              className="p-1.5 rounded-md transition-colors"
-              style={{
-                color: "var(--text-muted)",
-                background: "transparent",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = "var(--bg-elevated)";
-                e.currentTarget.style.color = "var(--text-primary)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "var(--text-muted)";
-              }}
-              title="Create new folder"
+        <div className="p-3.5 h-full flex flex-col justify-between">
+          <div>
+            {/* Sidebar Section Header */}
+            <div
+              className="flex items-center justify-between mb-3 pb-2.5"
+              style={{ borderBottom: "1px solid var(--border-subtle)" }}
             >
-              <FolderPlus className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* Folders Search */}
-          <div className="mb-3">
-            <div className="relative">
-              <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
-              <input
-                type="text"
-                placeholder="Search folders..."
-                value={filterQuery}
-                onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full text-xs rounded-md pl-7 pr-2 py-1.5 focus:outline-none transition-colors"
+              <span
+                className="text-[11px] font-bold uppercase tracking-wider"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Folders
+              </span>
+              <button
+                onClick={() => handleCreateFolder()}
+                className="p-1.5 rounded-lg transition-colors cursor-pointer"
                 style={{
-                  background: "var(--bg-elevated)",
-                  color: "var(--text-primary)",
-                  border: "1px solid var(--border-subtle)",
+                  color: "var(--accent-light)",
+                  background: "rgba(224, 144, 80, 0.1)",
                 }}
-              />
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "rgba(224, 144, 80, 0.2)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "rgba(224, 144, 80, 0.1)";
+                }}
+                title="Create folder"
+              >
+                <FolderPlus className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            {/* Instant Filter Input */}
+            <div className="mb-3">
+              <div className="relative">
+                <Search
+                  className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2"
+                  style={{ color: "var(--text-muted)" }}
+                />
+                <input
+                  type="text"
+                  placeholder="Filter folders..."
+                  value={filterQuery}
+                  onChange={(e) => setFilterQuery(e.target.value)}
+                  className="w-full text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none transition-colors"
+                  style={{
+                    background: "var(--bg-elevated)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Folders List Tree */}
+            <div className="space-y-0.5">
+              {loading ? (
+                <div className="py-8 flex justify-center">
+                  <Loader variant="spinner" className="h-4 w-4" />
+                </div>
+              ) : filteredFolders.length === 0 ? (
+                <div className="text-center py-8 px-2">
+                  <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
+                    No folders yet
+                  </p>
+                  <button
+                    onClick={() => handleCreateFolder()}
+                    className="btn-primary text-xs"
+                    style={{ padding: "0.35rem 0.75rem" }}
+                  >
+                    <FolderPlus className="h-3 w-3 inline mr-1" />
+                    New Folder
+                  </button>
+                </div>
+              ) : (
+                filteredFolders.map((folder) => renderFolder(folder))
+              )}
             </div>
           </div>
 
-          {/* Folders list */}
-          <div className="flex-1 space-y-0.5">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--text-muted)" }} />
-              </div>
-            ) : filteredFolders.length === 0 ? (
-              <div className="text-center py-10 px-3">
-                <div
-                  className="w-10 h-10 mx-auto mb-3 rounded-lg flex items-center justify-center"
-                  style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}
-                >
-                  <Folder className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
-                </div>
-                <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>No folders yet</p>
-                <button
-                  onClick={() => handleCreateFolder()}
-                  className="btn-primary text-xs"
-                  style={{ padding: "0.35rem 0.75rem" }}
-                >
-                  <FolderPlus className="h-3 w-3 mr-1" />
-                  New Folder
-                </button>
-              </div>
-            ) : (
-              filteredFolders.map((folder) => renderFolder(folder))
-            )}
-          </div>
-
-          {/* Footer */}
+          {/* Footer Area with Trash Bin */}
           <div
-            className="mt-3 pt-3 flex items-center justify-between"
+            className="pt-3 flex items-center justify-between"
             style={{ borderTop: "1px solid var(--border-subtle)" }}
           >
-            <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
-              <Folder className="h-3 w-3" />
+            <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+              <Folder className="h-3.5 w-3.5" />
               <span>
                 {folders.reduce((acc, f) => {
                   const countFolders = (folder) => {
@@ -421,18 +411,19 @@ export default function Sidebar({ isOpen, onClose }) {
                     return count;
                   };
                   return acc + countFolders(f);
-                }, 0)}{" "}folders
+                }, 0)}{" "}
+                total
               </span>
             </div>
 
             <Link
               to="/app/trash"
               onClick={onClose}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
               style={{ color: "var(--text-muted)" }}
               onMouseEnter={e => {
                 e.currentTarget.style.color = "var(--danger)";
-                e.currentTarget.style.background = "rgba(248, 81, 73, 0.1)";
+                e.currentTarget.style.background = "rgba(217, 91, 78, 0.1)";
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.color = "var(--text-muted)";
@@ -446,7 +437,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
       </aside>
 
-      {/* Create Folder Modal */}
+      {/* Modals */}
       {showCreateModal && (
         <CreateFolderModal
           parentId={selectedParent}
@@ -455,7 +446,6 @@ export default function Sidebar({ isOpen, onClose }) {
         />
       )}
 
-      {/* Delete Folder Confirm Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         title={confirmModal.title}

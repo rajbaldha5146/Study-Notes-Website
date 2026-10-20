@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { createFolder } from "../services/api";
 import { useFolders } from "../contexts/FolderContext";
@@ -11,8 +12,8 @@ const folderIcons = [
 ];
 
 const folderColors = [
-  "#6366f1", "#8b5cf6", "#a855f7", "#ec4899",
-  "#10b981", "#06b6d4", "#f59e0b", "#ef4444",
+  "#e09050", "#d9886a", "#d4a947", "#7cb380",
+  "#58a6ff", "#b084cc", "#d95b4e", "#8a5a30",
 ];
 
 export default function CreateFolderModal({
@@ -25,7 +26,7 @@ export default function CreateFolderModal({
     name: "",
     description: "",
     icon: "📁",
-    color: "#6366f1",
+    color: "#e09050",
     parentFolder: parentId,
   });
   const [loading, setLoading] = useState(false);
@@ -60,45 +61,52 @@ export default function CreateFolderModal({
     }
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm"
       style={{
         background: "rgba(0, 0, 0, 0.75)",
-        backdropFilter: "blur(8px)",
       }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transition-all"
+        className="w-full max-w-md rounded-xl shadow-2xl overflow-hidden transition-all"
         style={{
           background: "var(--bg-surface)",
           border: "1px solid var(--border-default)",
-          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.6)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 py-4"
+          className="flex items-center justify-between px-5 py-3.5"
           style={{ borderBottom: "1px solid var(--border-subtle)" }}
         >
-          <h3 className="text-lg font-bold text-neutral-100">
-            Create Folder
+          <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+            Create New Folder
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg transition-colors cursor-pointer"
+            style={{ color: "var(--text-muted)" }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = "var(--text-primary)";
+              e.currentTarget.style.background = "var(--bg-elevated)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = "var(--text-muted)";
+              e.currentTarget.style.background = "transparent";
+            }}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
-              Name
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
+              Folder Name
             </label>
             <input
               type="text"
@@ -106,29 +114,30 @@ export default function CreateFolderModal({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="input"
-              placeholder="Folder name"
+              className="input text-xs"
+              placeholder="e.g. Design Systems, React Architecture"
+              autoFocus
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
-              Description
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
+              Description <span className="font-normal opacity-60">(Optional)</span>
             </label>
             <textarea
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="input resize-none"
-              placeholder="Optional description"
+              className="input text-xs resize-none"
+              placeholder="Brief summary of notes in this notebook"
               rows={2}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
               Icon
             </label>
             <div className="grid grid-cols-8 gap-1.5">
@@ -137,11 +146,12 @@ export default function CreateFolderModal({
                   key={icon}
                   type="button"
                   onClick={() => setFormData({ ...formData, icon })}
-                  className={`p-2 text-lg rounded-lg border ${
-                    formData.icon === icon
-                      ? "border-indigo-500 bg-indigo-500/10"
-                      : "border-neutral-700 hover:border-neutral-600 hover:bg-neutral-800"
-                  }`}
+                  className="p-1.5 text-base rounded-lg border transition-all cursor-pointer flex items-center justify-center"
+                  style={{
+                    background: formData.icon === icon ? "rgba(224, 144, 80, 0.18)" : "var(--bg-elevated)",
+                    borderColor: formData.icon === icon ? "var(--accent)" : "var(--border-subtle)",
+                    transform: formData.icon === icon ? "scale(1.08)" : "none",
+                  }}
                 >
                   {icon}
                 </button>
@@ -150,8 +160,8 @@ export default function CreateFolderModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
-              Color
+            <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
+              Color Tag
             </label>
             <div className="flex flex-wrap gap-2">
               {folderColors.map((color) => (
@@ -159,36 +169,39 @@ export default function CreateFolderModal({
                   key={color}
                   type="button"
                   onClick={() => setFormData({ ...formData, color })}
-                  className={`w-8 h-8 rounded-full border-2 ${
-                    formData.color === color
-                      ? "border-white"
-                      : "border-neutral-700"
-                  }`}
-                  style={{ backgroundColor: color }}
+                  className="w-6 h-6 rounded-full transition-transform cursor-pointer"
+                  style={{
+                    backgroundColor: color,
+                    border: formData.color === color ? "2px solid #ffffff" : "2px solid transparent",
+                    boxShadow: formData.color === color ? "0 0 0 2px " + color : "none",
+                    transform: formData.color === color ? "scale(1.15)" : "none",
+                  }}
                 />
               ))}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-2.5 pt-3">
             <button
               type="button"
               onClick={onClose}
-              className="btn-ghost px-4 py-2"
+              className="btn-secondary text-xs px-4 py-2"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !formData.name.trim()}
-              className="btn-primary px-6 py-2"
+              className="btn-primary text-xs px-5 py-2 font-semibold"
             >
-              {loading ? "Creating..." : "Create"}
+              {loading ? "Creating..." : "Create Folder"}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

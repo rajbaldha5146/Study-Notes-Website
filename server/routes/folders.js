@@ -12,8 +12,29 @@ router.use(authenticateToken);
 // Get all folders for the authenticated user
 router.get('/', async (req, res) => {
   try {
-    const folders = await Folder.find({ user: req.user._id, isTrash: { $ne: true } }).populate('parentFolder').sort({ order: 1, createdAt: -1 });
-    res.json(folders);
+    const folders = await Folder.find({ user: req.user._id, isTrash: { $ne: true } })
+      .populate('parentFolder')
+      .sort({ order: 1, createdAt: -1 });
+
+    const noteCounts = await Note.aggregate([
+      { $match: { user: req.user._id, isTrash: { $ne: true } } },
+      { $group: { _id: '$folder', count: { $sum: 1 } } }
+    ]);
+
+    const countMap = {};
+    noteCounts.forEach(item => {
+      if (item._id) {
+        countMap[item._id.toString()] = item.count;
+      }
+    });
+
+    const foldersWithCount = folders.map(folder => {
+      const obj = folder.toObject();
+      obj.noteCount = countMap[folder._id.toString()] || 0;
+      return obj;
+    });
+
+    res.json(foldersWithCount);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -23,25 +44,47 @@ router.get('/', async (req, res) => {
 router.get('/tree', async (req, res) => {
   try {
     const folders = await Folder.find({ user: req.user._id, isTrash: { $ne: true } }).populate('parentFolder');
-    
-    // Build tree structure
-    const folderMap = {};
-    const rootFolders = [];
-    
-    folders.forEach(folder => {
-      folderMap[folder._id] = { ...folder.toObject(), children: [] };
-    });
-    
-    folders.forEach(folder => {
-      if (folder.parentFolder) {
-        if (folderMap[folder.parentFolder._id]) {
-          folderMap[folder.parentFolder._id].children.push(folderMap[folder._id]);
-        }
-      } else {
-        rootFolders.push(folderMap[folder._id]);
+
+    // Aggregate note counts per folder (excluding trashed notes)
+    const noteCounts = await Note.aggregate([
+      { $match: { user: req.user._id, isTrash: { $ne: true } } },
+      { $group: { _id: '$folder', count: { $sum: 1 } } }
+    ]);
+
+    const countMap = {};
+    noteCounts.forEach(item => {
+      if (item._id) {
+        countMap[item._id.toString()] = item.count;
       }
     });
-    
+
+    // Build tree structure with noteCount included
+    const folderMap = {};
+    const rootFolders = [];
+
+    folders.forEach(folder => {
+      const idStr = folder._id.toString();
+      folderMap[idStr] = {
+        ...folder.toObject(),
+        noteCount: countMap[idStr] || 0,
+        children: []
+      };
+    });
+
+    folders.forEach(folder => {
+      const idStr = folder._id.toString();
+      if (folder.parentFolder) {
+        const parentId = folder.parentFolder._id
+          ? folder.parentFolder._id.toString()
+          : folder.parentFolder.toString();
+        if (folderMap[parentId]) {
+          folderMap[parentId].children.push(folderMap[idStr]);
+        }
+      } else {
+        rootFolders.push(folderMap[idStr]);
+      }
+    });
+
     res.json(rootFolders);
   } catch (error) {
     res.status(500).json({ message: error.message });

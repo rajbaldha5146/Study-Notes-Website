@@ -1,145 +1,151 @@
 import { Link } from "react-router-dom";
 import {
-  FileText, ArrowRight, Folder, Upload, Share2, Search,
-  Sparkles, Lock, Code, GripVertical, Zap, CheckCircle2,
+  ArrowRight, Folder, Upload, Share2, Search,
+  Lock, Code, GripVertical, CheckCircle2, BookOpen,
 } from "lucide-react";
 
 export default function LandingPage() {
   const problems = [
-    { problem: "Notes scattered everywhere?", solution: "One vault for all your markdown notes" },
-    { problem: "Complex tools slowing you down?", solution: "Simple, fast, distraction-free" },
-    { problem: "Can't find what you need?", solution: "Smart search and organization" },
+    { problem: "Notes scattered everywhere?", solution: "One focused vault for all markdown docs" },
+    { problem: "Clunky bloated tools slowing you down?", solution: "Instant keyboard-first writing flow" },
+    { problem: "Can't find critical code or snippets?", solution: "Full-text heading and content search" },
   ];
 
   const features = [
-    { icon: Folder, title: "Smart Folders", description: "Create folders and subfolders. Drag and drop to reorder.", color: "#8b5cf6" },
-    { icon: Code, title: "Markdown Editor", description: "Write in Markdown with live preview and syntax highlighting.", color: "#06b6d4" },
-    { icon: Sparkles, title: "AI Generation", description: "Generate structured note outlines with AI in seconds.", color: "#a78bfa" },
-    { icon: Upload, title: "Bulk Import", description: "Upload multiple .md files at once. Migrate in seconds.", color: "#10b981" },
-    { icon: Share2, title: "Easy Sharing", description: "Share notes or entire folders with a simple link.", color: "#f59e0b" },
-    { icon: BookOpen, title: "Reading Mode", description: "Clean, distraction-free reading with progress tracking.", color: "#22d3ee" },
-    { icon: Search, title: "Fast Search", description: "Search and filter across all your notes instantly.", color: "#8b5cf6" },
-    { icon: GripVertical, title: "Drag & Drop", description: "Reorder folders by dragging. Organize at the speed of thought.", color: "#06b6d4" },
-    { icon: Lock, title: "Private & Secure", description: "Your notes are private by default. JWT-secured authentication.", color: "#f43f5e" },
+    { icon: Folder, title: "Structured Folders", description: "Organize notebooks and nested subfolders with drag-and-drop hierarchy." },
+    { icon: Code, title: "Markdown Studio", description: "Dual split-pane and live preview with instant syntax highlighting." },
+    { icon: BookOpen, title: "Serif Reading Mode", description: "Distraction-free night reading with scroll tracking and Table of Contents." },
+    { icon: Upload, title: "Bulk Markdown Import", description: "Drag and drop entire folders of .md files. Migrate your knowledge in seconds." },
+    { icon: Share2, title: "Seamless Sharing", description: "Create secure public links for single notes or entire folder directories." },
+    { icon: Search, title: "Global Instant Search", description: "Search by note titles, markdown headings, or keywords in milliseconds." },
+    { icon: GripVertical, title: "Visual Reordering", description: "Freely rearrange notes and folders with smooth drag handles." },
+    { icon: Lock, title: "Encrypted & Private", description: "Your notes belong to you. Secure JWT-based isolation." },
   ];
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-base)", color: "var(--text-primary)" }}>
-      {/* Clean subtle background */}
-
-      {/* Navigation */}
+      {/* Top Navigation */}
       <nav
-        className="fixed top-0 w-full z-50"
+        className="fixed top-0 w-full z-50 backdrop-blur-md"
         style={{
-          background: "var(--bg-surface)",
+          background: "rgba(26, 22, 20, 0.85)",
           borderBottom: "1px solid var(--border-subtle)",
         }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex justify-between items-center h-12">
-            <div className="flex items-center gap-2">
+          <div className="flex justify-between items-center h-14">
+            <div className="flex items-center gap-2.5">
               <img
                 src="/logo.png"
                 alt="NoteMaster"
-                className="w-7 h-7 rounded-md object-cover"
+                className="w-7 h-7 rounded-lg object-cover ring-1 ring-[var(--border-default)]"
               />
               <span
-                className="font-semibold text-sm"
-                style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}
+                className="font-bold text-sm tracking-tight"
+                style={{ color: "var(--text-primary)" }}
               >
                 NoteMaster
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <Link
                 to="/login"
-                className="text-sm font-medium transition-colors px-3 py-1.5 rounded-md"
+                className="text-xs sm:text-sm font-medium px-3.5 py-1.5 rounded-lg transition-all"
                 style={{ color: "var(--text-secondary)" }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--bg-elevated)"}
-                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = "var(--text-primary)";
+                  e.currentTarget.style.background = "var(--bg-elevated)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                  e.currentTarget.style.background = "transparent";
+                }}
               >
                 Sign in
               </Link>
               <Link
                 to="/register"
-                className="btn-primary text-sm"
-                style={{ padding: "0.4rem 0.875rem" }}
+                className="btn-primary text-xs sm:text-sm"
+                style={{ padding: "0.45rem 1rem" }}
               >
-                Get started
+                Get Started
               </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative pt-28 pb-20 px-4 sm:px-6" style={{ zIndex: 1 }}>
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
+          {/* Subtle Accent Pill */}
           <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-8"
             style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border-default)",
-              color: "var(--text-secondary)",
+              background: "rgba(224, 144, 80, 0.1)",
+              border: "1px solid rgba(224, 144, 80, 0.25)",
+              color: "var(--accent-light)",
             }}
           >
-            <Sparkles className="h-3 w-3" style={{ color: "var(--blue)" }} />
-            <span>Markdown notes with AI-powered generation</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+            <span>Refined Markdown Vault for Thinkers & Developers</span>
           </div>
 
-          {/* Headline */}
+          {/* Editorial Headline */}
           <h1
-            className="font-bold leading-tight mb-5"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.25rem)", letterSpacing: "-0.03em", color: "var(--text-primary)" }}
+            className="font-extrabold leading-[1.15] mb-6 tracking-tight"
+            style={{
+              fontSize: "clamp(2.25rem, 5.5vw, 3.75rem)",
+              color: "var(--text-primary)",
+              fontFamily: "'Source Serif 4', Georgia, serif",
+            }}
           >
-            Your notes,{" "}
-            <span style={{ color: "var(--blue-light)" }}>organized</span>
-            {" "}and{" "}
-            <span style={{ color: "var(--blue-light)" }}>searchable</span>
+            Your thoughts, <br className="hidden sm:inline" />
+            <span style={{ color: "var(--accent-light)", fontStyle: "italic" }}>beautifully written</span> and remembered.
           </h1>
 
           <p
-            className="text-base sm:text-lg mb-10 max-w-2xl mx-auto"
+            className="text-base sm:text-lg mb-10 max-w-xl mx-auto"
             style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}
           >
-            A clean, fast note-taking app built for developers and writers.
-            Markdown support, AI generation, and smart organization.
+            A warm, distraction-free markdown workspace crafted for extended reading, structured code notes, and friction-free organization.
           </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-14">
+          {/* Action CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
             <Link
               to="/register"
-              className="btn-primary inline-flex items-center justify-center gap-2"
-              style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
+              className="btn-primary inline-flex items-center justify-center gap-2 shadow-lg"
+              style={{ padding: "0.75rem 1.75rem", fontSize: "0.95rem" }}
             >
-              Start for free
+              Open Your Vault
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/login"
               className="btn-secondary inline-flex items-center justify-center gap-2"
-              style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
+              style={{ padding: "0.75rem 1.75rem", fontSize: "0.95rem" }}
             >
-              Sign in
+              Sign In to Notebook
             </Link>
           </div>
 
-          {/* Problem/Solution */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto">
+          {/* Problem vs Solution Strip */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
             {problems.map((item, i) => (
               <div
                 key={i}
-                className="text-left p-4 rounded-lg"
+                className="text-left p-4 rounded-xl transition-all"
                 style={{
-                  background: "var(--bg-elevated)",
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                 }}
               >
-                <p className="text-xs mb-2" style={{ color: "var(--text-muted)" }}>{item.problem}</p>
-                <p className="text-sm font-semibold flex items-center gap-2" style={{ color: "var(--success)" }}>
-                  <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0" />
+                <p className="text-xs mb-2 font-medium" style={{ color: "var(--text-muted)" }}>
+                  {item.problem}
+                </p>
+                <p className="text-sm font-semibold flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: "var(--success)" }} />
                   {item.solution}
                 </p>
               </div>
@@ -150,56 +156,106 @@ export default function LandingPage() {
 
       {/* Features Grid */}
       <section
-        className="relative py-20 px-4 sm:px-6"
-        style={{ borderTop: "1px solid var(--border-subtle)", zIndex: 1 }}
+        className="relative py-24 px-4 sm:px-6"
+        style={{ borderTop: "1px solid var(--border-subtle)" }}
       >
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-16">
             <h2
-              className="font-extrabold mb-4"
-              style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.03em" }}
+              className="font-bold mb-3 tracking-tight"
+              style={{
+                fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: "var(--text-primary)",
+              }}
             >
-              Everything you need
+              Crafted for long-form reading & clarity
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--text-secondary)" }}>
-              Powerful features that help you organize, write, and share effortlessly
+            <p className="text-base max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>
+              No clutter, no AI distractions. Just pure focus on knowledge capture.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {features.map((feature, i) => (
               <div
                 key={i}
-                className="p-6 rounded-xl group transition-all duration-300 cursor-default"
+                className="p-5 rounded-xl transition-all duration-200 card card-hover flex flex-col justify-between"
                 style={{
-                  background: `linear-gradient(135deg, var(--bg-card) 0%, ${feature.color}08 100%)`,
+                  background: "var(--bg-card)",
                   border: "1px solid var(--border-subtle)",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = `${feature.color}30`;
-                  e.currentTarget.style.transform = "translateY(-3px)";
-                  e.currentTarget.style.boxShadow = `0 12px 40px rgba(0,0,0,0.3), 0 0 24px ${feature.color}12`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-subtle)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+              >
+                <div>
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-4"
+                    style={{
+                      background: "rgba(224, 144, 80, 0.12)",
+                      border: "1px solid rgba(224, 144, 80, 0.2)",
+                      color: "var(--accent-light)",
+                    }}
+                  >
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-sm font-bold mb-2 tracking-tight" style={{ color: "var(--text-primary)" }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                    {feature.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Workflow Section */}
+      <section
+        className="relative py-20 px-4 sm:px-6"
+        style={{ borderTop: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <h2
+              className="font-bold mb-3 tracking-tight"
+              style={{
+                fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)",
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: "var(--text-primary)",
+              }}
+            >
+              The 3-Step Workspace
+            </h2>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              Organize once, reference effortlessly forever.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { n: "01", title: "Organize Folders", desc: "Build topical notebooks with custom icons, colors, and subdirectories." },
+              { n: "02", title: "Write in Markdown", desc: "Code, notes, checklists, and rich tables in comfortable warm serif typography." },
+              { n: "03", title: "Share or Present", desc: "Generate clean read-only links or present in full-screen slide deck mode." },
+            ].map((step) => (
+              <div
+                key={step.n}
+                className="p-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)]"
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-200"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center mb-3 font-mono font-bold text-xs"
                   style={{
-                    background: `${feature.color}15`,
-                    border: `1px solid ${feature.color}25`,
+                    background: "rgba(224, 144, 80, 0.12)",
+                    color: "var(--accent-light)",
                   }}
                 >
-                  <feature.icon className="h-5 w-5" style={{ color: feature.color }} />
+                  {step.n}
                 </div>
-                <h3 className="text-base font-bold mb-2" style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-                  {feature.title}
+                <h3 className="text-sm font-bold mb-1.5" style={{ color: "var(--text-primary)" }}>
+                  {step.title}
                 </h3>
-                <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.65 }}>
-                  {feature.description}
+                <p className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  {step.desc}
                 </p>
               </div>
             ))}
@@ -207,64 +263,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Bottom CTA */}
       <section
-        className="relative py-20 px-4 sm:px-6"
-        style={{ borderTop: "1px solid var(--border-subtle)", zIndex: 1 }}
+        className="relative py-20 px-4 sm:px-6 text-center"
+        style={{ borderTop: "1px solid var(--border-subtle)" }}
       >
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="font-extrabold mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.03em" }}>
-              Simple workflow
-            </h2>
-            <p className="text-lg" style={{ color: "var(--text-secondary)" }}>Get started in seconds</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { n: "01", title: "Create folders", desc: "Organize your notes into folders and subfolders" },
-              { n: "02", title: "Write or generate", desc: "Write in Markdown or use AI to generate content" },
-              { n: "03", title: "Share & present", desc: "Share notes with a link or run slideshow mode" },
-            ].map((step) => (
-              <div key={step.n} className="text-center">
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-4"
-                  style={{
-                    background: "var(--bg-elevated)",
-                    border: "1px solid var(--border-default)",
-                  }}
-                >
-                  <span className="text-sm font-bold font-mono" style={{ color: "var(--blue)" }}>{step.n}</span>
-                </div>
-                <h3 className="text-base font-semibold mb-2" style={{ color: "var(--text-primary)" }}>{step.title}</h3>
-                <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.65 }}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section
-        className="relative py-16 px-4 sm:px-6"
-        style={{
-          borderTop: "1px solid var(--border-subtle)",
-          zIndex: 1,
-        }}
-      >
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-bold mb-3" style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
-            Ready to organize your notes?
+        <div className="max-w-xl mx-auto">
+          <h2
+            className="font-bold mb-3 tracking-tight"
+            style={{
+              fontSize: "clamp(1.5rem, 3vw, 2.25rem)",
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              color: "var(--text-primary)",
+            }}
+          >
+            Ready to upgrade your reading & note setup?
           </h2>
-          <p className="text-sm mb-8" style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-            Free to start, no credit card required.
+          <p className="text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
+            Free to start, no cards required.
           </p>
           <Link
             to="/register"
-            className="btn-primary inline-flex items-center gap-2"
-            style={{ padding: "0.625rem 1.5rem", fontSize: "0.9375rem" }}
+            className="btn-primary inline-flex items-center gap-2 text-sm shadow-md"
+            style={{ padding: "0.75rem 1.75rem" }}
           >
-            Create free account
+            Get Started Free
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -272,21 +295,19 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer
-        className="relative py-6 px-4 sm:px-6"
-        style={{ borderTop: "1px solid var(--border-subtle)", zIndex: 1 }}
+        className="py-8 px-4 sm:px-6"
+        style={{ borderTop: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}
       >
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="NoteMaster"
-              className="w-6 h-6 rounded-md object-cover"
-            />
-            <span className="text-sm" style={{ color: "var(--text-muted)" }}>© 2025 NoteMaster</span>
+            <img src="/logo.png" alt="NoteMaster" className="w-5 h-5 rounded object-cover" />
+            <span className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>
+              NoteMaster &copy; {new Date().getFullYear()}
+            </span>
           </div>
-          <div className="flex items-center gap-6 text-sm" style={{ color: "var(--text-muted)" }}>
-            <span>Made for developers and writers</span>
-          </div>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            A handcrafted study & notes environment for developers and authors.
+          </p>
         </div>
       </footer>
     </div>

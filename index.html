@@ -5,11 +5,22 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#1b1f27" />
+    <meta name="theme-color" content="#1a1614" />
     <title>NoteMaster - Smart Note Taking App</title>
-    <meta name="description" content="NoteMaster — A clean, fast markdown note-taking app for developers and writers. Smart folders, AI generation, and easy sharing." />
+    <meta name="description" content="NoteMaster — A clean, fast markdown note-taking app for developers and writers. Smart folders, beautiful reading, and easy sharing." />
+    <script>
+      (function() {
+        try {
+          var isShared = window.location.pathname.startsWith('/share/');
+          var saved = localStorage.getItem('theme');
+          var theme = isShared ? 'light' : (saved || 'dark');
+          document.documentElement.classList.add(theme);
+          document.documentElement.style.backgroundColor = theme === 'light' ? '#f6f5f1' : '#1a1614';
+        } catch(e) {}
+      })();
+    </script>
   </head>
-  <body>
+  <body style="margin: 0; min-height: 100vh;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

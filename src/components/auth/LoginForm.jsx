@@ -27,38 +27,44 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto" style={{ animation: "fade-up 0.4s ease both" }}>
+    <div className="w-full max-w-sm mx-auto animate-fade-in">
       {/* Logo */}
       <div className="text-center mb-8">
         <div className="flex justify-center mb-4">
           <img
             src="/logo.png"
             alt="NoteMaster"
-            className="w-14 h-14 rounded-2xl object-cover"
+            className="w-12 h-12 rounded-xl object-cover shadow-md"
           />
         </div>
-        <h1 className="text-2xl font-extrabold mb-1" style={{ letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
+        <h1
+          className="font-serif text-2xl font-normal tracking-tight mb-1"
+          style={{ color: "var(--text-primary)" }}
+        >
           Welcome back
         </h1>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>Sign in to your account</p>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          Sign in to your notebook
+        </p>
       </div>
 
       {/* Card */}
       <div
         className="p-6 rounded-xl"
         style={{
-          background: "var(--bg-elevated)",
-          border: "1px solid var(--border-default)",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-subtle)",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className="block text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-              Email
+            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-muted)" }}>
+              Email address
             </label>
             <div className="relative">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
                 <Mail className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
               </div>
               <input
@@ -67,33 +73,20 @@ const LoginForm = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm transition-all duration-200"
-                style={{
-                  background: "rgba(26, 37, 64, 0.6)",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-primary)",
-                  outline: "none",
-                }}
+                className="input w-full py-2.5 text-sm"
+                style={{ paddingLeft: "2.75rem", paddingRight: "1rem" }}
                 placeholder="you@example.com"
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--violet)";
-                  e.target.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.15)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border-subtle)";
-                  e.target.style.boxShadow = "none";
-                }}
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+            <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-muted)" }}>
               Password
             </label>
             <div className="relative">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
                 <Lock className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
               </div>
               <input
@@ -102,28 +95,16 @@ const LoginForm = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full pl-10 pr-12 py-3 rounded-xl text-sm transition-all duration-200"
-                style={{
-                  background: "rgba(26, 37, 64, 0.6)",
-                  border: "1px solid var(--border-subtle)",
-                  color: "var(--text-primary)",
-                  outline: "none",
-                }}
+                className="input w-full py-2.5 text-sm"
+                style={{ paddingLeft: "2.75rem", paddingRight: "2.75rem" }}
                 placeholder="••••••••"
-                onFocus={(e) => {
-                  e.target.style.borderColor = "var(--violet)";
-                  e.target.style.boxShadow = "0 0 0 3px rgba(139,92,246,0.15)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "var(--border-subtle)";
-                  e.target.style.boxShadow = "none";
-                }}
               />
               <button
                 type="button"
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors hover:opacity-100 z-10"
                 style={{ color: "var(--text-muted)" }}
                 onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -133,20 +114,30 @@ const LoginForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full flex items-center justify-center gap-2 py-3 mt-2 rounded-xl text-sm"
+            className="btn-primary w-full flex items-center justify-center gap-2 py-2.5 mt-2 text-sm font-medium"
           >
             {loading ? (
-              <><div className="spinner" /> Signing in...</>
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Signing in...
+              </span>
             ) : (
-              <><span>Sign in</span><ArrowRight className="h-4 w-4" /></>
+              <>
+                <span>Sign in</span>
+                <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </button>
         </form>
 
         <div className="mt-5 pt-5 text-center" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-          <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
             Don't have an account?{" "}
-            <Link to="/register" className="font-semibold transition-colors hover:opacity-80" style={{ color: "var(--violet-light)" }}>
+            <Link
+              to="/register"
+              className="font-medium transition-colors hover:underline"
+              style={{ color: "var(--accent)" }}
+            >
               Sign up free
             </Link>
           </span>

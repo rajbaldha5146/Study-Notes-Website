@@ -41,13 +41,15 @@ export function stripMarkdown(md) {
  * @returns {{ words: number, minutes: number, text: string }}
  */
 export function calculateReadingTime(content) {
-  if (!content) return { words: 0, minutes: 1, text: "1 min read" };
+  if (!content) return { words: 0, chars: 0, minutes: 0, text: "0 min read" };
   const plainText = stripMarkdown(content);
   const words = plainText.split(/\s+/).filter(Boolean).length;
+  const chars = content.length;
   const WPM = 200; // Average reading speed
-  const minutes = Math.max(1, Math.ceil(words / WPM));
+  const minutes = words === 0 ? 0 : Math.max(1, Math.ceil(words / WPM));
   return {
     words,
+    chars,
     minutes,
     text: `${minutes} min read`,
   };

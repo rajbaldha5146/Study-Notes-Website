@@ -4,16 +4,20 @@ import { ArrowLeft, Save, Eye, Layout, Columns } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import { getNote, updateNote } from "../services/api";
 import toast from "react-hot-toast";
 import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
 import { calculateReadingTime } from "../utils/markdownHelpers";
 import MarkdownToolbar from "../components/MarkdownToolbar";
-import BookLoader from "../components/BookLoader";
+import ReadingStatsBadge from "../components/ReadingStatsBadge";
+import Loader from "../components/Loader";
+import { useTabs } from "../contexts/TabContext";
 
 export default function EditNote() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { openTab } = useTabs();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -33,6 +37,11 @@ export default function EditNote() {
       setFormData({
         title: note.title,
         content: note.content,
+      });
+      openTab({
+        id: note._id,
+        title: note.title || "Untitled",
+        path: `/app/note/${note._id}`,
       });
     } catch (error) {
       toast.error("Failed to fetch note");
@@ -59,7 +68,12 @@ export default function EditNote() {
         title: sanitizedTitle,
         content: sanitizedContent,
       });
-      toast.success("Note updated!");
+      openTab({
+        id,
+        title: sanitizedTitle,
+        path: `/app/note/${id}`,
+      });
+      toast.success("Note saved!");
       navigate(`/app/note/${id}`);
     } catch (error) {
       console.error("Error updating note:", error);
@@ -78,8 +92,8 @@ export default function EditNote() {
 
   if (initialLoading) {
     return (
-      <div className="flex justify-center items-center h-[60vh]">
-        <BookLoader message="Loading note..." />
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Loader message="Loading editor..." />
       </div>
     );
   }
@@ -88,21 +102,27 @@ export default function EditNote() {
   const charCount = formData.content.length;
 
   return (
-    <div className="page-container py-6">
-      {/* Header */}
+    <div className="page-container py-6 animate-fade-in max-w-5xl">
+      {/* Header with Back and Mode Switcher */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => navigate(`/app/note/${id}`)}
-            className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
+            className="btn-ghost flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
+            <span>Cancel</span>
           </button>
-          <h1 className="text-xl font-semibold text-neutral-100">Edit Note</h1>
+          <h1
+            className="text-lg font-bold tracking-tight"
+            style={{ color: "var(--text-primary)", fontFamily: "'Source Serif 4', Georgia, serif" }}
+          >
+            Edit Note
+          </h1>
         </div>
 
-        {/* View Mode Switches */}
+        {/* View Mode Segmented Control */}
         <div
           className="flex items-center p-1 rounded-lg"
           style={{
@@ -113,14 +133,13 @@ export default function EditNote() {
           <button
             type="button"
             onClick={() => setViewMode("edit")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "edit" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background: viewMode === "edit" ? "var(--blue)" : "transparent",
-              color: viewMode === "edit" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "edit" ? "var(--accent)" : "transparent",
+              color: viewMode === "edit" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "edit" ? "600" : "500",
             }}
-            title="Edit Only"
+            title="Edit mode"
           >
             <Layout className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Edit</span>
@@ -128,14 +147,13 @@ export default function EditNote() {
           <button
             type="button"
             onClick={() => setViewMode("split")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "split" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background: viewMode === "split" ? "var(--blue)" : "transparent",
-              color: viewMode === "split" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "split" ? "var(--accent)" : "transparent",
+              color: viewMode === "split" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "split" ? "600" : "500",
             }}
-            title="Split View"
+            title="Split mode"
           >
             <Columns className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Split</span>
@@ -143,14 +161,13 @@ export default function EditNote() {
           <button
             type="button"
             onClick={() => setViewMode("preview")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "preview" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background: viewMode === "preview" ? "var(--blue)" : "transparent",
-              color: viewMode === "preview" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "preview" ? "var(--accent)" : "transparent",
+              color: viewMode === "preview" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "preview" ? "600" : "500",
             }}
-            title="Preview Only"
+            title="Preview mode"
           >
             <Eye className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Preview</span>
@@ -158,58 +175,39 @@ export default function EditNote() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div className="card p-6">
-          <label className="block text-sm font-medium text-neutral-300 mb-2">
-            Title
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Title Input Card */}
+        <div className="card p-5">
+          <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
+            Note Title
           </label>
           <input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="input"
-            placeholder="Note title"
+            className="input text-xs sm:text-sm font-medium"
+            placeholder="Note title..."
             required
           />
         </div>
 
         {/* Content Editor with Formatting Toolbar */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border-subtle)",
-          }}
-        >
-          {/* Header & Stats */}
+        <div className="card overflow-hidden">
+          {/* Header Bar */}
           <div
-            className="px-6 py-3 flex items-center justify-between"
-            style={{ borderBottom: "1px solid var(--border-subtle)" }}
+            className="px-5 py-3 flex items-center justify-between"
+            style={{ borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}
           >
             <div>
-              <h3
-                className="text-sm font-bold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                Editor
+              <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>
+                Editor Workspace
               </h3>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Markdown supported
-              </p>
             </div>
-            <div
-              className="flex items-center gap-3 text-xs"
-              style={{ color: "var(--text-muted)" }}
-            >
-              <span>{readingTimeStats.words} words</span>
-              <span>•</span>
-              <span>{readingTimeStats.text}</span>
-            </div>
+            <ReadingStatsBadge content={formData.content} />
           </div>
 
-          {/* Markdown Formatting Toolbar */}
+          {/* Formatting Toolbar */}
           <MarkdownToolbar
             textareaRef={textareaRef}
             content={formData.content}
@@ -221,40 +219,43 @@ export default function EditNote() {
           <div
             className={`grid ${
               viewMode === "split" ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"
-            } min-h-[450px]`}
+            } min-h-[460px]`}
           >
-            {/* Editor */}
+            {/* Editor Textarea */}
             {viewMode !== "preview" && (
               <textarea
                 ref={textareaRef}
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[450px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
+                className="w-full h-[460px] p-5 text-xs sm:text-sm resize-none focus:outline-none font-mono leading-relaxed"
                 style={{
                   background: "var(--bg-elevated)",
                   color: "var(--text-primary)",
                   border: "none",
                   fontFamily: "'JetBrains Mono', ui-monospace, monospace",
                 }}
-                placeholder="Write your content here..."
+                placeholder="Write your note content here..."
                 required
               />
             )}
 
-            {/* Preview */}
+            {/* Live Preview Panel */}
             {viewMode !== "edit" && (
               <div
-                className={`p-6 prose max-w-none overflow-auto h-[450px] custom-scrollbar ${
-                  viewMode === "split" ? "border-l border-neutral-700" : ""
+                className={`p-5 prose max-w-none overflow-auto h-[460px] custom-scrollbar ${
+                  viewMode === "split" ? "border-t lg:border-t-0 lg:border-l" : ""
                 }`}
-                style={{ background: "var(--bg-elevated)" }}
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
               >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
+                  rehypePlugins={[rehypeHighlight, rehypeRaw]}
                 >
-                  {formData.content || "*Preview will appear here...*"}
+                  {formData.content || "*Formatted preview appears here in real time...*"}
                 </ReactMarkdown>
               </div>
             )}
@@ -262,27 +263,27 @@ export default function EditNote() {
 
           {/* Status Bar */}
           <div
-            className="px-6 py-2 flex items-center justify-between text-xs"
+            className="px-5 py-2 flex items-center justify-between text-xs font-mono"
             style={{
               background: "var(--bg-surface)",
               borderTop: "1px solid var(--border-subtle)",
               color: "var(--text-muted)",
             }}
           >
-            <span>Markdown Mode</span>
+            <span>Markdown Active</span>
             <div className="flex items-center gap-4">
-              <span>{charCount} characters</span>
+              <span>{charCount} chars</span>
               <span>{readingTimeStats.words} words</span>
             </div>
           </div>
         </div>
 
         {/* Submit */}
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-2">
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary flex items-center gap-2 px-6 py-2.5"
+            className="btn-primary flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold"
           >
             <Save className="h-4 w-4" />
             <span>{loading ? "Saving..." : "Save Changes"}</span>

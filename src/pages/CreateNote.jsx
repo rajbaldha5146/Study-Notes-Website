@@ -8,12 +8,12 @@ import {
   Plus,
   Layout,
   Columns,
-  Maximize2,
-  Sparkles,
+  LayoutTemplate,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import { createNote, getFolders, createFolder } from "../services/api";
 import toast from "react-hot-toast";
 import { useFolders } from "../contexts/FolderContext";
@@ -21,6 +21,7 @@ import { sanitizeMarkdown, sanitizeName } from "../utils/sanitize";
 import { calculateReadingTime } from "../utils/markdownHelpers";
 import { NOTE_TEMPLATES } from "../utils/noteTemplates";
 import MarkdownToolbar from "../components/MarkdownToolbar";
+import ReadingStatsBadge from "../components/ReadingStatsBadge";
 
 export default function CreateNote() {
   const navigate = useNavigate();
@@ -51,8 +52,8 @@ export default function CreateNote() {
       if (foldersData.length === 0) {
         const defaultFolder = await createFolder({
           name: "My Notes",
-          description: "Default folder",
-          color: "#6366f1",
+          description: "Default notebook",
+          color: "#e09050",
           icon: "📝",
         });
         setFolders([defaultFolder]);
@@ -88,7 +89,7 @@ export default function CreateNote() {
     }
 
     if (!formData.folder) {
-      toast.error("Please select a folder");
+      toast.error("Please select a notebook folder");
       return;
     }
 
@@ -147,37 +148,40 @@ export default function CreateNote() {
         content: content,
       }));
       setUploadedFile(file);
-      toast.success("File loaded");
+      toast.success(`Loaded "${file.name}"`);
     };
-
-    reader.onerror = () => toast.error("Error reading file");
     reader.readAsText(file);
   };
 
   const clearUploadedFile = () => {
     setUploadedFile(null);
-    setFormData((prev) => ({ ...prev, content: "" }));
   };
 
   const readingTimeStats = calculateReadingTime(formData.content);
   const charCount = formData.content.length;
 
   return (
-    <div className="page-container py-6">
-      {/* Header */}
+    <div className="page-container py-6 animate-fade-in max-w-5xl">
+      {/* Header & Mode Segmented Switcher */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/app")}
-            className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
+            type="button"
+            onClick={() => navigate(-1)}
+            className="btn-ghost flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Back</span>
           </button>
-          <h1 className="text-xl font-semibold text-neutral-100">Create Note</h1>
+          <h1
+            className="text-lg font-bold tracking-tight"
+            style={{ color: "var(--text-primary)", fontFamily: "'Source Serif 4', Georgia, serif" }}
+          >
+            Create New Note
+          </h1>
         </div>
 
-        {/* View Mode Switches */}
+        {/* View Mode Segmented Control */}
         <div
           className="flex items-center p-1 rounded-lg"
           style={{
@@ -188,15 +192,13 @@ export default function CreateNote() {
           <button
             type="button"
             onClick={() => setViewMode("edit")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "edit" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background:
-                viewMode === "edit" ? "var(--blue)" : "transparent",
-              color: viewMode === "edit" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "edit" ? "var(--accent)" : "transparent",
+              color: viewMode === "edit" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "edit" ? "600" : "500",
             }}
-            title="Edit Only"
+            title="Edit mode"
           >
             <Layout className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Edit</span>
@@ -204,15 +206,13 @@ export default function CreateNote() {
           <button
             type="button"
             onClick={() => setViewMode("split")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "split" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background:
-                viewMode === "split" ? "var(--blue)" : "transparent",
-              color: viewMode === "split" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "split" ? "var(--accent)" : "transparent",
+              color: viewMode === "split" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "split" ? "600" : "500",
             }}
-            title="Split View"
+            title="Split mode"
           >
             <Columns className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Split</span>
@@ -220,15 +220,13 @@ export default function CreateNote() {
           <button
             type="button"
             onClick={() => setViewMode("preview")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-              viewMode === "preview" ? "text-white" : ""
-            }`}
+            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer"
             style={{
-              background:
-                viewMode === "preview" ? "var(--blue)" : "transparent",
-              color: viewMode === "preview" ? "#fff" : "var(--text-muted)",
+              background: viewMode === "preview" ? "var(--accent)" : "transparent",
+              color: viewMode === "preview" ? "#1a1614" : "var(--text-muted)",
+              fontWeight: viewMode === "preview" ? "600" : "500",
             }}
-            title="Preview Only"
+            title="Preview mode"
           >
             <Eye className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Preview</span>
@@ -236,9 +234,9 @@ export default function CreateNote() {
         </div>
       </div>
 
-      {/* Quick Actions & Templates */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="flex flex-wrap gap-2">
+      {/* Action Strip: Reset, Upload, Templates */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
@@ -249,13 +247,17 @@ export default function CreateNote() {
                 folder: folderId || (folders.length > 0 ? folders[0]._id : ""),
               });
             }}
-            className="btn-primary flex items-center gap-2 text-xs"
+            className="btn-secondary flex items-center gap-1.5 text-xs font-medium"
+            style={{ padding: "0.4rem 0.75rem" }}
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>Reset</span>
+            <span>Clear</span>
           </button>
 
-          <label className="btn-secondary flex items-center gap-2 text-xs cursor-pointer">
+          <label
+            className="btn-secondary flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+            style={{ padding: "0.4rem 0.75rem" }}
+          >
             <FileText className="h-3.5 w-3.5" />
             <span>Upload .md</span>
             <input
@@ -269,8 +271,8 @@ export default function CreateNote() {
 
         {/* Templates Selector */}
         <div className="flex items-center gap-2">
-          <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--blue-light)" }} />
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+          <LayoutTemplate className="h-3.5 w-3.5" style={{ color: "var(--accent)" }} />
+          <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
             Template:
           </span>
           <select
@@ -282,8 +284,8 @@ export default function CreateNote() {
             className="px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition-colors"
             style={{
               background: "var(--bg-elevated)",
-              border: "1px solid var(--border-subtle)",
-              color: "var(--text-secondary)",
+              border: "1px solid var(--border-default)",
+              color: "var(--text-primary)",
             }}
           >
             {NOTE_TEMPLATES.map((tmpl) => (
@@ -295,34 +297,41 @@ export default function CreateNote() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* File Status */}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* File Loaded Status Pill */}
         {uploadedFile && (
-          <div className="card p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-emerald-400" />
+          <div
+            className="p-3 rounded-lg flex items-center justify-between border"
+            style={{
+              background: "rgba(124, 179, 128, 0.08)",
+              borderColor: "rgba(124, 179, 128, 0.25)",
+            }}
+          >
+            <div className="flex items-center gap-2.5">
+              <FileText className="h-4 w-4" style={{ color: "var(--success)" }} />
               <div>
-                <p className="text-sm font-medium text-neutral-200">
+                <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
                   {uploadedFile.name}
                 </p>
-                <p className="text-xs text-neutral-500">File loaded</p>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Markdown file loaded</p>
               </div>
             </div>
             <button
               type="button"
               onClick={clearUploadedFile}
-              className="text-sm text-red-400 hover:text-red-300"
+              className="text-xs font-medium hover:underline cursor-pointer"
+              style={{ color: "var(--danger)" }}
             >
               Remove
             </button>
           </div>
         )}
 
-        {/* Basic Info */}
-        <div className="card p-6">
+        {/* Basic Metadata Info */}
+        <div className="card p-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-2">
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
                 Title
               </label>
               <input
@@ -330,26 +339,26 @@ export default function CreateNote() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="input"
-                placeholder="Enter note title..."
+                className="input text-xs sm:text-sm"
+                placeholder="e.g. Distributed Consensus in Raft"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-neutral-300 mb-2">
-                Folder
+              <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-secondary)" }}>
+                Notebook Folder
               </label>
               <select
                 name="folder"
                 value={formData.folder}
                 onChange={handleChange}
-                className="input"
+                className="input text-xs sm:text-sm cursor-pointer"
                 required
                 disabled={loadingFolders}
               >
                 {loadingFolders ? (
-                  <option>Loading...</option>
+                  <option>Loading notebooks...</option>
                 ) : (
                   folders.map((folder) => (
                     <option key={folder._id} value={folder._id}>
@@ -362,41 +371,22 @@ export default function CreateNote() {
           </div>
         </div>
 
-        {/* Content Editor with Formatting Toolbar */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border-subtle)",
-          }}
-        >
-          {/* Header & Markdown Toolbar */}
+        {/* Content Editor & Split Preview Panel */}
+        <div className="card overflow-hidden">
+          {/* Editor Header Bar */}
           <div
-            className="px-6 py-3 flex items-center justify-between"
-            style={{ borderBottom: "1px solid var(--border-subtle)" }}
+            className="px-5 py-3 flex items-center justify-between"
+            style={{ borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-surface)" }}
           >
             <div>
-              <h3
-                className="text-sm font-bold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                Editor
+              <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>
+                Editor Workspace
               </h3>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Markdown supported
-              </p>
             </div>
-            <div
-              className="flex items-center gap-3 text-xs"
-              style={{ color: "var(--text-muted)" }}
-            >
-              <span>{readingTimeStats.words} words</span>
-              <span>•</span>
-              <span>{readingTimeStats.text}</span>
-            </div>
+            <ReadingStatsBadge content={formData.content} />
           </div>
 
-          {/* Markdown Toolbar */}
+          {/* Formatting Toolbar */}
           <MarkdownToolbar
             textareaRef={textareaRef}
             content={formData.content}
@@ -410,7 +400,7 @@ export default function CreateNote() {
               viewMode === "split"
                 ? "grid-cols-1 lg:grid-cols-2"
                 : "grid-cols-1"
-            } min-h-[450px]`}
+            } min-h-[460px]`}
           >
             {/* Textarea Editor */}
             {viewMode !== "preview" && (
@@ -420,24 +410,24 @@ export default function CreateNote() {
                   name="content"
                   value={formData.content}
                   onChange={handleChange}
-                  className="w-full h-[450px] p-6 text-sm resize-none focus:ring-0 focus:outline-none font-mono leading-relaxed"
+                  className="w-full h-[460px] p-5 text-xs sm:text-sm resize-none focus:outline-none font-mono leading-relaxed"
                   style={{
                     background: "var(--bg-elevated)",
                     color: "var(--text-primary)",
                     border: "none",
                     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
                   }}
-                  placeholder={`# Your Note Title
+                  placeholder={`# Note Title
 
-Write your content here...
+Write your structured notes here...
 
-## Section
+## Key Concepts
 
-- Point 1
-- Point 2
+- Concept 1: Description
+- Concept 2: Code reference
 
 \`\`\`javascript
-console.log('Hello!');
+const vault = new NoteVault();
 \`\`\``}
                   required
                 />
@@ -447,16 +437,19 @@ console.log('Hello!');
             {/* Live Preview Panel */}
             {viewMode !== "edit" && (
               <div
-                className={`p-6 prose max-w-none overflow-auto h-[450px] custom-scrollbar ${
-                  viewMode === "split" ? "border-l border-neutral-700" : ""
+                className={`p-5 prose max-w-none overflow-auto h-[460px] custom-scrollbar ${
+                  viewMode === "split" ? "border-t lg:border-t-0 lg:border-l" : ""
                 }`}
-                style={{ background: "var(--bg-elevated)" }}
+                style={{
+                  background: "var(--bg-surface)",
+                  borderColor: "var(--border-subtle)",
+                }}
               >
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
+                  rehypePlugins={[rehypeHighlight, rehypeRaw]}
                 >
-                  {formData.content || "*Preview will appear here...*"}
+                  {formData.content || "*Formatted preview appears here in real time...*"}
                 </ReactMarkdown>
               </div>
             )}
@@ -464,30 +457,30 @@ console.log('Hello!');
 
           {/* Status Bar */}
           <div
-            className="px-6 py-2 flex items-center justify-between text-xs"
+            className="px-5 py-2 flex items-center justify-between text-xs font-mono"
             style={{
               background: "var(--bg-surface)",
               borderTop: "1px solid var(--border-subtle)",
               color: "var(--text-muted)",
             }}
           >
-            <span>Markdown Mode</span>
+            <span>Markdown Active</span>
             <div className="flex items-center gap-4">
-              <span>{charCount} characters</span>
+              <span>{charCount} chars</span>
               <span>{readingTimeStats.words} words</span>
             </div>
           </div>
         </div>
 
-        {/* Submit */}
-        <div className="flex justify-end">
+        {/* Submit Button */}
+        <div className="flex justify-end pt-2">
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary flex items-center gap-2 px-6 py-2.5"
+            className="btn-primary flex items-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-semibold"
           >
             <Save className="h-4 w-4" />
-            <span>{loading ? "Creating..." : "Create Note"}</span>
+            <span>{loading ? "Creating..." : "Save to Notebook"}</span>
           </button>
         </div>
       </form>

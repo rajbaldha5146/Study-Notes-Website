@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { FolderProvider } from "./contexts/FolderContext";
+import { TabProvider } from "./contexts/TabContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -26,7 +27,8 @@ export default function App() {
         <AuthProvider>
           <FolderProvider>
             <Router>
-              <Routes>
+              <TabProvider>
+                <Routes>
                 {/* Public routes */}
                 <Route
                   path="/"
@@ -53,14 +55,10 @@ export default function App() {
                   }
                 />
 
-                {/* Share route - requires authentication */}
+                {/* Public Share route - accessible without login */}
                 <Route
                   path="/share/:shareId"
-                  element={
-                    <ProtectedRoute>
-                      <SharedContentView />
-                    </ProtectedRoute>
-                  }
+                  element={<SharedContentView />}
                 />
 
                 {/* Protected routes with shared layout */}
@@ -120,41 +118,31 @@ export default function App() {
                 toastOptions={{
                   duration: 3500,
                   style: {
-                    background: "rgba(22, 25, 32, 0.95)",
-                    color: "#e2e8f0",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "12px",
-                    padding: "12px 16px",
-                    fontSize: "14px",
+                    background: "var(--bg-elevated)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-default)",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
+                    fontSize: "13px",
                     fontWeight: "500",
-                    boxShadow: "0 12px 32px rgba(0, 0, 0, 0.5)",
-                    backdropFilter: "blur(16px)",
+                    boxShadow: "var(--shadow-modal)",
                   },
                   success: {
-                    style: {
-                      border: "1px solid rgba(63, 185, 80, 0.3)",
-                      background: "rgba(16, 32, 24, 0.95)",
-                      color: "#4ade80",
-                    },
                     iconTheme: {
-                      primary: "#4ade80",
-                      secondary: "#162018",
+                      primary: "var(--success)",
+                      secondary: "var(--bg-elevated)",
                     },
                   },
                   error: {
-                    style: {
-                      border: "1px solid rgba(248, 81, 73, 0.3)",
-                      background: "rgba(35, 16, 18, 0.95)",
-                      color: "#fca5a5",
-                    },
                     iconTheme: {
-                      primary: "#f85149",
-                      secondary: "#231012",
+                      primary: "var(--danger)",
+                      secondary: "var(--bg-elevated)",
                     },
                   },
                 }}
                 limit={4}
               />
+              </TabProvider>
             </Router>
           </FolderProvider>
         </AuthProvider>

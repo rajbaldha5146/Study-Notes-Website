@@ -16,15 +16,12 @@ import {
 
 const router = express.Router();
 
-// Apply authentication to all routes
-router.use(authenticateToken);
-
 /**
  * POST /api/shares
  * Create a share link for a note or folder
  * Requirements: 1.1, 1.2, 1.3, 2.1, 2.4, 2.5
  */
-router.post('/', async (req, res, next) => {
+router.post('/', authenticateToken, async (req, res, next) => {
   try {
     const { type, resourceId } = req.body;
     const userId = req.user._id;
@@ -85,7 +82,7 @@ router.post('/', async (req, res, next) => {
  * NOTE: This route must be defined BEFORE /:shareId to avoid conflicts
  * Requirements: 7.1, 7.2, 7.3, 7.5
  */
-router.get('/resource/:type/:resourceId', validateObjectId('resourceId'), async (req, res, next) => {
+router.get('/resource/:type/:resourceId', authenticateToken, validateObjectId('resourceId'), async (req, res, next) => {
   try {
     const { type, resourceId } = req.params;
     const userId = req.user._id;
@@ -186,7 +183,7 @@ router.get('/:shareId', async (req, res, next) => {
  * Save a copy of shared content to user's account
  * Requirements: 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.6
  */
-router.post('/:shareId/save', async (req, res, next) => {
+router.post('/:shareId/save', authenticateToken, async (req, res, next) => {
   try {
     const { shareId } = req.params;
     const { destinationFolderId } = req.body;
@@ -248,7 +245,7 @@ router.post('/:shareId/save', async (req, res, next) => {
  * Revoke a share (owner only)
  * Requirements: 7.1, 7.2, 7.3, 7.5
  */
-router.delete('/:shareId', async (req, res, next) => {
+router.delete('/:shareId', authenticateToken, async (req, res, next) => {
   try {
     const { shareId } = req.params;
     const userId = req.user._id;

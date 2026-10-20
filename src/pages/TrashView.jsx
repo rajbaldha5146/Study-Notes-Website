@@ -17,7 +17,7 @@ import {
   emptyTrash,
   permanentDeleteNote,
 } from "../services/api";
-import BookLoader from "../components/BookLoader";
+import Loader from "../components/Loader";
 import ConfirmModal from "../components/ConfirmModal";
 import toast from "react-hot-toast";
 
@@ -145,8 +145,8 @@ export default function TrashView() {
 
   if (loading) {
     return (
-      <div className="page-container py-8 flex justify-center items-center h-[60vh]">
-        <BookLoader message="Loading Trash..." />
+      <div className="page-container py-12 flex justify-center items-center min-h-[60vh]">
+        <Loader message="Loading Trash..." />
       </div>
     );
   }
@@ -154,25 +154,32 @@ export default function TrashView() {
   const allSelected = notes.length > 0 && selectedIds.length === notes.length;
 
   return (
-    <div className="page-container py-8" style={{ animation: "fade-up 0.2s ease both" }}>
+    <div className="page-container py-8 animate-fade-in">
       {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/app")}
-            className="btn-ghost flex items-center gap-2 px-3 py-1.5 text-sm"
+            className="btn-ghost flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
+            <span>Dashboard</span>
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <Trash2 className="h-5 w-5 text-red-400" />
-              <h1 className="text-2xl font-bold text-neutral-100">Trash / Recycle Bin</h1>
+              <h1
+                className="text-xl sm:text-2xl font-bold tracking-tight"
+                style={{
+                  color: "var(--text-primary)",
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                }}
+              >
+                Recycle Bin
+              </h1>
               <span className="badge badge-neutral text-xs">{notes.length}</span>
             </div>
-            <p className="text-xs text-neutral-500 mt-1">
-              Items in trash can be restored anytime or deleted permanently.
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              Items in trash can be restored or purged permanently.
             </p>
           </div>
         </div>
@@ -180,9 +187,9 @@ export default function TrashView() {
         {notes.length > 0 && (
           <button
             onClick={handleEmptyTrash}
-            className="btn-danger flex items-center gap-2 text-xs self-start sm:self-auto"
+            className="btn-danger flex items-center gap-2 text-xs font-semibold self-start sm:self-auto"
           >
-            <AlertTriangle className="h-4 w-4" />
+            <AlertTriangle className="h-3.5 w-3.5" />
             <span>Empty Trash</span>
           </button>
         )}
@@ -191,7 +198,7 @@ export default function TrashView() {
       {/* Bulk Action Toolbar */}
       {notes.length > 0 && (
         <div
-          className="p-4 rounded-xl mb-6 flex flex-wrap items-center justify-between gap-4"
+          className="p-3.5 rounded-xl mb-6 flex flex-wrap items-center justify-between gap-4"
           style={{
             background: "var(--bg-surface)",
             border: "1px solid var(--border-subtle)",
@@ -199,13 +206,13 @@ export default function TrashView() {
         >
           <button
             onClick={handleSelectAll}
-            className="flex items-center gap-2 text-sm font-medium transition-colors"
+            className="flex items-center gap-2 text-xs font-medium transition-colors cursor-pointer"
             style={{ color: "var(--text-secondary)" }}
           >
             {allSelected ? (
-              <CheckSquare className="h-4 w-4 text-blue-400" />
+              <CheckSquare className="h-4 w-4" style={{ color: "var(--accent)" }} />
             ) : (
-              <Square className="h-4 w-4" />
+              <Square className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
             )}
             <span>
               {allSelected ? "Deselect All" : "Select All"} ({notes.length})
@@ -214,38 +221,38 @@ export default function TrashView() {
 
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-neutral-400 font-medium mr-2">
+              <span className="text-xs font-medium mr-1 font-mono" style={{ color: "var(--text-muted)" }}>
                 {selectedIds.length} selected
               </span>
               <button
                 onClick={handleBulkRestore}
-                className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+                className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5 font-semibold"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                <span>Restore Selected</span>
+                <span>Restore</span>
               </button>
               <button
                 onClick={handleBulkDelete}
-                className="btn-danger flex items-center gap-1.5 text-xs px-3 py-1.5"
+                className="btn-danger flex items-center gap-1.5 text-xs px-3 py-1.5 font-semibold"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                <span>Delete Permanently</span>
+                <span>Purge</span>
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* Trash Items List */}
+      {/* Trash Note Cards */}
       {notes.length === 0 ? (
         <div className="empty-state">
-          <Trash2 className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
-          <h3 className="empty-state-title">Trash is Empty</h3>
+          <Trash2 className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--text-muted)" }} />
+          <h3 className="empty-state-title">Recycle Bin is Empty</h3>
           <p className="empty-state-description">
-            Deleted notes will appear here so you can restore them anytime.
+            Deleted notes will appear here so you can recover them anytime.
           </p>
-          <Link to="/app" className="btn-primary inline-flex items-center gap-2 text-sm">
-            Go to Vault
+          <Link to="/app" className="btn-primary inline-flex items-center gap-2 text-xs">
+            Return to Dashboard
           </Link>
         </div>
       ) : (
@@ -255,66 +262,73 @@ export default function TrashView() {
             return (
               <div
                 key={note._id}
-                className={`card p-5 transition-all relative group ${
-                  isSelected ? "ring-2 ring-blue-500/50" : ""
-                }`}
+                className="card card-hover p-5 relative group flex flex-col justify-between"
                 style={{
                   background: isSelected ? "var(--bg-elevated)" : "var(--bg-card)",
-                  border: "1px solid var(--border-subtle)",
+                  borderColor: isSelected ? "var(--accent)" : "var(--border-subtle)",
+                  boxShadow: isSelected ? "0 0 0 1px var(--accent)" : "none",
                 }}
               >
-                {/* Top bar with selection checkbox and actions */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <button
-                      onClick={() => handleToggleSelect(note._id)}
-                      className="p-1 text-neutral-400 hover:text-white transition-colors"
-                    >
-                      {isSelected ? (
-                        <CheckSquare className="h-4 w-4 text-blue-400" />
-                      ) : (
-                        <Square className="h-4 w-4" />
-                      )}
-                    </button>
-                    <h3 className="font-bold text-sm text-neutral-100 truncate">
-                      {note.title}
-                    </h3>
+                <div>
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between gap-3 mb-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <button
+                        onClick={() => handleToggleSelect(note._id)}
+                        className="cursor-pointer"
+                        style={{ color: isSelected ? "var(--accent)" : "var(--text-muted)" }}
+                      >
+                        {isSelected ? (
+                          <CheckSquare className="h-4 w-4" />
+                        ) : (
+                          <Square className="h-4 w-4" />
+                        )}
+                      </button>
+                      <h3 className="font-bold text-sm truncate" style={{ color: "var(--text-primary)" }}>
+                        {note.title}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <button
+                        onClick={() => handleSingleRestore(note._id, note.title)}
+                        className="p-1 rounded hover:bg-white/10 transition-colors"
+                        style={{ color: "var(--success)" }}
+                        title="Restore Note"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleSingleDelete(note._id, note.title)}
+                        className="p-1 rounded hover:bg-red-500/10 transition-colors"
+                        style={{ color: "var(--danger)" }}
+                        title="Delete Permanently"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleSingleRestore(note._id, note.title)}
-                      className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-neutral-400 hover:text-emerald-400 transition-colors"
-                      title="Restore Note"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleSingleDelete(note._id, note.title)}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10 text-neutral-400 hover:text-red-400 transition-colors"
-                      title="Delete Permanently"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+                  {/* Excerpt */}
+                  <p
+                    className="text-xs line-clamp-2 mb-4 leading-relaxed"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    {note.content ? note.content.substring(0, 120).replace(/[#*`_]/g, "") : "No content"}
+                  </p>
                 </div>
 
-                {/* Excerpt */}
-                <p className="text-xs line-clamp-2 mb-4" style={{ color: "var(--text-muted)", lineHeight: 1.6 }}>
-                  {note.content ? note.content.substring(0, 120).replace(/[#*`_]/g, "") : "No content"}
-                </p>
-
-                {/* Meta info */}
+                {/* Footer Metadata */}
                 <div
                   className="flex items-center justify-between text-xs pt-3"
-                  style={{ borderTop: "1px solid var(--border-subtle)", color: "var(--text-muted)" }}
+                  style={{ borderTop: "1px solid var(--border-subtle)", color: "var(--text-faint)" }}
                 >
                   {note.folder && (
-                    <span className="badge badge-neutral text-xs">
+                    <span className="badge badge-neutral text-[10px]">
                       {note.folder.icon || "📁"} {note.folder.name}
                     </span>
                   )}
-                  <span className="flex items-center gap-1 text-[11px]">
+                  <span className="flex items-center gap-1 text-[11px] font-mono">
                     <Calendar className="h-3 w-3" />
                     {new Date(note.deletedAt || note.updatedAt).toLocaleDateString()}
                   </span>

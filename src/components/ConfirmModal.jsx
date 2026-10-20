@@ -1,3 +1,5 @@
+import React from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, Trash2, X } from "lucide-react";
 
 export default function ConfirmModal({
@@ -14,68 +16,77 @@ export default function ConfirmModal({
 
   const isDanger = variant === "danger";
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm"
       style={{
         background: "rgba(0, 0, 0, 0.75)",
-        backdropFilter: "blur(8px)",
       }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl p-6 relative shadow-2xl transition-all"
+        className="w-full max-w-md rounded-xl p-6 relative shadow-2xl transition-all"
         style={{
           background: "var(--bg-surface)",
           border: "1px solid var(--border-default)",
-          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.6)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 p-1 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="absolute right-4 top-4 p-1 rounded-lg transition-colors cursor-pointer"
+          style={{ color: "var(--text-muted)" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "var(--text-primary)";
+            e.currentTarget.style.background = "var(--bg-elevated)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--text-muted)";
+            e.currentTarget.style.background = "transparent";
+          }}
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Icon Header */}
         <div className="flex items-center gap-3 mb-4">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{
               background: isDanger
-                ? "rgba(248, 81, 73, 0.15)"
-                : "rgba(74, 158, 255, 0.15)",
+                ? "rgba(217, 91, 78, 0.15)"
+                : "rgba(224, 144, 80, 0.15)",
               border: `1px solid ${
-                isDanger ? "rgba(248, 81, 73, 0.3)" : "rgba(74, 158, 255, 0.3)"
+                isDanger ? "rgba(217, 91, 78, 0.3)" : "rgba(224, 144, 80, 0.3)"
               }`,
             }}
           >
             {isDanger ? (
-              <Trash2 className="h-5 w-5 text-red-400" />
+              <Trash2 className="h-5 w-5" style={{ color: "var(--danger)" }} />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-blue-400" />
+              <AlertTriangle className="h-5 w-5" style={{ color: "var(--accent)" }} />
             )}
           </div>
-          <h3 className="text-lg font-bold text-neutral-100">{title}</h3>
+          <h3 className="text-base font-bold" style={{ color: "var(--text-primary)" }}>
+            {title}
+          </h3>
         </div>
 
         {/* Message */}
         <p
-          className="text-sm mb-6 leading-relaxed"
+          className="text-xs sm:text-sm mb-6 leading-relaxed"
           style={{ color: "var(--text-secondary)" }}
         >
           {message}
         </p>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary text-sm px-4 py-2"
+            className="btn-secondary text-xs font-medium px-4 py-2"
           >
             {cancelText}
           </button>
@@ -87,8 +98,8 @@ export default function ConfirmModal({
             }}
             className={
               isDanger
-                ? "btn-danger text-sm px-4 py-2"
-                : "btn-primary text-sm px-4 py-2"
+                ? "btn-danger text-xs font-semibold px-4 py-2"
+                : "btn-primary text-xs font-semibold px-4 py-2"
             }
           >
             {confirmText}
@@ -97,4 +108,6 @@ export default function ConfirmModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

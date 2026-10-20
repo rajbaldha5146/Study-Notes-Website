@@ -89,8 +89,10 @@ export const getSharedNoteContent = async (shareId) => {
       name: share.owner.name
     },
     content: {
+      _id: note._id.toString(),
       title: note.title,
       content: note.content,
+      episode: note.episode,
       createdAt: note.createdAt
     },
     shareCreatedAt: share.createdAt
@@ -119,8 +121,10 @@ const fetchSubfoldersRecursively = async (folderId, userId) => {
         description: subfolder.description
       },
       notes: notes.map(note => ({
+        _id: note._id.toString(),
         title: note.title,
         content: note.content,
+        episode: note.episode,
         createdAt: note.createdAt
       })),
       subfolders: nestedSubfolders
@@ -169,8 +173,10 @@ export const getSharedFolderContent = async (shareId) => {
         description: folder.description
       },
       notes: notes.map(note => ({
+        _id: note._id.toString(),
         title: note.title,
         content: note.content,
+        episode: note.episode,
         createdAt: note.createdAt
       })),
       subfolders
