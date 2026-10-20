@@ -8,6 +8,7 @@ import {
   Plus,
   Trash2,
   Search,
+  Smartphone,
 } from "lucide-react";
 import { getFolderTree, deleteFolder } from "../services/api";
 import CreateFolderModal from "./CreateFolderModal";
@@ -416,23 +417,42 @@ export default function Sidebar({ isOpen, onClose }) {
               </span>
             </div>
 
-            <Link
-              to="/app/trash"
-              onClick={onClose}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
-              style={{ color: "var(--text-muted)" }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = "var(--danger)";
-                e.currentTarget.style.background = "rgba(217, 91, 78, 0.1)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = "var(--text-muted)";
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              <span>Trash</span>
-            </Link>
+            <div className="flex items-center gap-1">
+              <Link
+                to="/download"
+                onClick={onClose}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors"
+                style={{ color: "var(--accent-light)" }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "var(--bg-elevated)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "transparent";
+                }}
+                title="Download NoteMaster Android Mobile App"
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+                <span className="hidden xl:inline">Mobile App</span>
+              </Link>
+
+              <Link
+                to="/app/trash"
+                onClick={onClose}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
+                style={{ color: "var(--text-muted)" }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = "var(--danger)";
+                  e.currentTarget.style.background = "rgba(217, 91, 78, 0.1)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = "var(--text-muted)";
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Trash</span>
+              </Link>
+            </div>
           </div>
         </div>
       </aside>

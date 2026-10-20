@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight, Folder, Upload, Share2, Search,
-  Lock, Code, GripVertical, CheckCircle2, BookOpen,
+  Lock, Code, GripVertical, CheckCircle2, BookOpen, Smartphone,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -48,6 +48,18 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex items-center gap-2.5">
+              <Link
+                to="/download"
+                className="text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5"
+                style={{
+                  color: "var(--accent-light)",
+                  background: "rgba(224, 144, 80, 0.12)",
+                  border: "1px solid rgba(224, 144, 80, 0.3)",
+                }}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Android App</span>
+              </Link>
               <Link
                 to="/login"
                 className="text-xs sm:text-sm font-medium px-3.5 py-1.5 rounded-lg transition-all"

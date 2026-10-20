@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Plus, Home, LogOut, PanelLeft, ChevronDown, Sun, Moon, Search, Keyboard } from "lucide-react";
+import { Plus, Home, LogOut, PanelLeft, ChevronDown, Sun, Moon, Search, Keyboard, Smartphone } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useState, useEffect, useRef } from "react";
@@ -188,6 +188,22 @@ export default function Navbar({ onToggleSidebar, sidebarOpen, onOpenSpotlight }
                 <span className="hidden sm:inline">New Note</span>
               </Link>
 
+              {/* Mobile App Link */}
+              <Link
+                to="/download"
+                id="nav-mobile-app-link"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                style={{
+                  background: "rgba(224, 144, 80, 0.12)",
+                  border: "1px solid rgba(224, 144, 80, 0.3)",
+                  color: "var(--accent-light)",
+                }}
+                title="Download NoteMaster Android APK"
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+                <span className="hidden lg:inline">Android App</span>
+              </Link>
+
               {/* User Dropdown Trigger */}
               <div className="relative ml-1">
                 <button
@@ -327,6 +343,38 @@ export default function Navbar({ onToggleSidebar, sidebarOpen, onOpenSpotlight }
                             ?
                           </span>
                         </button>
+
+                        {/* Mobile App Download Link in Dropdown */}
+                        <Link
+                          to="/download"
+                          onClick={() => setShowUserMenu(false)}
+                          className="w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg transition-colors cursor-pointer font-medium"
+                          style={{ color: "var(--text-secondary)" }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "var(--bg-hover)";
+                            e.currentTarget.style.color = "var(--text-primary)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.color = "var(--text-secondary)";
+                          }}
+                          role="menuitem"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Smartphone className="h-3.5 w-3.5" style={{ color: "var(--accent)" }} />
+                            <span>Android App (APK)</span>
+                          </div>
+                          <span
+                            className="text-[10px] px-1.5 py-0.5 rounded font-mono uppercase"
+                            style={{
+                              background: "rgba(34, 197, 94, 0.15)",
+                              border: "1px solid rgba(34, 197, 94, 0.3)",
+                              color: "#4ade80",
+                            }}
+                          >
+                            v1.0
+                          </span>
+                        </Link>
 
                         <button
                           onClick={handleLogout}
