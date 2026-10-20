@@ -9,7 +9,10 @@ import {
   Copy,
   Check,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
 import toast from "react-hot-toast";
 
 const APK_BUILD_URL =
@@ -17,6 +20,7 @@ const APK_BUILD_URL =
 
 export default function MobileAppPage() {
   const [copied, setCopied] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(APK_BUILD_URL);
@@ -32,9 +36,9 @@ export default function MobileAppPage() {
     >
       {/* Top Navigation */}
       <header
-        className="sticky top-0 z-40 backdrop-blur-md"
+        className="sticky top-0 z-40 backdrop-blur-md transition-colors"
         style={{
-          background: "rgba(20, 17, 15, 0.85)",
+          background: "var(--bg-surface)",
           borderBottom: "1px solid var(--border-subtle)",
         }}
       >
@@ -56,21 +60,46 @@ export default function MobileAppPage() {
               alt="NoteMaster"
               className="w-6 h-6 rounded-md object-cover ring-1 ring-[var(--border-default)]"
             />
-            <span className="font-bold text-sm tracking-tight hidden sm:inline">
+            <span
+              className="font-bold text-sm tracking-tight hidden sm:inline"
+              style={{ color: "var(--text-primary)" }}
+            >
               NoteMaster Mobile
             </span>
           </div>
 
-          <a
-            href={APK_BUILD_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary text-xs flex items-center gap-1.5"
-            style={{ padding: "0.4rem 0.85rem" }}
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download APK</span>
-          </a>
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 rounded-lg transition-colors cursor-pointer"
+              style={{
+                color: "var(--text-secondary)",
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border-subtle)",
+              }}
+              aria-label="Toggle theme"
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-[var(--accent)]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[var(--accent)]" />
+              )}
+            </button>
+
+            <a
+              href={APK_BUILD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary text-xs flex items-center gap-1.5"
+              style={{ padding: "0.45rem 0.85rem" }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download APK</span>
+            </a>
+          </div>
         </div>
       </header>
 
