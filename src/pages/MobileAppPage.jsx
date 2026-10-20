@@ -5,15 +5,9 @@ import {
   Download,
   QrCode,
   Smartphone,
-  CheckCircle2,
-  Code2,
-  FolderTree,
-  Zap,
-  ShieldCheck,
   ExternalLink,
   Copy,
   Check,
-  Layers,
   Sparkles,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -275,107 +269,6 @@ export default function MobileAppPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Features Highlight */}
-        <div className="mb-16">
-          <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-center mb-8">
-            Why Use the Android Mobile App?
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div
-              className="p-5 rounded-xl transition-all"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{
-                  background: "rgba(224, 144, 80, 0.15)",
-                  color: "var(--accent-light)",
-                }}
-              >
-                <Zap className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm mb-1.5">Infinite Scroll Feed</h4>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Loads 20 notes at a time and automatically fetches the next batch as
-                you read. Effortless browsing across 360+ notes.
-              </p>
-            </div>
-
-            <div
-              className="p-5 rounded-xl transition-all"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{
-                  background: "rgba(59, 130, 246, 0.15)",
-                  color: "#60a5fa",
-                }}
-              >
-                <Code2 className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm mb-1.5">Syntax Highlighting</h4>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Code blocks with colored syntax for JavaScript, Python, C#, and
-                TypeScript, plus a 1-tap clipboard copy button.
-              </p>
-            </div>
-
-            <div
-              className="p-5 rounded-xl transition-all"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{
-                  background: "rgba(168, 85, 247, 0.15)",
-                  color: "#c084fc",
-                }}
-              >
-                <FolderTree className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm mb-1.5">Nested Folders Tree</h4>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Organize subfolders hierarchically with branch indicators. Tap to
-                dive deep and use your phone back gesture to navigate back.
-              </p>
-            </div>
-
-            <div
-              className="p-5 rounded-xl transition-all"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-              }}
-            >
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                style={{
-                  background: "rgba(16, 185, 129, 0.15)",
-                  color: "#34d399",
-                }}
-              >
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm mb-1.5">Real-time Cloud Sync</h4>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                Any note you write, edit, or star on your laptop is synced
-                instantaneously to your phone via our MongoDB API.
-              </p>
             </div>
           </div>
         </div>

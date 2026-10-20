@@ -20,7 +20,7 @@ import TrashView from "./pages/TrashView";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MobileAppPage from "./pages/MobileAppPage";
-import AppDownloadBannerModal from "./components/AppDownloadBannerModal";
+import AppDownloadToast from "./components/AppDownloadToast";
 
 export default function App() {
   return (
@@ -30,7 +30,7 @@ export default function App() {
           <FolderProvider>
             <Router>
               <TabProvider>
-                <AppDownloadBannerModal />
+                <AppDownloadToast />
                 <Routes>
                 {/* Public routes */}
                 <Route
