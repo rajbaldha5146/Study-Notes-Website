@@ -1,93 +1,104 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import toast from "react-hot-toast";
-import { X, Smartphone, ArrowRight } from "lucide-react";
-
-const TOAST_KEY = "notemaster_app_toast_shown_v1";
+import { X, Smartphone, ArrowRight, Download } from "lucide-react";
 
 export default function AppDownloadToast() {
+  const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Don't show toast if already on the download page
-    if (location.pathname === "/download" || location.pathname === "/mobile") return;
+    // Don't show toast if user is already on the download page
+    if (location.pathname === "/download" || location.pathname === "/mobile") {
+      setVisible(false);
+      return;
+    }
 
-    // Check if shown in current session
-    if (sessionStorage.getItem(TOAST_KEY)) return;
+    // Check if dismissed in this browser session
+    const isDismissed = sessionStorage.getItem("notemaster_app_toast_dismissed");
+    if (isDismissed) {
+      return;
+    }
 
-    sessionStorage.setItem(TOAST_KEY, "true");
-
+    // Show toast after 800ms
     const timer = setTimeout(() => {
-      toast.custom(
-        (t) => (
-          <div
-            onClick={() => {
-              toast.dismiss(t.id);
-              navigate("/download");
-            }}
-            className={`flex items-center gap-3 p-3 rounded-xl shadow-2xl cursor-pointer transition-all duration-300 group ${
-              t.visible
-                ? "opacity-100 translate-y-0 scale-100"
-                : "opacity-0 translate-y-2 scale-95"
-            }`}
-            style={{
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border-default)",
-              maxWidth: "360px",
-              boxShadow: "0 12px 32px -4px rgba(0, 0, 0, 0.4)",
-            }}
-          >
-            {/* QR thumbnail */}
-            <div className="w-10 h-10 rounded-lg p-0.5 bg-white flex-shrink-0 flex items-center justify-center shadow-sm">
-              <img
-                src="/notemaster-qr.png"
-                alt="QR"
-                className="w-full h-full object-contain rounded"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-[var(--accent-light)] flex items-center gap-1">
-                  <Smartphone className="w-3.5 h-3.5" />
-                  NoteMaster for Android
-                </span>
-              </div>
-              <p className="text-[11px] truncate text-[var(--text-muted)] mt-0.5">
-                Tap to view QR & download the APK
-              </p>
-            </div>
-
-            {/* Arrow & Close */}
-            <div className="flex items-center gap-1 pl-1">
-              <div className="p-1 rounded text-[var(--accent)] group-hover:translate-x-0.5 transition-transform">
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toast.dismiss(t.id);
-                }}
-                className="p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded transition-colors"
-                aria-label="Dismiss toast"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        ),
-        {
-          duration: 9000,
-          position: "bottom-right",
-        }
-      );
-    }, 1200);
+      setVisible(true);
+    }, 800);
 
     return () => clearTimeout(timer);
-  }, [location.pathname, navigate]);
+  }, [location.pathname]);
 
-  return null;
+  if (!visible) return null;
+
+  const handleDismiss = (e) => {
+    e?.stopPropagation();
+    setVisible(false);
+    sessionStorage.setItem("notemaster_app_toast_dismissed", "true");
+  };
+
+  const handleOpenDownload = () => {
+    handleDismiss();
+    navigate("/download");
+  };
+
+  return (
+    <aside
+      role="status"
+      aria-live="polite"
+      onClick={handleOpenDownload}
+      className="fixed bottom-5 right-5 z-[9999] max-w-sm w-[calc(100vw-2.5rem)] rounded-2xl shadow-2xl p-3.5 flex items-center gap-3.5 cursor-pointer transition-all duration-300 hover:scale-[1.02] border group"
+      style={{
+        background: "var(--bg-elevated)",
+        borderColor: "var(--border-default)",
+        boxShadow: "0 20px 40px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-subtle)",
+      }}
+    >
+      {/* Mini QR code preview */}
+      <div
+        className="w-12 h-12 rounded-xl p-1 flex-shrink-0 flex items-center justify-center shadow-sm"
+        style={{ background: "#ffffff" }}
+      >
+        <img
+          src="/notemaster-qr.png"
+          alt="QR Code"
+          className="w-full h-full object-contain rounded"
+        />
+      </div>
+
+      {/* Info text */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span
+            className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded font-mono"
+            style={{
+              background: "rgba(224, 144, 80, 0.15)",
+              color: "var(--accent-light)",
+            }}
+          >
+            Android App
+          </span>
+          <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
+            v1.0.0
+          </span>
+        </div>
+        <h4 className="text-xs font-bold text-[var(--text-primary)] truncate">
+          NoteMaster Mobile APK
+        </h4>
+        <p className="text-[11px] truncate mt-0.5" style={{ color: "var(--text-muted)" }}>
+          Tap to view QR & install on phone →
+        </p>
+      </div>
+
+      {/* Close button */}
+      <button
+        type="button"
+        onClick={handleDismiss}
+        className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors cursor-pointer flex-shrink-0"
+        title="Dismiss"
+        aria-label="Dismiss notification"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </aside>
+  );
 }
